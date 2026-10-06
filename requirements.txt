@@ -1,0 +1,12 @@
+# Dependencias para generar los entregables del proyecto.
+# Instalar SIEMPRE dentro del entorno virtual del proyecto (.venv), nunca en el pip global:
+#
+#   python -m venv .venv
+#   .venv\Scripts\python -m pip install -r requirements.txt
+#
+python-docx==1.2.0      # informe .docx
+python-pptx==1.0.2      # presentacion .pptx
+matplotlib==3.11.1      # figuras y diagramas
+pillow==12.3.0          # medidas de imagen al maquetar la PPT
+pymupdf==1.28.2         # render de los PDF de revision
+pypdf==6.18.0           # lectura del material del curso en PDF

@@ -1,0 +1,21 @@
+# Entorno virtual del proyecto: se reconstruye con requirements.txt
+.venv/
+
+# Cachés de Python
+__pycache__/
+*.py[cod]
+
+# Temporales de Office al abrir los entregables
+~$*.docx
+~$*.pptx
+
+# Secretos y variables de entorno
+.env
+.env.*
+!.env.example
+
+# Sistema operativo / editores
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

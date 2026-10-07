@@ -5,7 +5,7 @@
 EMPRESA = "Coral Shop S.A.C."
 TITULO = "Plataforma de comercio electrónico para la venta de ropa juvenil personalizable"
 CURSO = "Desarrollo Web Integrado"
-DOCENTE = "Ronald Fernando Medina Cabrera"
+DOCENTE = "Joel Ronald Vilca Chambi"
 CARRERA = "Ingeniería de Software"
 CICLO = "2026"
 GRUPO = "Grupo 1"

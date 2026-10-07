@@ -59,6 +59,7 @@ pecho (4 S, 4 M, 4 L), paga y ve su pedido pasar de PAGADO a ENTREGADO.*
 | D9 | Interfaz en **español**; moneda **S/ (PEN)**; direcciones con departamento, provincia y distrito | ✅ Definida |
 | D10 | El servidor **siempre recalcula** precio y stock; nunca confía en importes enviados por el navegador | ✅ Definida |
 | D11 | **Una sola cuenta para comprar y administrar.** Un administrador también es cliente (jerarquía `ROLE_ADMIN` ⊃ `ROLE_USER`). El login lleva a «Mi cuenta» por defecto; el botón **Admin** del header lleva al login y, tras autenticarse, al panel | ✅ Definida |
+| D12 | **La cuenta se identifica por su correo.** El registro pide nombre, apellido, correo y contraseña (sin nombre de usuario). Migración `V4__user_names_replace_username.sql` | ✅ Definida |
 
 ### D2 — Regla de cantidad: opción A, cantidad libre con escalas
 
@@ -94,7 +95,7 @@ bloqueaban cantidades que el cliente igual podía armar agregando unidades suelt
 
 **Base de datos**
 
-- Todo cambio de esquema es una **migración Flyway nueva** (`V4__…`, `V5__…`); nunca se
+- Todo cambio de esquema es una **migración Flyway nueva** (`V5__…`, `V6__…`); nunca se
   edita una migración ya aplicada.
 - `snake_case`; dinero en `NUMERIC(12,2)`; fechas en `TIMESTAMPTZ`.
 
@@ -119,7 +120,7 @@ bloqueaban cantidades que el cliente igual podía armar agregando unidades suelt
 | Fase | Objetivo | Depende de | Resultado visible |
 |---|---|---|---|
 | **0** | Ordenar la casa: limpieza, español, S/, capas en el backend | — | Código limpio, catálogo en capas |
-| **1** | Modelo de datos del negocio (migración V4) | 0 | Tablas de personalización, mayoreo y pedidos |
+| **1** | Modelo de datos del negocio (migración V5) | 0 | Tablas de personalización, mayoreo y pedidos |
 | **2** | API del flujo de compra | 1 | Cotizar, subir diseño, crear pedido, pagar (simulado), admin de pedidos |
 | **3** | Frontend del flujo de compra | 2 | Personalizador, carrito, checkout, confirmación, «Mis pedidos» |
 | **4** | Evento de dominio `OrderStatusChanged` | 2 | Notificaciones al cliente y auditoría |
@@ -191,11 +192,12 @@ usa `JdbcTemplate`; los endpoints actuales responden igual que antes.
 ## Fase 1 — Modelo de datos del negocio
 
 **Objetivo:** que la base de datos soporte personalización, mayoreo, pedidos, pagos y
-seguimiento. Se entrega como `backend/src/main/resources/db/migration/V4__negocio_personalizacion.sql`
-(más `V5` para datos semilla si se separan). La `V3` ya existe: retira las columnas de CJ.
+seguimiento. Se entrega como `backend/src/main/resources/db/migration/V5__negocio_personalizacion.sql`
+(más `V6` para datos semilla si se separan). Ya existen la `V3` (retira las columnas de CJ)
+y la `V4` (nombre y apellido en lugar de nombre de usuario).
 
 > `orders` y `order_items` existen desde la V1, pero ningún flujo los usa todavía y
-> están vacías; la V4 puede **recrearlas** con la estructura definitiva.
+> están vacías; la V5 puede **recrearlas** con la estructura definitiva.
 
 ### 1.1 Catálogo
 
@@ -242,7 +244,7 @@ PENDIENTE_PAGO ──pago aprobado──► PAGADO ──► EN_PRODUCCION ─�
 
 ### 1.6 Tareas
 
-- [ ] Escribir `V4__negocio_personalizacion.sql` con las tablas y restricciones anteriores.
+- [ ] Escribir `V5__negocio_personalizacion.sql` con las tablas y restricciones anteriores.
 - [ ] Semilla: tipos, técnicas, zonas, `product_type_zones` con recargos, escalas de
       mayoreo y métodos de envío.
 - [ ] Asignar `product_type_id` a los productos existentes.
@@ -250,7 +252,7 @@ PENDIENTE_PAGO ──pago aprobado──► PAGADO ──► EN_PRODUCCION ─�
       diagramas ER del entregable 2).
 - [ ] Diagrama ER actualizado (`python scripts/figuras.py`).
 
-**Hecho cuando:** el backend arranca, Flyway aplica la V4 sin errores y JPA valida el
+**Hecho cuando:** el backend arranca, Flyway aplica la V5 sin errores y JPA valida el
 esquema (`ddl-auto=validate`).
 
 ---

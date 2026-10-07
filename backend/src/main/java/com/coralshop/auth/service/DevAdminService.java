@@ -29,15 +29,16 @@ public class DevAdminService {
     }
 
     @Transactional
-    public void ensureAdmin(String username, String email, String password) {
+    public void ensureAdmin(String firstName, String lastName, String email, String password) {
         String normalizedEmail = email.trim().toLowerCase(Locale.ROOT);
-        if (userRepository.existsByUsername(username) || userRepository.existsByEmailIgnoreCase(normalizedEmail)) {
-            log.info("Administrador de desarrollo '{}' ya existe; no se modifica", username);
+        if (userRepository.existsByEmailIgnoreCase(normalizedEmail)) {
+            log.info("Administrador de desarrollo {} ya existe; no se modifica", normalizedEmail);
             return;
         }
         Role adminRole = roleRepository.findByName("ROLE_ADMIN")
                 .orElseThrow(() -> new IllegalStateException("Falta el rol ROLE_ADMIN en la base de datos"));
-        userRepository.save(new User(adminRole, username, normalizedEmail, passwordEncoder.encode(password)));
-        log.info("Administrador de desarrollo '{}' creado ({})", username, normalizedEmail);
+        userRepository.save(new User(adminRole, firstName, lastName, normalizedEmail,
+                passwordEncoder.encode(password)));
+        log.info("Administrador de desarrollo {} creado", normalizedEmail);
     }
 }

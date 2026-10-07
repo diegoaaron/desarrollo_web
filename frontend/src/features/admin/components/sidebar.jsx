@@ -13,6 +13,7 @@ import {
   Users,
   X,
 } from "lucide-react";
+import { fullName } from "../../auth/model/account-name";
 
 const MENU_ITEMS = [
   { name: "Resumen", path: "/admin", icon: LayoutDashboard },
@@ -164,7 +165,7 @@ export function Sidebar({ mobileOpen, onMobileClose }) {
 
         <div className={`border-t border-white/8 p-4 ${collapsed ? "lg:px-3" : ""}`}>
           <p className={`mb-2 truncate px-3.5 text-xs text-slate-400 ${collapsed ? "lg:sr-only" : ""}`}>
-            Sesión iniciada como <span className="font-semibold text-white">{account?.username}</span>
+            Sesión iniciada como <span className="font-semibold text-white">{fullName(account)}</span>
           </p>
           {signOutError ? <p role="alert" className="mb-2 px-3.5 text-xs text-red-300">{signOutError}</p> : null}
           <Link

@@ -36,10 +36,11 @@ public class StatsRepository {
 
     public List<RecentOrder> recentOrders(int limit) {
         return jdbc.query("""
-                SELECT o.id, u.username, o.total_amount, o.status, o.created_at
+                SELECT o.id, btrim(u.first_name || ' ' || u.last_name) AS customer_name,
+                       o.total_amount, o.status, o.created_at
                 FROM orders o JOIN users u ON u.id = o.user_id
                 ORDER BY o.created_at DESC LIMIT ?
-                """, (rs, row) -> new RecentOrder(rs.getLong("id"), rs.getString("username"),
+                """, (rs, row) -> new RecentOrder(rs.getLong("id"), rs.getString("customer_name"),
                 rs.getBigDecimal("total_amount"), rs.getString("status"),
                 rs.getObject("created_at", OffsetDateTime.class)), limit);
     }

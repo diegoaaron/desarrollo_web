@@ -79,7 +79,7 @@ export function Orders() {
                   <div className="flex items-start justify-between gap-4">
                     <div>
                       <p className="font-black text-slate-950">Pedido #{order.id}</p>
-                      <p className="mt-1 text-sm font-semibold text-slate-500">{order.username}</p>
+                      <p className="mt-1 text-sm font-semibold text-slate-500">{order.customerName}</p>
                     </div>
                     <AdminBadge value={order.status} />
                   </div>
@@ -125,7 +125,7 @@ export function Orders() {
                   {filteredOrders.map((order) => (
                     <tr key={order.id} className="transition-colors hover:bg-[#fffaf7]">
                       <td className="px-6 py-4 text-sm font-black text-slate-900">#{order.id}</td>
-                      <td className="px-6 py-4 text-sm font-semibold text-slate-600">{order.username}</td>
+                      <td className="px-6 py-4 text-sm font-semibold text-slate-600">{order.customerName}</td>
                       <td className="px-6 py-4 text-sm font-black text-slate-900">{formatPrice(order.totalAmount)}</td>
                       <td className="px-6 py-4"><AdminBadge value={order.status} /></td>
                       <td className="px-6 py-4 text-sm text-slate-500">{formatAdminDate(order.createdAt)}</td>

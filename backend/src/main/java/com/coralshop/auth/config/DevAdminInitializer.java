@@ -17,22 +17,25 @@ import org.springframework.stereotype.Component;
 public class DevAdminInitializer implements ApplicationRunner {
 
     private final DevAdminService devAdminService;
-    private final String username;
+    private final String firstName;
+    private final String lastName;
     private final String email;
     private final String password;
 
     public DevAdminInitializer(DevAdminService devAdminService,
-                               @Value("${app.dev-admin.username}") String username,
+                               @Value("${app.dev-admin.first-name}") String firstName,
+                               @Value("${app.dev-admin.last-name}") String lastName,
                                @Value("${app.dev-admin.email}") String email,
                                @Value("${app.dev-admin.password}") String password) {
         this.devAdminService = devAdminService;
-        this.username = username;
+        this.firstName = firstName;
+        this.lastName = lastName;
         this.email = email;
         this.password = password;
     }
 
     @Override
     public void run(ApplicationArguments args) {
-        devAdminService.ensureAdmin(username, email, password);
+        devAdminService.ensureAdmin(firstName, lastName, email, password);
     }
 }

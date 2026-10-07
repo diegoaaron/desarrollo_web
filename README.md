@@ -194,16 +194,17 @@ La configuración **Backend** arranca con el perfil de desarrollo (`SPRING_PROFI
 que **crea automáticamente un administrador** la primera vez que el backend se levanta
 sobre una base nueva:
 
-| Campo | Valor |
+| Correo | Contraseña |
 |---|---|
-| Correo (para iniciar sesión) | `diego@diego.com` |
-| Usuario | `diego` |
-| Contraseña | `diego989` |
+| `diego@diego.com` | `diego989` |
+
+Las cuentas se identifican por su **correo**; el registro pide nombre, apellido, correo y
+contraseña.
 
 1. Entra a <http://localhost:5173/login> con esas credenciales.
 2. El login te lleva al panel: <http://localhost:5173/admin>.
 
-> Si ya existía una cuenta con ese usuario o correo, el backend **no la modifica** (conserva
+> Si ya existía una cuenta con ese correo, el backend **no la modifica** (conserva
 > su contraseña y su rol). Las credenciales están en
 > `backend/src/main/resources/application-dev.properties` y solo valen en local: en
 > Railway el perfil `dev` no está activo y este usuario no se crea.
@@ -213,7 +214,7 @@ sobre una base nueva:
 (rol id 1), desde la ventana *Database* de IntelliJ o con:
 
 ```powershell
-docker exec -it coralshop-db psql -U coralshop -d coralshop -c "UPDATE users SET role_id = 1 WHERE username = 'TU_USUARIO';"
+docker exec -it coralshop-db psql -U coralshop -d coralshop -c "UPDATE users SET role_id = 1 WHERE email = 'correo@ejemplo.pe';"
 ```
 
 Luego cierra sesión y vuelve a entrar.

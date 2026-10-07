@@ -17,7 +17,7 @@ export async function registerUser(details) {
 
   if (!response.ok) {
     if (response.status === 409) {
-      throw new Error("Ese correo o nombre de usuario ya está registrado.");
+      throw new Error("Ese correo ya está registrado.");
     }
     if (response.status === 400) {
       throw new Error("Revisa tus datos e inténtalo de nuevo.");

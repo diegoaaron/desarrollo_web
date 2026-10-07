@@ -9,6 +9,7 @@ import {
   useCategories,
 } from "../../features/categories/hooks/use-categories";
 import { MobileMenu } from "./mobile-menu";
+import { fullName, initial } from "../../features/auth/model/account-name";
 
 export function Header() {
   const { account, checking } = useAuth();
@@ -128,11 +129,11 @@ export function Header() {
                 <Link
                   to={accountPath}
                   className={`grid h-10 w-10 place-items-center rounded-full transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff5331] ${account ? "bg-[#ff5331] text-white hover:bg-[#e94727]" : "text-slate-700 hover:bg-stone-100"}`}
-                  aria-label={account ? `Abrir la cuenta de ${account.username}` : "Iniciar sesión"}
+                  aria-label={account ? `Abrir la cuenta de ${fullName(account)}` : "Iniciar sesión"}
                 >
                   {account ? (
                     <span aria-hidden="true" className="text-base font-bold uppercase">
-                      {account.username.trim().charAt(0)}
+                      {initial(account)}
                     </span>
                   ) : <User aria-hidden="true" />}
                 </Link>

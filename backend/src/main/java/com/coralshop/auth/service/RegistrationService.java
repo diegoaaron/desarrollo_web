@@ -31,30 +31,31 @@ public class RegistrationService {
 
     @Transactional
     public RegisterResponse register(RegisterRequest request) {
-        String username = request.username().trim();
+        String firstName = request.firstName().trim();
+        String lastName = request.lastName().trim();
         String email = request.email().trim().toLowerCase(Locale.ROOT);
 
-        if (username.length() < 3) {
-            throw new InvalidRequestException("El usuario debe tener al menos 3 caracteres");
+        if (firstName.isEmpty() || lastName.isEmpty()) {
+            throw new InvalidRequestException("Ingresa tu nombre y tu apellido");
         }
         // BCrypt solo utiliza los primeros 72 bytes; rechazar el resto evita truncar contraseñas.
         if (request.password().getBytes(StandardCharsets.UTF_8).length > 72) {
             throw new InvalidRequestException("La contraseña es demasiado larga");
         }
-        if (userRepository.existsByEmailIgnoreCase(email) || userRepository.existsByUsername(username)) {
-            throw new ConflictException("El correo o usuario ya está registrado");
+        if (userRepository.existsByEmailIgnoreCase(email)) {
+            throw new ConflictException("El correo ya está registrado");
         }
 
         Role userRole = roleRepository.findByName("ROLE_USER")
                 .orElseThrow(() -> new IllegalStateException("Falta el rol ROLE_USER en la base de datos"));
 
-        User user = new User(userRole, username, email, passwordEncoder.encode(request.password()));
+        User user = new User(userRole, firstName, lastName, email, passwordEncoder.encode(request.password()));
         try {
             User saved = userRepository.saveAndFlush(user);
-            return new RegisterResponse(saved.getId(), saved.getUsername(), saved.getEmail());
+            return new RegisterResponse(saved.getId(), saved.getFirstName(), saved.getLastName(), saved.getEmail());
         } catch (DataIntegrityViolationException exception) {
             // La restricción UNIQUE también protege si dos solicitudes llegan al mismo tiempo.
-            throw new ConflictException("El correo o usuario ya está registrado", exception);
+            throw new ConflictException("El correo ya está registrado", exception);
         }
     }
 }

@@ -2,6 +2,7 @@ import { ArrowLeft, Heart, LogOut, Mail, ShieldCheck, UserRound } from "lucide-r
 import { useState } from "react";
 import { Link, Navigate, useNavigate } from "react-router";
 import { useAuth } from "../../features/auth/hooks/use-auth";
+import { fullName } from "../../features/auth/model/account-name";
 
 export function AccountPage() {
   const { account, checking, error: sessionError, signOut } = useAuth();
@@ -39,7 +40,7 @@ export function AccountPage() {
         <div className="mt-8 flex flex-wrap items-center justify-between gap-4">
           <div>
             <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#e94727]">Tu espacio</p>
-            <h1 className="mt-2 text-3xl font-semibold text-slate-950 sm:text-4xl">Hola, {account.username}</h1>
+            <h1 className="mt-2 text-3xl font-semibold text-slate-950 sm:text-4xl">Hola, {account.firstName}</h1>
             <p className="mt-2 text-slate-600">Los datos de tu cuenta y tus prendas guardadas, todo en un solo lugar.</p>
           </div>
           <div className="flex flex-wrap gap-3">
@@ -75,8 +76,8 @@ export function AccountPage() {
             </div>
             <dl className="space-y-5">
               <div>
-                <dt className="text-xs font-bold uppercase tracking-wider text-slate-400">Nombre de usuario</dt>
-                <dd className="mt-1 font-medium text-slate-900">{account.username}</dd>
+                <dt className="text-xs font-bold uppercase tracking-wider text-slate-400">Nombre</dt>
+                <dd className="mt-1 font-medium text-slate-900">{fullName(account)}</dd>
               </div>
               <div>
                 <dt className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-400">

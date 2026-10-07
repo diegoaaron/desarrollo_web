@@ -196,7 +196,7 @@ export function MobileMenu({ cartItemCount, onClose }) {
               isActive={isCurrentPath(accountPath)}
               onClick={onClose}
             >
-              {account ? account.username : "Iniciar sesión"}
+              {account ? account.firstName : "Iniciar sesión"}
             </MobileNavLink>
             {showAdminLink ? (
               <MobileNavLink

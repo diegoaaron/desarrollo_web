@@ -9,6 +9,7 @@ import {
 } from "../components/admin-ui";
 import { ROLE_LABELS, formatAdminDate, selectStyles } from "../components/admin-styles";
 import { useUsers } from "../hooks/use-users";
+import { fullName } from "../../auth/model/account-name";
 
 const SKELETONS = Array.from({ length: 5 }, (_, index) => index);
 
@@ -61,7 +62,7 @@ export function Users() {
                 <article key={user.id} className="p-5 sm:p-6">
                   <div className="flex items-start justify-between gap-4">
                     <div className="min-w-0">
-                      <p className="truncate font-black text-slate-950">{user.username}</p>
+                      <p className="truncate font-black text-slate-950">{fullName(user)}</p>
                       <p className="mt-1 truncate text-sm text-slate-500">{user.email}</p>
                     </div>
                     <RoleBadge role={user.roleName} />
@@ -72,7 +73,7 @@ export function Users() {
                       <p className="mt-1 text-sm font-bold text-slate-600">{formatAdminDate(user.createdAt)}</p>
                     </div>
                     <div>
-                      <label className="sr-only" htmlFor={`user-${user.id}-role`}>Actualizar el rol de {user.username}</label>
+                      <label className="sr-only" htmlFor={`user-${user.id}-role`}>Actualizar el rol de {fullName(user)}</label>
                       <select
                         id={`user-${user.id}-role`}
                         value={user.roleId}
@@ -104,12 +105,12 @@ export function Users() {
                   {users.map((user) => (
                     <tr key={user.id} className="transition-colors hover:bg-[#fffaf7]">
                       <td className="px-6 py-4 text-xs font-bold text-slate-400">#{user.id}</td>
-                      <td className="px-6 py-4 text-sm font-black text-slate-900">{user.username}</td>
+                      <td className="px-6 py-4 text-sm font-black text-slate-900">{fullName(user)}</td>
                       <td className="px-6 py-4 text-sm text-slate-500">{user.email}</td>
                       <td className="px-6 py-4"><RoleBadge role={user.roleName} /></td>
                       <td className="px-6 py-4 text-sm text-slate-500">{formatAdminDate(user.createdAt)}</td>
                       <td className="px-6 py-4 text-right">
-                        <label className="sr-only" htmlFor={`desktop-user-${user.id}-role`}>Actualizar el rol de {user.username}</label>
+                        <label className="sr-only" htmlFor={`desktop-user-${user.id}-role`}>Actualizar el rol de {fullName(user)}</label>
                         <select
                           id={`desktop-user-${user.id}-role`}
                           value={user.roleId}

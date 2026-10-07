@@ -21,7 +21,8 @@ export function RegisterPage() {
 
     try {
       const user = await registerUser({
-        username: form.get("username").trim(),
+        firstName: form.get("firstName").trim(),
+        lastName: form.get("lastName").trim(),
         email: form.get("email").trim(),
         password: form.get("password"),
       });
@@ -54,7 +55,7 @@ export function RegisterPage() {
               Cuenta creada
             </span>
             <h1 className="mt-5 text-3xl font-semibold tracking-tight text-slate-950">
-              Te damos la bienvenida a Coral, {registeredUser.username}.
+              Te damos la bienvenida a Coral, {registeredUser.firstName}.
             </h1>
             <p className="mt-4 leading-7 text-slate-600">
               Tu cuenta se guardó correctamente. Inicia sesión para acceder a ella.
@@ -87,13 +88,24 @@ export function RegisterPage() {
             ) : null}
 
             <form onSubmit={handleSubmit} className="space-y-5">
-              <div>
-                <label htmlFor="register-username" className="mb-2 block text-sm font-semibold text-slate-700">
-                  Nombre de usuario
-                </label>
-                <div className="relative">
-                  <UserRound className="pointer-events-none absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" aria-hidden="true" />
-                  <input id="register-username" name="username" type="text" autoComplete="username" minLength={3} maxLength={80} required className={inputStyles} placeholder="Tu nombre de usuario" />
+              <div className="grid gap-5 sm:grid-cols-2">
+                <div>
+                  <label htmlFor="register-first-name" className="mb-2 block text-sm font-semibold text-slate-700">
+                    Nombre
+                  </label>
+                  <div className="relative">
+                    <UserRound className="pointer-events-none absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" aria-hidden="true" />
+                    <input id="register-first-name" name="firstName" type="text" autoComplete="given-name" maxLength={80} required className={inputStyles} placeholder="Tu nombre" />
+                  </div>
+                </div>
+                <div>
+                  <label htmlFor="register-last-name" className="mb-2 block text-sm font-semibold text-slate-700">
+                    Apellido
+                  </label>
+                  <div className="relative">
+                    <UserRound className="pointer-events-none absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" aria-hidden="true" />
+                    <input id="register-last-name" name="lastName" type="text" autoComplete="family-name" maxLength={80} required className={inputStyles} placeholder="Tu apellido" />
+                  </div>
                 </div>
               </div>
 

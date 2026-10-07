@@ -25,8 +25,11 @@ public class User {
     @JoinColumn(name = "role_id", nullable = false)
     private Role role;
 
-    @Column(nullable = false, unique = true, length = 80)
-    private String username;
+    @Column(name = "first_name", nullable = false, length = 80)
+    private String firstName;
+
+    @Column(name = "last_name", nullable = false, length = 80)
+    private String lastName;
 
     @Column(nullable = false, length = 255)
     private String email;
@@ -49,9 +52,10 @@ public class User {
         // JPA necesita un constructor sin argumentos.
     }
 
-    public User(Role role, String username, String email, String passwordHash) {
+    public User(Role role, String firstName, String lastName, String email, String passwordHash) {
         this.role = role;
-        this.username = username;
+        this.firstName = firstName;
+        this.lastName = lastName;
         this.email = email;
         this.passwordHash = passwordHash;
     }
@@ -64,8 +68,12 @@ public class User {
         return role;
     }
 
-    public String getUsername() {
-        return username;
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
     }
 
     public String getEmail() {

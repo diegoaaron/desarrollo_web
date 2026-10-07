@@ -30,12 +30,20 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, ObjectMapper objectMapper,
                                                     AuthService authService) throws Exception {
+        // El orden importa: gana la primera regla que coincide. Las rutas de cliente bajo
+        // /api/orders van antes que la regla de administrador /api/orders/**.
         http.authorizeHttpRequests(auth -> auth
                 .requestMatchers(HttpMethod.GET, "/api/health", "/api/auth/csrf",
-                        "/api/products", "/api/products/*", "/api/categories", "/api/brands").permitAll()
-                .requestMatchers(HttpMethod.POST, "/api/auth/register", "/api/auth/login").permitAll()
+                        "/api/products", "/api/products/*", "/api/products/*/customization-options",
+                        "/api/categories", "/api/brands", "/api/product-types", "/api/shipping-methods").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/auth/register", "/api/auth/login", "/api/quotes").permitAll()
                 .requestMatchers("/api/auth/me").authenticated()
-                // Escritura de categorías, usuarios y pedidos: rutas que completa la fase 2.
+                // Cliente (ROLE_USER; un administrador también lo cumple, D11).
+                .requestMatchers(HttpMethod.GET, "/api/orders/me", "/api/orders/me/*").hasRole("USER")
+                .requestMatchers(HttpMethod.POST, "/api/orders", "/api/orders/*/payment").hasRole("USER")
+                .requestMatchers("/api/addresses", "/api/addresses/**", "/api/designs", "/api/designs/**")
+                        .hasRole("USER")
+                // Administración.
                 .requestMatchers("/api/admin/**", "/api/stats/**", "/api/users/**", "/api/orders/**",
                         "/api/categories/**").hasRole("ADMIN")
                 .anyRequest().authenticated()

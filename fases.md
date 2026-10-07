@@ -358,26 +358,26 @@ Cuerpo de ejemplo de `POST /api/orders`:
     ]
   }],
   "addressId": 7,
-  "shippingMethodCode": "LIMA",
+  "shippingMethodCode": "LIMA_METROPOLITANA",
   "customerNote": "Logo centrado"
 }
 ```
 
 ### 2.3 Tareas
 
-- [ ] Módulo `customization`: repositorios, `CustomizationService`, endpoint de opciones.
-- [ ] Módulo `design`: subida *multipart* (`spring.servlet.multipart.max-file-size=5MB`),
+- [x] Módulo `customization`: repositorios, `CustomizationService`, endpoint de opciones.
+- [x] Módulo `design`: subida *multipart* (`spring.servlet.multipart.max-file-size=5MB`),
       validación del tipo real del archivo (cabecera PNG/JPG, no solo la extensión), hash
       SHA-256.
-- [ ] `PricingService` + `QuantityPolicy` + `POST /api/quotes`.
-- [ ] Módulo `order`: `OrderService`, `OrderStatusPolicy`, repositorios, endpoints de
+- [x] `PricingService` + `QuantityPolicy` + `POST /api/quotes`.
+- [x] Módulo `order`: `OrderService`, `OrderStatusPolicy`, repositorios, endpoints de
       cliente y de admin.
-- [ ] Módulo `payment`: interfaz `PaymentGateway`, `SimulatedPaymentGateway`, endpoint de
+- [x] Módulo `payment`: interfaz `PaymentGateway`, `SimulatedPaymentGateway`, endpoint de
       pago.
-- [ ] Módulo `address` y métodos de envío.
-- [ ] Completar `users` y `categories` (admin) y la edición de productos.
-- [ ] Catálogo con filtros y paginación en el servidor.
-- [ ] Actualizar `SecurityConfig` con las nuevas rutas y roles. Las rutas de cliente
+- [x] Módulo `address` y métodos de envío.
+- [x] Completar `users` y `categories` (admin) y la edición de productos.
+- [x] Catálogo con filtros y paginación en el servidor.
+- [x] Actualizar `SecurityConfig` con las nuevas rutas y roles. Las rutas de cliente
       (`/api/orders/me/**`, `/api/addresses/**`, `/api/designs/**`) exigen `ROLE_USER`, que
       también cumple un admin (D11), y deben declararse **antes** que la regla de admin
       `/api/orders/**`.
@@ -385,6 +385,41 @@ Cuerpo de ejemplo de `POST /api/orders`:
 **Hecho cuando:** con Postman se recorre *cotizar → subir diseño → crear pedido → pagar →
 el admin avanza estados hasta ENTREGADO*, y cada regla rota responde 400, 409 o 422 con un
 mensaje claro.
+
+**Estado (2026-10-07):** completada en la rama `fase-2-api`. El recorrido completo se
+verificó contra PostgreSQL con un script de 64 controles (flujo feliz y cada regla rota) y
+hay 40 pruebas unitarias de las reglas puras (`QuantityPolicy`, importes de línea,
+`OrderStatusPolicy`, detección de imagen y pasarela simulada). La colección de Postman
+queda para la fase 5.
+
+### 2.4 Detalles del contrato fijados al implementar
+
+- **Paginación** (`GET /api/products`, `GET /api/orders`): `?page=` desde 0 y `?size=`
+  (máximo 100; 12 y 20 por defecto). Respuesta `{ items, page, size, totalItems, totalPages }`.
+  El frontend actual pide `size=100` y usa `items` hasta que la fase 3 pagine de verdad.
+- **Producto**: `ProductView` agrega `productTypeId`, `productTypeCode` e `isCustomizable`; las
+  variantes traen `sizeId`, `colorId`, `colorHex` e `isActive`. Crear y editar aceptan
+  `productTypeId` e `isCustomizable`. `GET /api/admin/products/{id}` devuelve también las
+  variantes inactivas; `PATCH /api/admin/products/{id}` con `{ isActive }` activa o desactiva.
+- **Cotización**: cada línea trae sus importes o `errors` (zona inválida, stock, producto
+  inactivo…); `valid` indica si todo el carrito se puede comprar. Siempre responde 200 si el
+  formato es correcto.
+- **Pedido**: con envío a domicilio `addressId` es obligatorio; en `RECOJO_TIENDA` basta
+  `contactPhone` (o una dirección, de la que se toman nombre y teléfono). Una línea
+  personalizada exige `designId` del propio cliente. El código del pedido es `CS-` + 8
+  caracteres aleatorios (sin 0/O ni 1/I).
+- **Pago** `POST /api/orders/{code}/payment`: `{ cardNumber, cardHolder, expiryMonth,
+  expiryYear, cvv }`. Tarjetas de prueba: `4111 1111 1111 1111` aprueba;
+  `4000 0000 0000 0002` se rechaza por fondos; un número que no pasa Luhn o una tarjeta
+  vencida también se rechazan. Un rechazo responde **200** con `paymentStatus: RECHAZADO`
+  (queda registrado) y el pedido sigue en `PENDIENTE_PAGO`. La tarjeta nunca se guarda.
+- **Estados (admin)**: `PUT /api/orders/{id}/status` con `{ status, comment? }`. `PAGADO`
+  solo se alcanza con un pago aprobado. El detalle de admin trae `nextStatuses` para armar
+  el selector. Cancelar repone el stock.
+- **Usuarios**: `GET /api/users` → `id, firstName, lastName, email, roleId, roleName,
+  isActive, createdAt`. Un administrador no puede cambiar su propio rol (422).
+- **Categorías**: nombre único entre las categorías raíz (409); no se elimina una categoría
+  con productos o subcategorías (409).
 
 ---
 

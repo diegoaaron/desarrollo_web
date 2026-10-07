@@ -10,8 +10,10 @@ async function requestProducts(endpoint = "", { signal } = {}) {
   return response.json();
 }
 
-export function getProducts(options) {
-  return requestProducts("", options);
+// La API pagina el catálogo; mientras el filtrado siga en el navegador (fase 3), se pide la página máxima.
+export async function getProducts(options) {
+  const page = await requestProducts("?size=100", options);
+  return page.items;
 }
 
 export function getProduct(id, options) {

@@ -22,10 +22,7 @@ export function LoginPage() {
         email: form.get("email").trim(),
         password: form.get("password"),
       });
-      const destination = account.role === "ROLE_ADMIN" ? "/admin" : "/account";
-      const from = location.state?.from;
-      navigate(from === destination || (destination === "/admin" && from?.startsWith("/admin/"))
-        ? from : destination, { replace: true });
+      navigate(destinationAfterLogin(location.state?.from, account), { replace: true });
     } catch (requestError) {
       setError(
         requestError instanceof TypeError
@@ -70,9 +67,14 @@ export function LoginPage() {
             <p className="rounded-xl bg-orange-50 px-4 py-3 text-sm text-[#a43c26]">
               Tu sesión está activa.
             </p>
-            <Link to={user.role === "ROLE_ADMIN" ? "/admin" : "/account"} className="block rounded-lg bg-[#FF623F] px-4 py-3 font-semibold text-white hover:bg-[#e94727]">
-              {user.role === "ROLE_ADMIN" ? "Abrir el panel" : "Abrir mi cuenta"}
+            <Link to="/account" className="block rounded-lg bg-[#FF623F] px-4 py-3 font-semibold text-white hover:bg-[#e94727]">
+              Abrir mi cuenta
             </Link>
+            {user.role === "ROLE_ADMIN" ? (
+              <Link to="/admin" className="block rounded-lg border border-[#FF623F] px-4 py-3 font-semibold text-[#e94727] hover:bg-orange-50">
+                Abrir el panel de administración
+              </Link>
+            ) : null}
             <button
               type="button"
               onClick={handleLogout}
@@ -148,4 +150,14 @@ export function LoginPage() {
       </div>
     </main>
   );
+}
+
+// Destino tras iniciar sesión: la página desde la que se pidió el login (p. ej. el botón
+// «Admin» envía a /admin) o, por defecto, «Mi cuenta». Cualquier cuenta, incluida la de un
+// administrador, entra como cliente salvo que haya pedido el panel.
+function destinationAfterLogin(from, account) {
+  const isInternalPath = typeof from === "string" && from.startsWith("/") && !from.startsWith("//");
+  if (!isInternalPath || from === "/login" || from === "/register") return "/account";
+  if (from.startsWith("/admin") && account.role !== "ROLE_ADMIN") return "/account";
+  return from;
 }

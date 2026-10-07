@@ -58,6 +58,7 @@ pecho (4 S, 4 M, 4 L), paga y ve su pedido pasar de PAGADO a ENTREGADO.*
 | D8 | **Sin proveedores externos**: todos los productos base a personalizar se cargan y configuran desde el panel admin de Coral Shop. La integración con CJ Dropshipping que traía el backend se **eliminó** | ✅ Definida |
 | D9 | Interfaz en **español**; moneda **S/ (PEN)**; direcciones con departamento, provincia y distrito | ✅ Definida |
 | D10 | El servidor **siempre recalcula** precio y stock; nunca confía en importes enviados por el navegador | ✅ Definida |
+| D11 | **Una sola cuenta para comprar y administrar.** Un administrador también es cliente (jerarquía `ROLE_ADMIN` ⊃ `ROLE_USER`). El login lleva a «Mi cuenta» por defecto; el botón **Admin** del header lleva al login y, tras autenticarse, al panel | ✅ Definida |
 
 ### D2 — Regla de cantidad: opción A, cantidad libre con escalas
 
@@ -351,7 +352,10 @@ Cuerpo de ejemplo de `POST /api/orders`:
 - [ ] Módulo `address` y métodos de envío.
 - [ ] Completar `users` y `categories` (admin) y la edición de productos.
 - [ ] Catálogo con filtros y paginación en el servidor.
-- [ ] Actualizar `SecurityConfig` con las nuevas rutas y roles.
+- [ ] Actualizar `SecurityConfig` con las nuevas rutas y roles. Las rutas de cliente
+      (`/api/orders/me/**`, `/api/addresses/**`, `/api/designs/**`) exigen `ROLE_USER`, que
+      también cumple un admin (D11), y deben declararse **antes** que la regla de admin
+      `/api/orders/**`.
 
 **Hecho cuando:** con Postman se recorre *cotizar → subir diseño → crear pedido → pagar →
 el admin avanza estados hasta ENTREGADO*, y cada regla rota responde 400, 409 o 422 con un

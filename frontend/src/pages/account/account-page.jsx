@@ -1,4 +1,4 @@
-import { ArrowLeft, Heart, LogOut, Mail, UserRound } from "lucide-react";
+import { ArrowLeft, Heart, LogOut, Mail, ShieldCheck, UserRound } from "lucide-react";
 import { useState } from "react";
 import { Link, Navigate, useNavigate } from "react-router";
 import { useAuth } from "../../features/auth/hooks/use-auth";
@@ -16,7 +16,6 @@ export function AccountPage() {
     return <main className="grid min-h-[60vh] place-items-center px-6 text-center text-red-700" role="alert">{sessionError}</main>;
   }
   if (!account) return <Navigate to="/login" state={{ from: "/account" }} replace />;
-  if (account.role === "ROLE_ADMIN") return <Navigate to="/admin" replace />;
 
   async function handleSignOut() {
     setSigningOut(true);
@@ -43,6 +42,15 @@ export function AccountPage() {
             <h1 className="mt-2 text-3xl font-semibold text-slate-950 sm:text-4xl">Hola, {account.username}</h1>
             <p className="mt-2 text-slate-600">Los datos de tu cuenta y tus prendas guardadas, todo en un solo lugar.</p>
           </div>
+          <div className="flex flex-wrap gap-3">
+            {account.role === "ROLE_ADMIN" ? (
+              <Link
+                to="/admin"
+                className="inline-flex items-center gap-2 rounded-xl bg-[#ff623f] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#e94727]"
+              >
+                <ShieldCheck className="h-4 w-4" aria-hidden="true" /> Panel de administración
+              </Link>
+            ) : null}
           <button
             type="button"
             onClick={handleSignOut}
@@ -52,6 +60,7 @@ export function AccountPage() {
             <LogOut className="h-4 w-4" aria-hidden="true" />
             {signingOut ? "Cerrando sesión..." : "Cerrar sesión"}
           </button>
+          </div>
         </div>
 
         {error ? <p role="alert" className="mt-6 rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p> : null}

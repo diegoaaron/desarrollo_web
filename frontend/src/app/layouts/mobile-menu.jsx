@@ -4,6 +4,7 @@ import {
   Home,
   LayoutGrid,
   LogIn,
+  ShieldCheck,
   ShoppingBag,
   X,
 } from "lucide-react";
@@ -37,7 +38,8 @@ export function MobileMenu({ cartItemCount, onClose }) {
     })),
     { label: "Precio: menor a mayor", to: "/products?sort=price-low" },
   ];
-  const accountPath = account?.role === "ROLE_ADMIN" ? "/admin" : account ? "/account" : "/login";
+  const accountPath = account ? "/account" : "/login";
+  const showAdminLink = !account || account.role === "ROLE_ADMIN";
   const location = useLocation();
   const panelRef = useRef(null);
   const closeButtonRef = useRef(null);
@@ -196,6 +198,16 @@ export function MobileMenu({ cartItemCount, onClose }) {
             >
               {account ? account.username : "Iniciar sesión"}
             </MobileNavLink>
+            {showAdminLink ? (
+              <MobileNavLink
+                to="/admin"
+                icon={ShieldCheck}
+                isActive={isCurrentPath("/admin")}
+                onClick={onClose}
+              >
+                Admin
+              </MobileNavLink>
+            ) : null}
           </div>
 
           <div className="my-5 h-px bg-stone-200" />

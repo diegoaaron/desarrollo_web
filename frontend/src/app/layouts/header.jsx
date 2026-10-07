@@ -1,4 +1,4 @@
-import { Menu, Search, ShoppingCart, User, X } from "lucide-react";
+import { Menu, Search, ShieldCheck, ShoppingCart, User, X } from "lucide-react";
 import { useCallback, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { CartDropDown } from "../../features/cart/components/cart-dropdown";
@@ -69,7 +69,9 @@ export function Header() {
     (total, item) => total + item.quantity,
     0,
   );
-  const accountPath = account?.role === "ROLE_ADMIN" ? "/admin" : account ? "/account" : "/login";
+  const accountPath = account ? "/account" : "/login";
+  // Visible para visitantes (lleva al login y luego al panel) y para administradores.
+  const showAdminLink = !account || account.role === "ROLE_ADMIN";
 
   return (
     <header className="sticky top-0 z-50">
@@ -109,6 +111,15 @@ export function Header() {
               </Link>
             </div>
             <div className="relative col-start-2 col-end-3 flex justify-end gap-3 md:col-start-3 md:col-end-4">
+              {!checking && showAdminLink ? (
+                <Link
+                  to="/admin"
+                  className="hidden h-10 items-center gap-1.5 rounded-full border border-stone-200 px-3 text-sm font-semibold text-slate-700 transition-colors hover:border-[#ff5331] hover:text-[#ff5331] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff5331] sm:inline-flex"
+                  aria-label="Panel de administración"
+                >
+                  <ShieldCheck className="h-4 w-4" aria-hidden="true" /> Admin
+                </Link>
+              ) : null}
               {checking ? (
                 <span className="grid h-10 w-10 place-items-center text-slate-400" role="status" aria-label="Cargando cuenta">
                   <User aria-hidden="true" />
@@ -117,7 +128,7 @@ export function Header() {
                 <Link
                   to={accountPath}
                   className={`grid h-10 w-10 place-items-center rounded-full transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff5331] ${account ? "bg-[#ff5331] text-white hover:bg-[#e94727]" : "text-slate-700 hover:bg-stone-100"}`}
-                  aria-label={account ? `Abrir ${account.role === "ROLE_ADMIN" ? "el panel" : "la cuenta"} de ${account.username}` : "Iniciar sesión"}
+                  aria-label={account ? `Abrir la cuenta de ${account.username}` : "Iniciar sesión"}
                 >
                   {account ? (
                     <span aria-hidden="true" className="text-base font-bold uppercase">

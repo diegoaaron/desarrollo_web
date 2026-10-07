@@ -1,0 +1,15 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Backend" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+    <envs>
+      <env name="DB_URL" value="jdbc:postgresql://localhost:5432/coralshop" />
+      <env name="DB_USER" value="coralshop" />
+      <env name="DB_PASSWORD" value="coralshop" />
+    </envs>
+    <option name="INCLUDE_PROVIDED_SCOPE" value="false" />
+    <module name="coral-shop-backend" />
+    <option name="SPRING_BOOT_MAIN_CLASS" value="com.coralshop.CoralShopBackendApplication" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

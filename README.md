@@ -10,7 +10,8 @@ desarrollo_web/
 ├─ backend/             API REST: Spring Boot 3.5 · Java 21 · PostgreSQL · Flyway
 ├─ scripts/             Generadores (Python) del informe Word y la presentación
 ├─ clase_entregables/   Word, PPT y figuras de cada entregable (salida de scripts/)
-└─ clase_referencias/   Indicaciones y material notificado por el docente
+├─ clase_referencias/   Indicaciones y material notificado por el docente
+└─ .run/                Configuraciones de ejecución compartidas de IntelliJ
 ```
 
 Esta guía explica cómo levantar el proyecto en una computadora **sin nada instalado**,
@@ -116,57 +117,56 @@ No hace falta crear tablas: **el backend las crea solo al arrancar** (Flyway apl
 migraciones de `backend/src/main/resources/db/migration/`, que también cargan roles,
 categorías, tallas y colores iniciales).
 
-### Paso 5 — Ejecutar el backend (API en `http://localhost:8082`)
+### Paso 5 — Instalar las dependencias del frontend
 
-1. Abre `backend/src/main/java/com/coralshop/CoralShopBackendApplication.java` y dale al
-   **▶ verde** junto a `main`. **La primera vez falla** con
-   `Could not resolve placeholder 'DB_URL'`: es normal, faltan las variables de entorno.
-2. Arriba a la derecha, haz clic en el desplegable **CoralShopBackendApplication ⌄**
-   (a la izquierda del ▶; **no** en el engranaje) → **Edit Configurations…**.
-3. El campo de variables viene oculto: **Modify options** → sección *Operating System* →
-   **Environment variables** (atajo **Alt+E**). Aparece un campo nuevo; pega:
+Solo **la primera vez** o cuando cambie `package.json`. En la terminal de IntelliJ:
 
-   ```
-   DB_URL=jdbc:postgresql://localhost:5432/coralshop;DB_USER=coralshop;DB_PASSWORD=coralshop
-   ```
+```bash
+cd frontend
+npm install
+```
 
-4. Deja **sin marcar** *Store as project file* (guardaría la contraseña en `.idea/`).
-   **Apply → OK** y dale otra vez al **▶**.
+### Paso 6 — Ejecutar backend y frontend
 
-Está listo cuando el log dice `Started CoralShopBackendApplication`. Compruébalo en
-<http://localhost:8082/api/health>.
+El repositorio trae **configuraciones de ejecución compartidas** (carpeta `.run/`), así
+que no hay que configurar nada a mano. En el desplegable de arriba a la derecha, a la
+izquierda del **▶ verde**, aparecen:
+
+| Configuración | Qué hace |
+|---|---|
+| **Backend + Frontend** | lanza las dos a la vez — **la que se usa normalmente** |
+| **Backend** | API Spring Boot en `http://localhost:8082`, con `DB_URL`, `DB_USER` y `DB_PASSWORD` ya definidas |
+| **Frontend** | `npm run dev` en `http://localhost:5173`, apuntando al backend local (`API_PROXY_TARGET=http://localhost:8082`) |
+
+Elige **Backend + Frontend** y dale al **▶**. Se abren dos pestañas en la ventana *Run*
+(o *Services*):
+
+- El backend está listo cuando el log dice `Started CoralShopBackendApplication`.
+  Compruébalo en <http://localhost:8082/api/health>.
+- Abre la tienda en <http://localhost:5173>.
+
+> Si el desplegable no muestra estas configuraciones, falta el paso 3 (el módulo
+> `coral-shop-backend` tiene que existir) o IntelliJ aún está indexando: espera a que
+> termine la barra de progreso.
+>
+> Ejecuta siempre desde el desplegable, no con el ▶ que aparece junto a `main` en
+> `CoralShopBackendApplication.java`: ese puede crear una configuración nueva sin las
+> variables de entorno, que falla con `Could not resolve placeholder 'DB_URL'`.
+
+**Variables del backend.** Están en `.run/Backend.run.xml` (o en **Edit
+Configurations… → Backend**):
 
 | Variable | Obligatoria | Descripción |
 |---|---|---|
 | `DB_URL` | sí | URL JDBC de PostgreSQL |
 | `DB_USER` | sí | usuario de la base |
 | `DB_PASSWORD` | sí | contraseña de la base |
-| `CJ_API_KEY` | no | clave de CJ Dropshipping; solo la usa la importación de productos del panel admin (se agrega al mismo campo separada por `;`) |
+| `CJ_API_KEY` | no | clave de CJ Dropshipping; solo la usa la importación de productos del panel admin |
 
-### Paso 6 — Ejecutar el frontend (tienda en `http://localhost:5173`)
-
-1. Por defecto el frontend envía las llamadas `/api` al backend publicado en la nube.
-   Para que use **tu backend local**, crea el archivo `frontend/.env.local` (clic
-   derecho en `frontend` → **New → File**) con esta línea:
-
-   ```env
-   API_PROXY_TARGET=http://localhost:8082
-   ```
-
-   (`.env.local` no se sube al repositorio.)
-2. Instala las dependencias, **solo la primera vez** o cuando cambie `package.json`. En
-   la terminal de IntelliJ:
-
-   ```bash
-   cd frontend
-   npm install
-   ```
-
-3. Abre `frontend/package.json` y dale al **▶** que aparece junto al script `"dev"`.
-4. Abre <http://localhost:5173>.
-
-> Si creas o cambias `.env.local` con el frontend corriendo, detenlo (■) y vuelve a
-> darle al ▶: Vite solo lee ese archivo al arrancar.
+> La clave `coralshop` solo vale para la base local en Docker, por eso puede ir en el
+> repositorio. **Nunca** agregues a `.run/` claves reales (`CJ_API_KEY`, credenciales de
+> Railway): si necesitas `CJ_API_KEY`, crea una copia de la configuración **Backend**
+> desmarcando *Store as project file*, para que quede solo en tu máquina.
 
 ### Paso 7 — (Opcional) Ver la base de datos desde IntelliJ
 
@@ -185,7 +185,7 @@ sección 3).
 ### Resumen del día a día
 
 Una vez configurado, cada vez que trabajes: abrir Docker Desktop →
-`docker start coralshop-db` → ▶ del backend → ▶ del frontend.
+`docker start coralshop-db` → **Backend + Frontend** → ▶.
 
 ---
 
@@ -232,7 +232,13 @@ export DB_PASSWORD=coralshop
 ./mvnw spring-boot:run
 ```
 
-**Frontend** (en otra terminal, con `frontend/.env.local` creado como en el paso 6)
+**Frontend** (en otra terminal). Por defecto envía las llamadas `/api` al backend
+publicado en la nube; para que use tu backend local, crea `frontend/.env.local` con esta
+línea (no se sube al repositorio y Vite solo lo lee al arrancar):
+
+```env
+API_PROXY_TARGET=http://localhost:8082
+```
 
 ```bash
 cd frontend
@@ -298,8 +304,9 @@ scripts, no el Word ni la PPT.
 | IntelliJ no ofrece activar licencia | Está instalada la *Community Edition*. Instala la versión normal de IntelliJ IDEA (paso 0). |
 | En el menú de `pom.xml` no está *Add as Maven Project* | Ya está enlazado (se ve `backend [coral-shop-backend]`). Usa **Maven → Sync Project** (paso 3). |
 | Código del backend en rojo / *release version 21 not supported* | Falta el JDK 21: paso 2 y luego **Sync Project**. |
-| No aparece el campo *Environment variables* | Está oculto: **Modify options → Environment variables** (Alt+E) en *Edit Configurations* (paso 5). |
-| `Could not resolve placeholder 'DB_URL'` | Faltan las variables de entorno del paso 5. |
+| El desplegable no muestra *Backend*, *Frontend* ni *Backend + Frontend* | Falta el paso 3 (**Maven → Sync Project**) o IntelliJ sigue indexando. |
+| `Could not resolve placeholder 'DB_URL'` | Se ejecutó una configuración sin variables (p. ej. el ▶ junto a `main`). Usa **Backend** o **Backend + Frontend** del desplegable (paso 6). En terminal: faltan las variables de la sección 4. |
+| Necesito agregar una variable y no veo el campo *Environment variables* | Está oculto: **Edit Configurations… → Modify options → Environment variables** (Alt+E). |
 | `JAVA_HOME environment variable is not defined correctly` | Solo en terminal: no hay JDK 21 o `JAVA_HOME` no apunta a él. |
 | `Connection to localhost:5432 refused` | La base no está encendida: abre Docker Desktop y `docker start coralshop-db`. |
 | `docker: error during connect` / *cannot find the file specified* | Docker Desktop está cerrado o no terminó de arrancar. |
@@ -309,7 +316,7 @@ scripts, no el Word ni la PPT.
 | `Port 8082 was already in use` | El backend ya está corriendo (otra pestaña de *Run*) u otro proceso usa el puerto. |
 | El comando `docker run` falla en PowerShell con varias líneas | Escríbelo en una sola línea, como en el paso 4. |
 | `npm` no se reconoce | Node.js no está instalado o falta reiniciar IntelliJ/la PC tras instalarlo. |
-| El frontend muestra datos pero no los tuyos | Falta `frontend/.env.local`; está usando el backend de la nube. Reinicia el frontend después de crearlo. |
+| El frontend muestra datos pero no los tuyos | Está usando el backend de la nube. En IntelliJ, ejecútalo con la configuración **Frontend** (no con el ▶ de `package.json`); en terminal, crea `frontend/.env.local` (sección 4) y reinicia `npm run dev`. |
 | `./mvnw: Permission denied` (macOS/Linux) | `chmod +x mvnw` |
 
 ---

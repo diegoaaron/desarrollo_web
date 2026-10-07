@@ -5,7 +5,8 @@ import tailwindcss from '@tailwindcss/vite'
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, cwd(), 'API_PROXY_TARGET')
-  const target = env.API_PROXY_TARGET || 'https://coralshop-backend-production.up.railway.app'
+  // Por defecto, el backend local (./mvnw spring-boot:run). Otro destino: API_PROXY_TARGET en .env.local.
+  const target = env.API_PROXY_TARGET || 'http://localhost:8082'
   const proxy = {
     '/api': {
       target,

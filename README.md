@@ -208,7 +208,7 @@ sobre una base nueva:
 > `backend/src/main/resources/application-dev.properties` y solo valen en local: en
 > Railway el perfil `dev` no está activo y este usuario no se crea.
 
-**Dar el rol de administrador a otra cuenta.** Toda cuenta creada en **Crear cuenta**
+**Dar el rol de administrador a otra cuenta.** Toda cuenta creada con **Regístrate**
 (<http://localhost:5173/register>) nace como `ROLE_USER`. Para hacerla administradora
 (rol id 1), desde la ventana *Database* de IntelliJ o con:
 

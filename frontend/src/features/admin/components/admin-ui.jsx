@@ -88,10 +88,13 @@ export function EmptyState({ title, description }) {
 }
 
 const BADGE_STYLES = {
-  PENDING: "bg-amber-50 text-amber-700 ring-amber-600/10",
-  SHIPPED: "bg-blue-50 text-blue-700 ring-blue-600/10",
-  DELIVERED: "bg-emerald-50 text-emerald-700 ring-emerald-600/10",
-  CANCELLED: "bg-red-50 text-red-700 ring-red-600/10",
+  PENDIENTE_PAGO: "bg-amber-50 text-amber-700 ring-amber-600/10",
+  PAGADO: "bg-sky-50 text-sky-700 ring-sky-600/10",
+  EN_PRODUCCION: "bg-violet-50 text-violet-700 ring-violet-600/10",
+  LISTO_PARA_ENVIO: "bg-indigo-50 text-indigo-700 ring-indigo-600/10",
+  ENVIADO: "bg-blue-50 text-blue-700 ring-blue-600/10",
+  ENTREGADO: "bg-emerald-50 text-emerald-700 ring-emerald-600/10",
+  CANCELADO: "bg-red-50 text-red-700 ring-red-600/10",
   ACTIVE: "bg-emerald-50 text-emerald-700 ring-emerald-600/10",
   INACTIVE: "bg-stone-100 text-stone-600 ring-stone-600/10",
   ADMIN: "bg-violet-50 text-violet-700 ring-violet-600/10",

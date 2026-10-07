@@ -10,12 +10,15 @@ export const fieldStyles =
 export const selectStyles =
   "min-h-10 rounded-xl border border-stone-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 outline-none transition focus:border-[#ff5331] focus:ring-4 focus:ring-[#ff5331]/10";
 
-// Los valores (PENDING, ROLE_ADMIN…) viajan en inglés a la API; solo se traduce la etiqueta.
+// Los valores (PENDIENTE_PAGO, ROLE_ADMIN…) viajan como códigos a la API; solo se traduce la etiqueta.
 export const ORDER_STATUS_LABELS = {
-  PENDING: "Pendiente",
-  SHIPPED: "Enviado",
-  DELIVERED: "Entregado",
-  CANCELLED: "Cancelado",
+  PENDIENTE_PAGO: "Pendiente de pago",
+  PAGADO: "Pagado",
+  EN_PRODUCCION: "En producción",
+  LISTO_PARA_ENVIO: "Listo para envío",
+  ENVIADO: "Enviado",
+  ENTREGADO: "Entregado",
+  CANCELADO: "Cancelado",
 };
 
 export const ROLE_LABELS = {

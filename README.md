@@ -135,7 +135,7 @@ izquierda del **▶ verde**, aparecen:
 | Configuración | Qué hace |
 |---|---|
 | **Backend + Frontend** | lanza las dos a la vez — **la que se usa normalmente** |
-| **Backend** | API Spring Boot en `http://localhost:8082`, con `DB_URL`, `DB_USER` y `DB_PASSWORD` ya definidas |
+| **Backend** | API Spring Boot en `http://localhost:8082`, con `DB_URL`, `DB_USER`, `DB_PASSWORD` y el perfil `dev` ya definidos |
 | **Frontend** | `npm run dev` en `http://localhost:5173`, apuntando al backend local (`API_PROXY_TARGET=http://localhost:8082`) |
 
 Elige **Backend + Frontend** y dale al **▶**. Se abren dos pestañas en la ventana *Run*
@@ -188,18 +188,35 @@ Una vez configurado, cada vez que trabajes: abrir Docker Desktop →
 
 ---
 
-## 3. Primer uso: crear un administrador
+## 3. Primer uso: entrar al panel de administración
 
-1. En la tienda, entra a **Sign up** (<http://localhost:5173/register>) y crea una
-   cuenta. Toda cuenta nueva tiene el rol `ROLE_USER`.
-2. Para dar acceso al panel de administración, cambia su rol a `ROLE_ADMIN` (id 1),
-   desde la ventana *Database* de IntelliJ o con:
+La configuración **Backend** arranca con el perfil de desarrollo (`SPRING_PROFILES_ACTIVE=dev`),
+que **crea automáticamente un administrador** la primera vez que el backend se levanta
+sobre una base nueva:
 
-   ```powershell
-   docker exec -it coralshop-db psql -U coralshop -d coralshop -c "UPDATE users SET role_id = 1 WHERE username = 'TU_USUARIO';"
-   ```
+| Campo | Valor |
+|---|---|
+| Correo (para iniciar sesión) | `diego@diego.com` |
+| Usuario | `diego` |
+| Contraseña | `diego989` |
 
-3. Cierra sesión y vuelve a entrar.
+1. Entra a <http://localhost:5173/login> con esas credenciales.
+2. El login te lleva al panel: <http://localhost:5173/admin>.
+
+> Si ya existía una cuenta con ese usuario o correo, el backend **no la modifica** (conserva
+> su contraseña y su rol). Las credenciales están en
+> `backend/src/main/resources/application-dev.properties` y solo valen en local: en
+> Railway el perfil `dev` no está activo y este usuario no se crea.
+
+**Dar el rol de administrador a otra cuenta.** Toda cuenta creada en **Crear cuenta**
+(<http://localhost:5173/register>) nace como `ROLE_USER`. Para hacerla administradora
+(rol id 1), desde la ventana *Database* de IntelliJ o con:
+
+```powershell
+docker exec -it coralshop-db psql -U coralshop -d coralshop -c "UPDATE users SET role_id = 1 WHERE username = 'TU_USUARIO';"
+```
+
+Luego cierra sesión y vuelve a entrar.
 
 > Usa siempre datos ficticios. No registres datos personales reales.
 
@@ -218,6 +235,7 @@ cd backend
 $env:DB_URL = "jdbc:postgresql://localhost:5432/coralshop"
 $env:DB_USER = "coralshop"
 $env:DB_PASSWORD = "coralshop"
+$env:SPRING_PROFILES_ACTIVE = "dev"   # crea el administrador de desarrollo
 .\mvnw.cmd spring-boot:run
 ```
 
@@ -228,6 +246,7 @@ cd backend
 export DB_URL=jdbc:postgresql://localhost:5432/coralshop
 export DB_USER=coralshop
 export DB_PASSWORD=coralshop
+export SPRING_PROFILES_ACTIVE=dev   # crea el administrador de desarrollo
 ./mvnw spring-boot:run
 ```
 

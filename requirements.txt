@@ -10,3 +10,4 @@ matplotlib==3.11.1      # figuras y diagramas
 pillow==12.3.0          # medidas de imagen al maquetar la PPT
 pymupdf==1.28.2         # render de los PDF de revision
 pypdf==6.18.0           # lectura del material del curso en PDF
+markdown==3.11          # análisis .md → PDF (md_a_pdf.py)

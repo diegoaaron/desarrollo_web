@@ -135,7 +135,7 @@ izquierda del **▶ verde**, aparecen:
 | Configuración | Qué hace |
 |---|---|
 | **Backend + Frontend** | lanza las dos a la vez — **la que se usa normalmente** |
-| **Backend** | API Spring Boot en `http://localhost:8082`, con `DB_URL`, `DB_USER` y `DB_PASSWORD` ya definidas |
+| **Backend** | API Spring Boot en `http://localhost:8082`, con `DB_URL`, `DB_USER`, `DB_PASSWORD` y el perfil `dev` ya definidos |
 | **Frontend** | `npm run dev` en `http://localhost:5173`, apuntando al backend local (`API_PROXY_TARGET=http://localhost:8082`) |
 
 Elige **Backend + Frontend** y dale al **▶**. Se abren dos pestañas en la ventana *Run*
@@ -161,11 +161,10 @@ Configurations… → Backend**):
 | `DB_URL` | sí | URL JDBC de PostgreSQL |
 | `DB_USER` | sí | usuario de la base |
 | `DB_PASSWORD` | sí | contraseña de la base |
-| `CJ_API_KEY` | no | clave de CJ Dropshipping; solo la usa la importación de productos del panel admin |
 
 > La clave `coralshop` solo vale para la base local en Docker, por eso puede ir en el
-> repositorio. **Nunca** agregues a `.run/` claves reales (`CJ_API_KEY`, credenciales de
-> Railway): si necesitas `CJ_API_KEY`, crea una copia de la configuración **Backend**
+> repositorio. **Nunca** agregues a `.run/` claves reales (credenciales de Railway o de
+> servicios de pago): si necesitas una, crea una copia de la configuración **Backend**
 > desmarcando *Store as project file*, para que quede solo en tu máquina.
 
 ### Paso 7 — (Opcional) Ver la base de datos desde IntelliJ
@@ -189,18 +188,36 @@ Una vez configurado, cada vez que trabajes: abrir Docker Desktop →
 
 ---
 
-## 3. Primer uso: crear un administrador
+## 3. Primer uso: entrar al panel de administración
 
-1. En la tienda, entra a **Sign up** (<http://localhost:5173/register>) y crea una
-   cuenta. Toda cuenta nueva tiene el rol `ROLE_USER`.
-2. Para dar acceso al panel de administración, cambia su rol a `ROLE_ADMIN` (id 1),
-   desde la ventana *Database* de IntelliJ o con:
+La configuración **Backend** arranca con el perfil de desarrollo (`SPRING_PROFILES_ACTIVE=dev`),
+que **crea automáticamente un administrador** la primera vez que el backend se levanta
+sobre una base nueva:
 
-   ```powershell
-   docker exec -it coralshop-db psql -U coralshop -d coralshop -c "UPDATE users SET role_id = 1 WHERE username = 'TU_USUARIO';"
-   ```
+| Correo | Contraseña |
+|---|---|
+| `diego@diego.com` | `diego989` |
 
-3. Cierra sesión y vuelve a entrar.
+Las cuentas se identifican por su **correo**; el registro pide nombre, apellido, correo y
+contraseña.
+
+1. Entra a <http://localhost:5173/login> con esas credenciales.
+2. El login te lleva al panel: <http://localhost:5173/admin>.
+
+> Si ya existía una cuenta con ese correo, el backend **no la modifica** (conserva
+> su contraseña y su rol). Las credenciales están en
+> `backend/src/main/resources/application-dev.properties` y solo valen en local: en
+> Railway el perfil `dev` no está activo y este usuario no se crea.
+
+**Dar el rol de administrador a otra cuenta.** Toda cuenta creada con **Regístrate**
+(<http://localhost:5173/register>) nace como `ROLE_USER`. Para hacerla administradora
+(rol id 1), desde la ventana *Database* de IntelliJ o con:
+
+```powershell
+docker exec -it coralshop-db psql -U coralshop -d coralshop -c "UPDATE users SET role_id = 1 WHERE email = 'correo@ejemplo.pe';"
+```
+
+Luego cierra sesión y vuelve a entrar.
 
 > Usa siempre datos ficticios. No registres datos personales reales.
 
@@ -219,6 +236,7 @@ cd backend
 $env:DB_URL = "jdbc:postgresql://localhost:5432/coralshop"
 $env:DB_USER = "coralshop"
 $env:DB_PASSWORD = "coralshop"
+$env:SPRING_PROFILES_ACTIVE = "dev"   # crea el administrador de desarrollo
 .\mvnw.cmd spring-boot:run
 ```
 
@@ -229,6 +247,7 @@ cd backend
 export DB_URL=jdbc:postgresql://localhost:5432/coralshop
 export DB_USER=coralshop
 export DB_PASSWORD=coralshop
+export SPRING_PROFILES_ACTIVE=dev   # crea el administrador de desarrollo
 ./mvnw spring-boot:run
 ```
 

@@ -49,14 +49,14 @@ export function ConfirmModal({ title, message, onConfirm, onCancel }) {
         </p>
         <div className="mt-7 grid grid-cols-2 gap-3">
           <button ref={cancelButtonRef} type="button" onClick={onCancel} className={secondaryButtonStyles}>
-            Cancel
+            Cancelar
           </button>
           <button
             type="button"
             onClick={onConfirm}
             className="inline-flex min-h-11 items-center justify-center rounded-xl bg-red-600 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-red-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600"
           >
-            Delete
+            Eliminar
           </button>
         </div>
       </div>

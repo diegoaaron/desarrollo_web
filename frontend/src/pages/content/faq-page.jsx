@@ -3,20 +3,20 @@ import { Link } from "react-router";
 import { ContentCard, ContentPage } from "./components/content-page";
 
 const QUESTIONS = [
-  ["How can I track my order?", "Once your order ships, you will receive an email with a tracking number and a link to the carrier's website."],
-  ["Do you ship internationally?", "Yes. We ship to most countries worldwide, with rates and delivery estimates calculated during checkout."],
-  ["Can I change or cancel my order?", "Contact us as quickly as possible. Once an order has shipped, it can no longer be changed or cancelled."],
-  ["What payment methods do you accept?", "We accept Visa, Mastercard, American Express, PayPal, and Apple Pay."],
-  ["How long do returns take?", "Returns are usually inspected within three business days. Your bank may need additional time to post the refund."],
-  ["Are Coral products ethically sourced?", "We prioritize partners who provide fair wages, safe working conditions, and transparent sourcing practices."],
+  ["¿Cómo puedo hacer seguimiento a mi pedido?", "Cuando tu pedido sea despachado, recibirás un correo con el número de seguimiento y el enlace a la página del courier."],
+  ["¿Hacen envíos a provincias?", "Sí. Enviamos a todo el Perú; la tarifa y el tiempo estimado de entrega se calculan durante el pago según tu departamento, provincia y distrito."],
+  ["¿Puedo modificar o cancelar mi pedido?", "Escríbenos lo antes posible. Una vez que el pedido ha sido despachado, ya no es posible modificarlo ni cancelarlo."],
+  ["¿Qué medios de pago aceptan?", "Aceptamos tarjetas Visa, Mastercard y American Express, además de Yape y Plin."],
+  ["¿Cuánto demora una devolución?", "Las devoluciones suelen revisarse en un plazo de tres días hábiles. Tu banco puede necesitar algunos días adicionales para reflejar el reembolso."],
+  ["¿Los productos de Coral se fabrican de forma ética?", "Priorizamos proveedores que ofrecen salarios justos, condiciones de trabajo seguras y prácticas de abastecimiento transparentes."],
 ];
 
 export function FAQPage() {
   return (
     <ContentPage
-      eyebrow="Customer care"
-      title="Answers, without the searching"
-      description="The most common questions about orders, delivery, returns, and shopping with Coral."
+      eyebrow="Atención al cliente"
+      title="Respuestas, sin tener que buscar"
+      description="Las preguntas más comunes sobre pedidos, envíos, devoluciones y compras en Coral."
       icon={CircleHelp}
     >
       <ContentCard className="mx-auto max-w-4xl overflow-hidden divide-y divide-stone-200/80">
@@ -38,13 +38,13 @@ export function FAQPage() {
       <div className="mx-auto mt-6 flex max-w-4xl flex-col items-center justify-between gap-4 rounded-2xl bg-slate-950 p-5 text-center text-white sm:flex-row sm:text-left">
         <div className="flex items-center gap-3">
           <MessageCircle className="h-5 w-5 shrink-0 text-[#ff7354]" aria-hidden="true" />
-          <p className="text-sm font-semibold">Still need a hand? Our care team is ready.</p>
+          <p className="text-sm font-semibold">¿Aún necesitas ayuda? Nuestro equipo de atención está listo.</p>
         </div>
         <Link
           to="/contact-us"
           className="inline-flex min-h-10 shrink-0 items-center justify-center rounded-xl bg-white px-4 py-2 text-sm font-bold text-slate-950 transition hover:bg-[#ff5331] hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
         >
-          Contact us
+          Contáctanos
         </Link>
       </div>
     </ContentPage>

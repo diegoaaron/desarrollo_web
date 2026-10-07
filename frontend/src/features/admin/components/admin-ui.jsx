@@ -1,4 +1,5 @@
-import { AlertCircle, Inbox } from "lucide-react";
+import { AlertCircle, Inbox, X } from "lucide-react";
+import { BADGE_LABELS } from "./admin-styles";
 
 export function AdminPageHeader({ eyebrow, title, description, actions }) {
   return (
@@ -39,11 +40,35 @@ export function ErrorState({ error, detail }) {
           <AlertCircle className="h-6 w-6" aria-hidden="true" />
         </span>
         <h1 className="mt-5 text-xl font-black text-slate-950">
-          We could not load this view
+          No pudimos cargar esta vista
         </h1>
         <p className="mt-2 text-sm leading-6 text-slate-500">{error}</p>
         {detail ? <p className="mt-1 text-xs text-slate-400">{detail}</p> : null}
       </div>
+    </div>
+  );
+}
+
+export function ActionAlert({ message, onDismiss }) {
+  if (!message) return null;
+
+  return (
+    <div
+      role="alert"
+      className="mb-5 flex items-start gap-3 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+    >
+      <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
+      <p className="flex-1 font-semibold">{message}</p>
+      {onDismiss ? (
+        <button
+          type="button"
+          onClick={onDismiss}
+          className="grid h-6 w-6 shrink-0 place-items-center rounded-full hover:bg-red-100 focus-visible:outline-2 focus-visible:outline-red-500"
+          aria-label="Cerrar aviso"
+        >
+          <X className="h-3.5 w-3.5" aria-hidden="true" />
+        </button>
+      ) : null}
     </div>
   );
 }
@@ -80,7 +105,7 @@ export function AdminBadge({ value, label }) {
         BADGE_STYLES[value] || BADGE_STYLES.INACTIVE
       }`}
     >
-      {label || value}
+      {label || BADGE_LABELS[value] || value}
     </span>
   );
 }

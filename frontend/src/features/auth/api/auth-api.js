@@ -1,7 +1,7 @@
 async function getCsrfToken() {
   const response = await fetch("/api/auth/csrf");
   if (!response.ok) {
-    throw new Error("We couldn't connect to the server. Please try again later.");
+    throw new Error("No pudimos conectar con el servidor. Inténtalo de nuevo más tarde.");
   }
   const { token } = await response.json();
   return token;
@@ -17,12 +17,12 @@ export async function registerUser(details) {
 
   if (!response.ok) {
     if (response.status === 409) {
-      throw new Error("That email or username is already registered.");
+      throw new Error("Ese correo ya está registrado.");
     }
     if (response.status === 400) {
-      throw new Error("Please check your details and try again.");
+      throw new Error("Revisa tus datos e inténtalo de nuevo.");
     }
-    throw new Error("We couldn't create your account. Please try again later.");
+    throw new Error("No pudimos crear tu cuenta. Inténtalo de nuevo más tarde.");
   }
 
   return response.json();
@@ -40,10 +40,10 @@ export async function loginUser({ email, password }) {
   });
 
   if (response.status === 401) {
-    throw new Error("Incorrect email or password.");
+    throw new Error("Correo o contraseña incorrectos.");
   }
   if (!response.ok) {
-    throw new Error("We couldn't sign you in. Please try again later.");
+    throw new Error("No pudimos iniciar tu sesión. Inténtalo de nuevo más tarde.");
   }
 
   return response.json();
@@ -53,7 +53,7 @@ export async function getCurrentUser({ signal } = {}) {
   const response = await fetch("/api/auth/me", { signal });
   if (response.status === 401) return null;
   if (!response.ok) {
-    throw new Error("We couldn't check your session. Please try again later.");
+    throw new Error("No pudimos verificar tu sesión. Inténtalo de nuevo más tarde.");
   }
 
   return response.json();
@@ -66,6 +66,6 @@ export async function logoutUser() {
     headers: { "X-CSRF-TOKEN": token },
   });
   if (!response.ok) {
-    throw new Error("We couldn't sign you out. Please try again.");
+    throw new Error("No pudimos cerrar tu sesión. Inténtalo de nuevo.");
   }
 }

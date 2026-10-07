@@ -4,6 +4,7 @@
       <env name="DB_URL" value="jdbc:postgresql://localhost:5432/coralshop" />
       <env name="DB_USER" value="coralshop" />
       <env name="DB_PASSWORD" value="coralshop" />
+      <env name="SPRING_PROFILES_ACTIVE" value="dev" />
     </envs>
     <option name="INCLUDE_PROVIDED_SCOPE" value="false" />
     <module name="coral-shop-backend" />

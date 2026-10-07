@@ -7,7 +7,7 @@ import { LoadingState } from "../../../shared/components/loading-state";
 export function FeaturedProducts() {
   const { products, isLoading, error } = useProducts();
 
-  if (isLoading) return <LoadingState message="Loading featured products..." />;
+  if (isLoading) return <LoadingState message="Cargando productos destacados..." />;
   if (error) return <ErrorState message={error} />;
 
   return (
@@ -15,14 +15,14 @@ export function FeaturedProducts() {
       <div className="max-w-7xl w-[90%] mx-auto">
         <div className="flex justify-between mb-10">
           <div className="flex flex-col">
-            <h2 className="text-4xl mb-2 font-semibold">Featured Products</h2>
-            <p className="text-gray-600">Handpicked items just for you</p>
+            <h2 className="text-4xl mb-2 font-semibold">Productos destacados</h2>
+            <p className="text-gray-600">Seleccionados especialmente para ti</p>
           </div>
           <Link
             to="/products"
             className="px-6 py-2.5 flex items-center text-[#ff5331] border-2 border-[#ff5331] rounded-lg hover:bg-[#ff5331] hover:text-white transition-all duration-300 shadow-sm hover:shadow-md cursor-pointer"
           >
-            View All
+            Ver todo
           </Link>
         </div>
 
@@ -34,7 +34,7 @@ export function FeaturedProducts() {
           </div>
         ) : (
           <p className="rounded-2xl border border-stone-200 bg-white px-6 py-10 text-center text-slate-500">
-            Our collection is coming soon.
+            Nuestra colección llegará muy pronto.
           </p>
         )}
       </div>

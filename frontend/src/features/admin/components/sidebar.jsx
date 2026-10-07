@@ -13,13 +13,14 @@ import {
   Users,
   X,
 } from "lucide-react";
+import { fullName } from "../../auth/model/account-name";
 
 const MENU_ITEMS = [
-  { name: "Overview", path: "/admin", icon: LayoutDashboard },
-  { name: "Users", path: "/admin/users", icon: Users },
-  { name: "Products", path: "/admin/products", icon: Package },
-  { name: "Orders", path: "/admin/orders", icon: ShoppingCart },
-  { name: "Categories", path: "/admin/categories", icon: Tag },
+  { name: "Resumen", path: "/admin", icon: LayoutDashboard },
+  { name: "Usuarios", path: "/admin/users", icon: Users },
+  { name: "Productos", path: "/admin/products", icon: Package },
+  { name: "Pedidos", path: "/admin/orders", icon: ShoppingCart },
+  { name: "Categorías", path: "/admin/categories", icon: Tag },
 ];
 
 export function Sidebar({ mobileOpen, onMobileClose }) {
@@ -72,7 +73,7 @@ export function Sidebar({ mobileOpen, onMobileClose }) {
           type="button"
           className="mobile-menu-backdrop fixed inset-0 z-40 bg-slate-950/55 backdrop-blur-sm lg:hidden"
           onClick={onMobileClose}
-          aria-label="Close admin navigation"
+          aria-label="Cerrar navegación de administración"
         />
       ) : null}
 
@@ -82,7 +83,7 @@ export function Sidebar({ mobileOpen, onMobileClose }) {
             ? "visible translate-x-0"
             : "invisible -translate-x-full pointer-events-none lg:visible lg:pointer-events-auto"
         } ${collapsed ? "lg:w-[5.5rem]" : "lg:w-72"}`}
-        aria-label="Admin navigation"
+        aria-label="Navegación de administración"
       >
         <div className="flex h-20 items-center justify-between border-b border-white/8 px-5 lg:h-24">
           <Link
@@ -98,7 +99,7 @@ export function Sidebar({ mobileOpen, onMobileClose }) {
             <span>
               <span className="block text-lg font-black leading-none tracking-tight">Coral</span>
               <span className="mt-1.5 block text-[0.62rem] font-bold uppercase tracking-[0.18em] text-slate-400">
-                Admin studio
+                Panel de administración
               </span>
             </span>
           </Link>
@@ -108,7 +109,7 @@ export function Sidebar({ mobileOpen, onMobileClose }) {
             type="button"
             onClick={onMobileClose}
             className="grid h-10 w-10 place-items-center rounded-xl text-slate-400 transition hover:bg-white/8 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff7354] lg:hidden"
-            aria-label="Close admin navigation"
+            aria-label="Cerrar navegación de administración"
           >
             <X className="h-5 w-5" aria-hidden="true" />
           </button>
@@ -117,7 +118,7 @@ export function Sidebar({ mobileOpen, onMobileClose }) {
             <Link
               to="/admin"
               className="hidden h-11 w-11 place-items-center rounded-2xl bg-[#ff5331] lg:grid"
-              title="Coral Admin"
+              title="Administración de Coral"
             >
               <Sparkles className="h-5 w-5" aria-hidden="true" />
             </Link>
@@ -130,7 +131,7 @@ export function Sidebar({ mobileOpen, onMobileClose }) {
               collapsed ? "lg:sr-only" : ""
             }`}
           >
-            Workspace
+            Espacio de trabajo
           </p>
         </div>
 
@@ -164,7 +165,7 @@ export function Sidebar({ mobileOpen, onMobileClose }) {
 
         <div className={`border-t border-white/8 p-4 ${collapsed ? "lg:px-3" : ""}`}>
           <p className={`mb-2 truncate px-3.5 text-xs text-slate-400 ${collapsed ? "lg:sr-only" : ""}`}>
-            Signed in as <span className="font-semibold text-white">{account?.username}</span>
+            Sesión iniciada como <span className="font-semibold text-white">{fullName(account)}</span>
           </p>
           {signOutError ? <p role="alert" className="mb-2 px-3.5 text-xs text-red-300">{signOutError}</p> : null}
           <Link
@@ -173,20 +174,20 @@ export function Sidebar({ mobileOpen, onMobileClose }) {
             className={`flex min-h-12 items-center gap-3 rounded-xl px-3.5 text-sm font-bold text-slate-400 transition hover:bg-white/7 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff7354] ${
               collapsed ? "lg:justify-center lg:px-0" : ""
             }`}
-            title={collapsed ? "Back to store" : undefined}
+            title={collapsed ? "Volver a la tienda" : undefined}
           >
             <ShoppingCart className="h-5 w-5 shrink-0" aria-hidden="true" />
-            <span className={collapsed ? "lg:sr-only" : ""}>Back to store</span>
+            <span className={collapsed ? "lg:sr-only" : ""}>Volver a la tienda</span>
           </Link>
           <button
             type="button"
             onClick={handleSignOut}
             disabled={signingOut}
             className={`flex min-h-12 w-full items-center gap-3 rounded-xl px-3.5 text-sm font-bold text-slate-400 transition hover:bg-white/7 hover:text-white disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff7354] ${collapsed ? "lg:justify-center lg:px-0" : ""}`}
-            title={collapsed ? "Sign out" : undefined}
+            title={collapsed ? "Cerrar sesión" : undefined}
           >
             <LogOut className="h-5 w-5 shrink-0" aria-hidden="true" />
-            <span className={collapsed ? "lg:sr-only" : ""}>{signingOut ? "Signing out..." : "Sign out"}</span>
+            <span className={collapsed ? "lg:sr-only" : ""}>{signingOut ? "Cerrando sesión..." : "Cerrar sesión"}</span>
           </button>
           <button
             type="button"
@@ -194,14 +195,14 @@ export function Sidebar({ mobileOpen, onMobileClose }) {
             className={`mt-2 hidden min-h-11 w-full items-center gap-3 rounded-xl px-3.5 text-sm font-bold text-slate-500 transition hover:bg-white/7 hover:text-slate-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff7354] lg:flex ${
               collapsed ? "justify-center px-0" : ""
             }`}
-            aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+            aria-label={collapsed ? "Expandir barra lateral" : "Contraer barra lateral"}
           >
             {collapsed ? (
               <ChevronLeft className="h-5 w-5 rotate-180" aria-hidden="true" />
             ) : (
               <PanelLeftClose className="h-5 w-5" aria-hidden="true" />
             )}
-            <span className={collapsed ? "sr-only" : ""}>Collapse menu</span>
+            <span className={collapsed ? "sr-only" : ""}>Contraer menú</span>
           </button>
         </div>
       </aside>

@@ -6,7 +6,7 @@ async function request(endpoint, options = {}) {
   let csrfHeaders = {};
   if (method !== "GET") {
     const tokenResponse = await fetch("/api/auth/csrf");
-    if (!tokenResponse.ok) throw new Error("Unable to verify your session. Please try again.");
+    if (!tokenResponse.ok) throw new Error("No se pudo verificar tu sesión. Inténtalo de nuevo.");
     const { token } = await tokenResponse.json();
     csrfHeaders = { "X-CSRF-TOKEN": token };
   }
@@ -25,8 +25,8 @@ async function request(endpoint, options = {}) {
   if (!response.ok) {
     const error = await response.json().catch(() => ({}));
     throw new Error(error.message || error.detail || (response.status === 403
-      ? "Admin access required. Please sign in again."
-      : `Request failed (${response.status})`));
+      ? "Se requiere acceso de administrador. Vuelve a iniciar sesión."
+      : `La solicitud falló (${response.status})`));
   }
 
   if (response.status === 204) return null;

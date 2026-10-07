@@ -5,6 +5,7 @@ import { useCart } from "../../features/cart/hooks/use-cart";
 import { useProduct } from "../../features/products/hooks/use-product";
 import { ProductDetailSkeleton } from "../../features/products/skeletons/products-detail-skeleton";
 import { ErrorState } from "../../shared/components/error-state";
+import { formatPrice } from "../../shared/utils/format-price";
 
 export function ProductDetailPage() {
   const { id } = useParams();
@@ -16,9 +17,9 @@ export function ProductDetailPage() {
   if (error || !product) {
     return (
       <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4">
-        <ErrorState message={error || "Product not found"} />
+        <ErrorState message={error || "Producto no encontrado"} />
         <Link to="/products" className="text-sm font-semibold text-gray-600 underline hover:text-black">
-          Back to products
+          Volver a productos
         </Link>
       </div>
     );
@@ -34,7 +35,7 @@ export function ProductDetailPage() {
       title: `${product.name} · ${variant.size} / ${variant.color}`,
       image: product.imageUrl,
       price: product.basePrice,
-      maxQuantity: Math.min(5, variant.stock),
+      maxQuantity: variant.stock,
     });
   }
 
@@ -45,7 +46,7 @@ export function ProductDetailPage() {
           {product.imageUrl ? (
             <img className="max-h-95 w-auto object-contain" src={product.imageUrl} alt={product.name} />
           ) : (
-            <span className="text-gray-400">Image coming soon</span>
+            <span className="text-gray-400">Imagen próximamente</span>
           )}
         </div>
 
@@ -58,13 +59,13 @@ export function ProductDetailPage() {
           </div>
 
           <div>
-            <h2 className="mb-2 text-sm font-semibold uppercase tracking-wider text-gray-900">Description</h2>
-            <p className="leading-relaxed text-gray-600">{product.description || "No description yet."}</p>
+            <h2 className="mb-2 text-sm font-semibold uppercase tracking-wider text-gray-900">Descripción</h2>
+            <p className="leading-relaxed text-gray-600">{product.description || "Aún no tiene descripción."}</p>
           </div>
 
           <div>
             <label htmlFor="product-variant" className="mb-2 block text-sm font-semibold text-gray-900">
-              Size and color
+              Talla y color
             </label>
             <select
               id="product-variant"
@@ -73,17 +74,17 @@ export function ProductDetailPage() {
               disabled={product.variants.length === 0}
               className="w-full rounded-xl border border-stone-200 bg-white px-4 py-3 text-gray-900 focus:border-[#ff5331] focus:outline-none disabled:opacity-50"
             >
-              <option value="">Choose a size and color</option>
+              <option value="">Elige una talla y un color</option>
               {product.variants.map((item) => (
                 <option key={item.id} value={item.id} disabled={item.stock < 1}>
-                  {item.size} / {item.color} — {item.stock > 0 ? `${item.stock} available` : "Out of stock"}
+                  {item.size} / {item.color} — {item.stock > 0 ? `${item.stock} disponibles` : "Agotado"}
                 </option>
               ))}
             </select>
           </div>
 
           <div className="mt-4 flex flex-col gap-4 border-t border-gray-100 pt-6 sm:flex-row sm:items-center sm:justify-between">
-            <p className="text-4xl font-extrabold text-gray-900">${product.basePrice.toFixed(2)}</p>
+            <p className="text-4xl font-extrabold text-gray-900">{formatPrice(product.basePrice)}</p>
             <button
               type="button"
               onClick={handleAddToCart}
@@ -91,7 +92,7 @@ export function ProductDetailPage() {
               className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-gray-900 px-8 py-4 font-semibold text-white transition-colors hover:bg-black disabled:cursor-not-allowed disabled:opacity-50 sm:flex-initial"
             >
               <ShoppingCart className="h-5 w-5" aria-hidden="true" />
-              Add to cart
+              Agregar al carrito
             </button>
           </div>
         </div>

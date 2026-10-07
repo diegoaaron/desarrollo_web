@@ -10,7 +10,7 @@ export function AdminLayout() {
   const location = useLocation();
 
   if (checking) {
-    return <div className="grid min-h-screen place-items-center text-slate-600" role="status">Checking admin access...</div>;
+    return <div className="grid min-h-screen place-items-center text-slate-600" role="status">Verificando acceso de administrador...</div>;
   }
   if (error) {
     return <div className="grid min-h-screen place-items-center px-6 text-center text-red-700" role="alert">{error}</div>;
@@ -21,9 +21,9 @@ export function AdminLayout() {
   if (account.role !== "ROLE_ADMIN") {
     return (
       <div className="grid min-h-screen place-content-center gap-4 px-6 text-center">
-        <h1 className="text-2xl font-bold text-slate-950">Admin access required</h1>
-        <p className="text-slate-600">Your account cannot access this dashboard.</p>
-        <Link to="/" className="font-semibold text-[#e94727] hover:underline">Back to store</Link>
+        <h1 className="text-2xl font-bold text-slate-950">Se requiere acceso de administrador</h1>
+        <p className="text-slate-600">Tu cuenta no tiene acceso a este panel.</p>
+        <Link to="/" className="font-semibold text-[#e94727] hover:underline">Volver a la tienda</Link>
       </div>
     );
   }
@@ -47,7 +47,7 @@ export function AdminLayout() {
             <span>
               <span className="block text-sm font-black leading-none text-slate-950">Coral</span>
               <span className="mt-1 block text-[0.62rem] font-bold uppercase tracking-[0.16em] text-slate-400">
-                Admin studio
+                Panel de administración
               </span>
             </span>
           </Link>
@@ -55,7 +55,7 @@ export function AdminLayout() {
             type="button"
             onClick={() => setMobileMenuOpen(true)}
             className="grid h-11 w-11 place-items-center rounded-xl border border-stone-200 bg-white text-slate-700 shadow-sm transition hover:border-stone-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff5331]"
-            aria-label="Open admin navigation"
+            aria-label="Abrir navegación de administración"
             aria-expanded={mobileMenuOpen}
           >
             <Menu className="h-5 w-5" aria-hidden="true" />

@@ -1,36 +1,36 @@
-import { Clock3, Globe2, PackageCheck, Plane, Truck } from "lucide-react";
+import { Clock3, MapPinned, PackageCheck, Plane, Truck } from "lucide-react";
 import { ContentCard, ContentPage } from "./components/content-page";
 
 const SHIPPING_OPTIONS = [
   {
-    title: "Standard",
-    time: "5–7 business days",
-    price: "Free over $50",
-    description: "Our most economical tracked delivery option for everyday orders.",
+    title: "Estándar",
+    time: "5–7 días hábiles",
+    price: "Tarifa calculada al pagar",
+    description: "Nuestra opción de entrega con seguimiento más económica para tus pedidos de siempre.",
     icon: Truck,
   },
   {
     title: "Express",
-    time: "2–3 business days",
-    price: "$15.99 flat rate",
-    description: "A faster tracked service when your order needs to arrive sooner.",
+    time: "2–3 días hábiles",
+    price: "Tarifa calculada al pagar",
+    description: "Un servicio con seguimiento más rápido para cuando necesitas tu pedido antes.",
     icon: Plane,
   },
   {
-    title: "International",
-    time: "14–21 business days",
-    price: "Calculated at checkout",
-    description: "Worldwide delivery with timing and rates based on destination.",
-    icon: Globe2,
+    title: "Provincias",
+    time: "Según el destino",
+    price: "Tarifa calculada al pagar",
+    description: "Entregas en todo el Perú, con plazos y tarifas según el departamento, la provincia y el distrito de destino.",
+    icon: MapPinned,
   },
 ];
 
 export function ShippingInfoPage() {
   return (
     <ContentPage
-      eyebrow="Delivery guide"
-      title="From our makers to your door"
-      description="Clear delivery options, reliable tracking, and careful packaging for every Coral order."
+      eyebrow="Guía de envíos"
+      title="De nuestro taller a tu puerta"
+      description="Opciones de entrega claras, seguimiento confiable y un empaque cuidadoso para cada pedido de Coral."
       icon={PackageCheck}
     >
       <div className="grid gap-5 md:grid-cols-3">
@@ -56,9 +56,9 @@ export function ShippingInfoPage() {
       <ContentCard className="mt-6 overflow-hidden">
         <div className="grid gap-6 p-6 sm:p-8 md:grid-cols-3">
           {[
-            ["Tracked from dispatch", "A tracking link is emailed as soon as your order leaves us."],
-            ["Packed with care", "Each item is protected using recyclable or compostable materials."],
-            ["Customs & duties", "International orders may be subject to local import fees."],
+            ["Seguimiento desde el despacho", "Te enviamos por correo el enlace de seguimiento apenas tu pedido sale de nuestro almacén."],
+            ["Empacado con cuidado", "Cada prenda se protege con materiales reciclables o compostables."],
+            ["Zonas alejadas", "Los envíos a zonas de difícil acceso pueden requerir días adicionales."],
           ].map(([title, text], index) => (
             <div key={title} className="flex gap-3">
               <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-slate-950 text-xs font-black text-white">

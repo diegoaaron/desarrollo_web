@@ -55,9 +55,11 @@ pecho (4 S, 4 M, 4 L), paga y ve su pedido pasar de PAGADO a ENTREGADO.*
 | D5 | Zonas predefinidas **por tipo de producto** (polo/polera: pecho izq., pecho centro, espalda, mangas; gorra: frente, lateral; tote: cara A, cara B) | ✅ Definida |
 | D6 | Pago **simulado** en las fases 2 y 3; **pasarela real en la fase 6** | ✅ Definida |
 | D7 | Imágenes del cliente: PNG/JPG de hasta 5 MB, guardadas en PostgreSQL (`bytea`), porque el disco de Railway es efímero | ✅ Definida |
-| D8 | CJ Dropshipping **congelado**: se conserva lo que existe, sin nuevas inversiones | ✅ Definida |
+| D8 | **Sin proveedores externos**: todos los productos base a personalizar se cargan y configuran desde el panel admin de Coral Shop. La integración con CJ Dropshipping que traía el backend se **eliminó** | ✅ Definida |
 | D9 | Interfaz en **español**; moneda **S/ (PEN)**; direcciones con departamento, provincia y distrito | ✅ Definida |
 | D10 | El servidor **siempre recalcula** precio y stock; nunca confía en importes enviados por el navegador | ✅ Definida |
+| D11 | **Una sola cuenta para comprar y administrar.** Un administrador también es cliente (jerarquía `ROLE_ADMIN` ⊃ `ROLE_USER`). El login lleva a «Mi cuenta» por defecto; el botón **Admin** del header lleva al login y, tras autenticarse, al panel | ✅ Definida |
+| D12 | **La cuenta se identifica por su correo.** El registro pide nombre, apellido, correo y contraseña (sin nombre de usuario). Migración `V4__user_names_replace_username.sql` | ✅ Definida |
 
 ### D2 — Regla de cantidad: opción A, cantidad libre con escalas
 
@@ -93,7 +95,7 @@ bloqueaban cantidades que el cliente igual podía armar agregando unidades suelt
 
 **Base de datos**
 
-- Todo cambio de esquema es una **migración Flyway nueva** (`V3__…`, `V4__…`); nunca se
+- Todo cambio de esquema es una **migración Flyway nueva** (`V5__…`, `V6__…`); nunca se
   edita una migración ya aplicada.
 - `snake_case`; dinero en `NUMERIC(12,2)`; fechas en `TIMESTAMPTZ`.
 
@@ -118,7 +120,7 @@ bloqueaban cantidades que el cliente igual podía armar agregando unidades suelt
 | Fase | Objetivo | Depende de | Resultado visible |
 |---|---|---|---|
 | **0** | Ordenar la casa: limpieza, español, S/, capas en el backend | — | Código limpio, catálogo en capas |
-| **1** | Modelo de datos del negocio (migración V3) | 0 | Tablas de personalización, mayoreo y pedidos |
+| **1** | Modelo de datos del negocio (migración V5) | 0 | Tablas de personalización, mayoreo y pedidos |
 | **2** | API del flujo de compra | 1 | Cotizar, subir diseño, crear pedido, pagar (simulado), admin de pedidos |
 | **3** | Frontend del flujo de compra | 2 | Personalizador, carrito, checkout, confirmación, «Mis pedidos» |
 | **4** | Evento de dominio `OrderStatusChanged` | 2 | Notificaciones al cliente y auditoría |
@@ -136,7 +138,7 @@ Las fases 2 y 3 pueden avanzar en paralelo una vez acordados los contratos de la
 
 ### 0.1 Frontend: limpieza
 
-- [ ] Borrar el código muerto (no alcanzable desde `main.jsx`):
+- [x] Borrar el código muerto (no alcanzable desde `main.jsx`):
   - `src/app.jsx`, `src/router/router.jsx`
   - `src/app/home/`, `src/app/login/`, `src/app/products/`
   - `src/common/` (completa), `src/components/` (completa), `src/pages/home.jsx`
@@ -145,41 +147,42 @@ Las fases 2 y 3 pueden avanzar en paralelo una vez acordados los contratos de la
   - `src/features/products/component/`, `src/features/products/pages/`
   - `src/features/products/hooks/use-get-products.js`, `use-get-products-by-id.js` y
     `src/features/products/services/` (llaman a `fakestoreapi.com`)
-- [ ] Verificar que `npm run build` y `npm run lint` pasan tras la limpieza.
+- [x] Verificar que `npm run build` y `npm run lint` pasan tras la limpieza.
 
 ### 0.2 Frontend: idioma, moneda y errores
 
-- [ ] Traducir la interfaz al español (`index.html` con `lang="es"`).
-- [ ] Utilidad `formatPrice()` en `shared/` con S/; reemplazar todos los `$x.toFixed(2)`.
-- [ ] Categorías del header, del menú móvil y del home desde `GET /api/categories` (hoy
+- [x] Traducir la interfaz al español (`index.html` con `lang="es"`).
+- [x] Utilidad `formatPrice()` en `shared/` con S/; reemplazar todos los `$x.toFixed(2)`.
+- [x] Categorías del header, del menú móvil y del home desde `GET /api/categories` (hoy
       están fijas en el código).
-- [ ] Conectar o retirar el buscador del header (hoy no hace nada).
-- [ ] Corregir: `categoryName.toLowerCase()` sin protección ante nulos
+- [x] Conectar o retirar el buscador del header (hoy no hace nada).
+- [x] Corregir: `categoryName.toLowerCase()` sin protección ante nulos
       (`products-page.jsx`); `useOrders.updateStatus` sin `try/catch`; error de
       `useUsers.updateRole` que reemplaza toda la página; imagen repetida de la tarjeta
       *Unisex*; formularios de contacto y suscripción sin manejador.
 
 ### 0.3 Frontend: carrito
 
-- [ ] Persistir el carrito en `localStorage` (con `try/catch`).
-- [ ] Quitar el tope `MAX_CART_ITEMS = 5`. La regla de cantidad real llega en la fase 3.
-- [ ] Quitar la barra fija de «envío gratis desde $50».
+- [x] Persistir el carrito en `localStorage` (con `try/catch`).
+- [x] Quitar el tope `MAX_CART_ITEMS = 5`. La regla de cantidad real llega en la fase 3.
+- [x] Quitar la barra fija de «envío gratis desde $50».
 
 ### 0.4 Backend: capas
 
-- [ ] Reorganizar paquetes: `auth`, `catalog`, `user`, cada uno con
+- [x] Reorganizar paquetes: `auth`, `catalog`, `user`, cada uno con
       `controller / service / repository / dto`.
-- [ ] `CatalogController` → `CatalogService` → `ProductRepository` (`JdbcTemplate`).
-- [ ] `AdminProductController` → `ProductAdminService` (validaciones y `@Transactional`)
+- [x] `CatalogController` → `CatalogService` → `ProductRepository` (`JdbcTemplate`).
+- [x] `AdminProductController` → `ProductAdminService` (validaciones y `@Transactional`)
       → `ProductRepository`.
-- [ ] `CjImportController` → `CjImportService` → `ProductRepository` + `CjClient`
-      (reutilizar la inserción de producto; sin SQL duplicado).
-- [ ] `AdminOverviewController` → `StatsService` → `StatsRepository`.
-- [ ] `GlobalExceptionHandler` (`@RestControllerAdvice`): 400 / 404 / 409 / 422 / 500
+- [x] `AdminOverviewController` → `StatsService` → `StatsRepository`.
+- [x] `GlobalExceptionHandler` (`@RestControllerAdvice`): 400 / 404 / 409 / 422 / 500
       con JSON uniforme.
-- [ ] Mensajes de error en español en todo el backend.
-- [ ] `SecurityConfig`: dejar solo las reglas de rutas que existen o existirán en la fase 2.
-- [ ] Rotar la clave de CJ (el Word indica que fue expuesta).
+- [x] Mensajes de error en español en todo el backend.
+- [x] `SecurityConfig`: dejar solo las reglas de rutas que existen o existirán en la fase 2.
+- [x] Eliminar la integración con CJ Dropshipping (D8): clases, pantalla de importación y
+      migración `V3__remove_external_product_sources.sql`, que retira las columnas `cj_*`.
+
+**Estado (2026-10-07):** completada en la rama `fase-0-orden`.
 
 **Hecho cuando:** el frontend arranca sin archivos muertos y en español; ningún controller
 usa `JdbcTemplate`; los endpoints actuales responden igual que antes.
@@ -189,11 +192,12 @@ usa `JdbcTemplate`; los endpoints actuales responden igual que antes.
 ## Fase 1 — Modelo de datos del negocio
 
 **Objetivo:** que la base de datos soporte personalización, mayoreo, pedidos, pagos y
-seguimiento. Se entrega como `backend/src/main/resources/db/migration/V3__negocio_personalizacion.sql`
-(más `V4` para datos semilla si se separan).
+seguimiento. Se entrega como `backend/src/main/resources/db/migration/V5__negocio_personalizacion.sql`
+(más `V6` para datos semilla si se separan). Ya existen la `V3` (retira las columnas de CJ)
+y la `V4` (nombre y apellido en lugar de nombre de usuario).
 
 > `orders` y `order_items` existen desde la V1, pero ningún flujo los usa todavía y
-> están vacías; la V3 puede **recrearlas** con la estructura definitiva.
+> están vacías; la V5 puede **recrearlas** con la estructura definitiva.
 
 ### 1.1 Catálogo
 
@@ -240,7 +244,7 @@ PENDIENTE_PAGO ──pago aprobado──► PAGADO ──► EN_PRODUCCION ─�
 
 ### 1.6 Tareas
 
-- [ ] Escribir `V3__negocio_personalizacion.sql` con las tablas y restricciones anteriores.
+- [ ] Escribir `V5__negocio_personalizacion.sql` con las tablas y restricciones anteriores.
 - [ ] Semilla: tipos, técnicas, zonas, `product_type_zones` con recargos, escalas de
       mayoreo y métodos de envío.
 - [ ] Asignar `product_type_id` a los productos existentes.
@@ -248,7 +252,7 @@ PENDIENTE_PAGO ──pago aprobado──► PAGADO ──► EN_PRODUCCION ─�
       diagramas ER del entregable 2).
 - [ ] Diagrama ER actualizado (`python scripts/figuras.py`).
 
-**Hecho cuando:** el backend arranca, Flyway aplica la V3 sin errores y JPA valida el
+**Hecho cuando:** el backend arranca, Flyway aplica la V5 sin errores y JPA valida el
 esquema (`ddl-auto=validate`).
 
 ---
@@ -350,7 +354,10 @@ Cuerpo de ejemplo de `POST /api/orders`:
 - [ ] Módulo `address` y métodos de envío.
 - [ ] Completar `users` y `categories` (admin) y la edición de productos.
 - [ ] Catálogo con filtros y paginación en el servidor.
-- [ ] Actualizar `SecurityConfig` con las nuevas rutas y roles.
+- [ ] Actualizar `SecurityConfig` con las nuevas rutas y roles. Las rutas de cliente
+      (`/api/orders/me/**`, `/api/addresses/**`, `/api/designs/**`) exigen `ROLE_USER`, que
+      también cumple un admin (D11), y deben declararse **antes** que la regla de admin
+      `/api/orders/**`.
 
 **Hecho cuando:** con Postman se recorre *cotizar → subir diseño → crear pedido → pagar →
 el admin avanza estados hasta ENTREGADO*, y cada regla rota responde 400, 409 o 422 con un
@@ -489,6 +496,5 @@ Se retoman solo si el núcleo (fases 0 a 5) está terminado:
 - Cupones de descuento.
 - Reseñas de productos.
 - Banners administrables (la tabla `banners` ya existe).
-- Sincronización de stock y precios con CJ Dropshipping (D8).
 - Recuperación de contraseña por correo.
 - Correo de confirmación de pedido (nuevo consumidor del evento de la fase 4).

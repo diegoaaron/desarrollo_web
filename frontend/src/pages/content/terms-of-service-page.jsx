@@ -4,44 +4,44 @@ import { LegalDocument } from "./components/legal-document";
 
 const TERMS_SECTIONS = [
   {
-    title: "Acceptance of Terms",
+    title: "Aceptación de los términos",
     content:
-      "By accessing and using the Coral Shop website and services, you agree to these Terms of Service. If you do not agree, please do not use our services.",
+      "Al acceder y usar el sitio web y los servicios de Coral Shop, aceptas estos Términos del servicio. Si no estás de acuerdo, te pedimos no utilizar nuestros servicios.",
   },
   {
-    title: "Account Registration",
+    title: "Registro de cuenta",
     content:
-      "Some features may require an account. You are responsible for keeping your credentials confidential and for activity that takes place through your account.",
+      "Algunas funciones requieren una cuenta. Eres responsable de mantener la confidencialidad de tus credenciales y de la actividad que se realice desde tu cuenta.",
   },
   {
-    title: "Products and Pricing",
+    title: "Productos y precios",
     content:
-      "We work to keep product descriptions, availability, and prices accurate. We reserve the right to correct errors and update information when necessary.",
+      "Procuramos que las descripciones, la disponibilidad y los precios de los productos sean exactos. Nos reservamos el derecho de corregir errores y actualizar la información cuando sea necesario.",
   },
   {
-    title: "Orders and Payment",
+    title: "Pedidos y pagos",
     content:
-      "By placing an order, you confirm that the supplied information is accurate. We may refuse or cancel orders due to availability, payment issues, or incorrect product information.",
+      "Al realizar un pedido, confirmas que la información proporcionada es correcta. Podemos rechazar o cancelar pedidos por falta de disponibilidad, problemas con el pago o información incorrecta del producto.",
   },
   {
-    title: "Shipping and Returns",
+    title: "Envíos y devoluciones",
     content:
-      "Delivery and return conditions are described on our Shipping Information and Returns pages. By completing a purchase, you agree to those conditions.",
+      "Las condiciones de entrega y devolución se describen en nuestras páginas de Información de envío y de Cambios y devoluciones. Al completar una compra, aceptas dichas condiciones.",
   },
   {
-    title: "Intellectual Property",
+    title: "Propiedad intelectual",
     content:
-      "Text, graphics, branding, and images on this website belong to Coral Shop or their respective owners and may not be reproduced without permission.",
+      "Los textos, gráficos, la marca y las imágenes de este sitio web pertenecen a Coral Shop o a sus respectivos titulares y no pueden reproducirse sin autorización.",
   },
   {
-    title: "Limitation of Liability",
+    title: "Limitación de responsabilidad",
     content:
-      "To the extent permitted by law, Coral Shop is not responsible for indirect, incidental, or consequential damages arising from use of our services or products.",
+      "En la medida en que lo permita la ley, Coral Shop no se responsabiliza por daños indirectos, incidentales o consecuentes derivados del uso de nuestros servicios o productos.",
   },
   {
-    title: "Changes to These Terms",
+    title: "Cambios en estos términos",
     content:
-      "We may update these terms when our services or legal obligations change. Continued use after an update indicates acceptance of the revised terms.",
+      "Podemos actualizar estos términos cuando cambien nuestros servicios o nuestras obligaciones legales. El uso continuado tras una actualización implica la aceptación de los términos revisados.",
   },
 ];
 
@@ -49,13 +49,13 @@ export function TermsOfServicePage() {
   return (
     <ContentPage
       eyebrow="Legal"
-      title="Terms designed to be understood"
-      description="Last updated September 2026. These terms describe the agreement between you and Coral when using our store."
+      title="Términos pensados para entenderse"
+      description="Última actualización: septiembre de 2026. Estos términos describen el acuerdo entre tú y Coral al usar nuestra tienda."
       icon={FileCheck2}
     >
       <LegalDocument
         sections={TERMS_SECTIONS}
-        contactEmail="terms@coralshop.com"
+        contactEmail="terminos@coralshop.pe"
       />
     </ContentPage>
   );

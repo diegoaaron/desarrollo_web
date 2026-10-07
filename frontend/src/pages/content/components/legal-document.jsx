@@ -5,9 +5,9 @@ export function LegalDocument({ sections, contactEmail }) {
     <div className="mx-auto grid max-w-5xl gap-6 lg:grid-cols-[14rem_minmax(0,1fr)]">
       <aside className="h-fit rounded-2xl border border-stone-200 bg-white p-5 lg:sticky lg:top-48">
         <p className="text-xs font-black uppercase tracking-[0.18em] text-[#e94727]">
-          On this page
+          En esta página
         </p>
-        <nav className="mt-4" aria-label="Document sections">
+        <nav className="mt-4" aria-label="Secciones del documento">
           <ol className="space-y-1">
             {sections.map((section, index) => (
               <li key={section.title}>
@@ -48,7 +48,7 @@ export function LegalDocument({ sections, contactEmail }) {
 
         <div className="bg-stone-50 p-5 sm:p-8">
           <p className="text-sm leading-6 text-slate-600">
-            Questions about this document? Email{" "}
+            ¿Tienes preguntas sobre este documento? Escríbenos a{" "}
             <a
               href={`mailto:${contactEmail}`}
               className="font-bold text-[#e94727] underline decoration-[#ff5331]/30 underline-offset-4 hover:decoration-[#ff5331] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff5331]"

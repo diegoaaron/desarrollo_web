@@ -27,7 +27,8 @@ def h(doc, nivel, texto):
 
 
 # ============================================================== PORTADA
-def portada(doc):
+def caratula(doc, etiqueta="PROYECTO FINAL"):
+    """Carátula común a los entregables: universidad, título, datos del curso y grupo."""
     for _ in range(2):
         doc.add_paragraph()
     parrafo(doc, "UNIVERSIDAD TECNOLÓGICA DEL PERÚ", size=16, bold=True,
@@ -35,7 +36,7 @@ def portada(doc):
     parrafo(doc, f"Facultad de Ingeniería  ·  {C.CARRERA}", size=12,
             color=MUTED, align=CENTRO, space_after=36)
 
-    parrafo(doc, "PROYECTO FINAL", size=11, bold=True, color=ACCENT, align=CENTRO,
+    parrafo(doc, etiqueta, size=11, bold=True, color=ACCENT, align=CENTRO,
             space_after=6)
     parrafo(doc, C.TITULO, size=20, bold=True, color=PRIMARY, align=CENTRO,
             space_after=6)
@@ -54,6 +55,10 @@ def portada(doc):
 
     parrafo(doc, "Lima - Perú", size=11, color=MUTED, align=CENTRO, space_after=0)
     salto_pagina(doc)
+
+
+def portada(doc):
+    caratula(doc)
 
     h(doc, 1, "Índice")
     indice(doc)

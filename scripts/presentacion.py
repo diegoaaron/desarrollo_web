@@ -7,6 +7,7 @@ from pptx.enum.shapes import MSO_SHAPE
 from pptx.enum.text import PP_ALIGN, MSO_ANCHOR
 from pptx.util import Inches, Pt
 
+import contenido as CONT
 from pptx_util import (
     nueva_presentacion, lamina, caja, texto, cabecera, chip, tarjeta, vinetas,
     figura, pie, numero,
@@ -23,7 +24,7 @@ M = MSO_ANCHOR.MIDDLE
 
 
 # ------------------------------------------------------------------ 1 portada
-def portada(prs):
+def portada(prs, lema="Proyecto Final  ·  Diagnóstico, diseño de la solución y plan de implementación"):
     s = lamina(prs, DARK)
     caja(s, 10.2, -1.6, 4.8, 4.8, color=PRIMARY, forma=MSO_SHAPE.OVAL)
     caja(s, 11.6, 4.9, 3.4, 3.4, color=ACCENT, forma=MSO_SHAPE.OVAL)
@@ -37,21 +38,17 @@ def portada(prs):
           "Plataforma de comercio electrónico para\nla venta de ropa juvenil personalizable",
           size=21, color=ROSE, font=TITULO, interlineado=1.2)
     texto(s, 0.8, 3.62, 9.4, 0.4,
-          "Proyecto Final  ·  Diagnóstico, diseño de la solución y plan de implementación",
-          size=14, color=MUTED_LIGHT)
+          lema, size=14, color=MUTED_LIGHT)
 
     caja(s, 0.8, 4.35, 11.1, 2.0, color=PRIMARY)
     datos = [("CURSO", "Desarrollo Web Integrado", 1.15, 3.2),
-             ("DOCENTE", "Ronald Fernando Medina Cabrera", 4.75, 3.6),
-             ("AÑO", "2026", 8.7, 2.0)]
+             ("DOCENTE", CONT.DOCENTE, 4.75, 3.6),
+             ("AÑO", CONT.CICLO, 8.7, 2.0)]
     for etiqueta, valor, x, w in datos:
         texto(s, x, 4.62, w, 0.25, etiqueta, size=9.5, color=ROSE, bold=True, spc=100)
         texto(s, x, 4.90, w, 0.32, valor, size=13, color=CREAM)
     texto(s, 1.15, 5.44, 3.0, 0.25, "GRUPO 1", size=9.5, color=ROSE, bold=True, spc=100)
-    texto(s, 1.15, 5.72, 10.4, 0.6,
-          "Choquehuanca Marrufo, Liam Lennon  ·  Damián Valdivia, Diego Aarón  ·  "
-          "Loayza Gerónimo, Juan Franco  ·  Villanueva Montalvo, Apolo Chris  ·  "
-          "Campos Sulca, Jian Pier",
+    texto(s, 1.15, 5.72, 10.4, 0.6, "  ·  ".join(CONT.INTEGRANTES),
           size=12.5, color=CREAM, interlineado=1.25)
 
 

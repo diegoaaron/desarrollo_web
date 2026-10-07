@@ -69,26 +69,19 @@ public class ProductRepository {
                 """, VARIANT_MAPPER, productId);
     }
 
-    public boolean existsByCjProductId(String cjProductId) {
-        Integer count = jdbc.queryForObject("SELECT count(*) FROM products WHERE cj_product_id = ?",
-                Integer.class, cjProductId);
-        return count != null && count > 0;
-    }
-
     /** Inserta el producto, su imagen principal y sus variantes; devuelve el id generado. */
     public long insert(NewProduct product) {
         GeneratedKeyHolder keys = new GeneratedKeyHolder();
         jdbc.update(connection -> {
             PreparedStatement statement = connection.prepareStatement("""
-                    INSERT INTO products (name, description, base_price, category_id, is_active, cj_product_id)
-                    VALUES (?, ?, ?, ?, ?, ?)
+                    INSERT INTO products (name, description, base_price, category_id, is_active)
+                    VALUES (?, ?, ?, ?, ?)
                     """, new String[] {"id"});
             statement.setString(1, product.name());
             statement.setString(2, product.description());
             statement.setBigDecimal(3, product.basePrice());
             statement.setLong(4, product.categoryId());
             statement.setBoolean(5, product.active());
-            statement.setString(6, product.cjProductId());
             return statement;
         }, keys);
         long productId = keys.getKey().longValue();
@@ -97,10 +90,9 @@ public class ProductRepository {
                 productId, product.imageUrl(), product.name());
         for (NewProduct.Variant variant : product.variants()) {
             jdbc.update("""
-                    INSERT INTO product_variants (product_id, size_id, color_id, sku, stock, cj_variant_id)
-                    VALUES (?, ?, ?, ?, ?, ?)
-                    """, productId, variant.sizeId(), variant.colorId(), variant.sku(), variant.stock(),
-                    variant.cjVariantId());
+                    INSERT INTO product_variants (product_id, size_id, color_id, sku, stock)
+                    VALUES (?, ?, ?, ?, ?)
+                    """, productId, variant.sizeId(), variant.colorId(), variant.sku(), variant.stock());
         }
         return productId;
     }

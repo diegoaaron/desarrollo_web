@@ -37,22 +37,16 @@ public class ProductAdminService {
         return new CatalogOptionsResponse(optionRepository.findSizes(), optionRepository.findColors());
     }
 
+    /** Registra el producto con su imagen principal y variantes en una sola transacción. */
     @Transactional
     public long create(CreateProductRequest request) {
         List<NewProduct.Variant> variants = request.variants().stream()
                 .map(variant -> new NewProduct.Variant(variant.sizeId(), variant.colorId(), variant.sku().trim(),
-                        variant.stock(), null))
+                        variant.stock()))
                 .toList();
-        return register(new NewProduct(request.name().trim(), request.description(), request.basePrice(),
-                request.categoryId(), request.imageUrl().trim(), request.isActive(), null, variants));
-    }
+        NewProduct product = new NewProduct(request.name().trim(), request.description(), request.basePrice(),
+                request.categoryId(), request.imageUrl().trim(), request.isActive(), variants);
 
-    /**
-     * Registra un producto con su imagen principal y variantes en una sola transacción.
-     * Lo usan el alta manual y la importación desde CJ.
-     */
-    @Transactional
-    public long register(NewProduct product) {
         if (!optionRepository.isActiveCategory(product.categoryId())) {
             throw new BusinessRuleException("Selecciona una categoría activa");
         }
@@ -72,7 +66,7 @@ public class ProductAdminService {
         try {
             return productRepository.insert(product);
         } catch (DataIntegrityViolationException exception) {
-            throw new ConflictException("El SKU ya existe o el producto de CJ ya fue importado", exception);
+            throw new ConflictException("Alguno de los SKU ya está registrado", exception);
         }
     }
 }

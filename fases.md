@@ -55,7 +55,7 @@ pecho (4 S, 4 M, 4 L), paga y ve su pedido pasar de PAGADO a ENTREGADO.*
 | D5 | Zonas predefinidas **por tipo de producto** (polo/polera: pecho izq., pecho centro, espalda, mangas; gorra: frente, lateral; tote: cara A, cara B) | ✅ Definida |
 | D6 | Pago **simulado** en las fases 2 y 3; **pasarela real en la fase 6** | ✅ Definida |
 | D7 | Imágenes del cliente: PNG/JPG de hasta 5 MB, guardadas en PostgreSQL (`bytea`), porque el disco de Railway es efímero | ✅ Definida |
-| D8 | CJ Dropshipping **congelado**: se conserva lo que existe, sin nuevas inversiones | ✅ Definida |
+| D8 | **Sin proveedores externos**: todos los productos base a personalizar se cargan y configuran desde el panel admin de Coral Shop. La integración con CJ Dropshipping que traía el backend se **eliminó** | ✅ Definida |
 | D9 | Interfaz en **español**; moneda **S/ (PEN)**; direcciones con departamento, provincia y distrito | ✅ Definida |
 | D10 | El servidor **siempre recalcula** precio y stock; nunca confía en importes enviados por el navegador | ✅ Definida |
 
@@ -93,7 +93,7 @@ bloqueaban cantidades que el cliente igual podía armar agregando unidades suelt
 
 **Base de datos**
 
-- Todo cambio de esquema es una **migración Flyway nueva** (`V3__…`, `V4__…`); nunca se
+- Todo cambio de esquema es una **migración Flyway nueva** (`V4__…`, `V5__…`); nunca se
   edita una migración ya aplicada.
 - `snake_case`; dinero en `NUMERIC(12,2)`; fechas en `TIMESTAMPTZ`.
 
@@ -118,7 +118,7 @@ bloqueaban cantidades que el cliente igual podía armar agregando unidades suelt
 | Fase | Objetivo | Depende de | Resultado visible |
 |---|---|---|---|
 | **0** | Ordenar la casa: limpieza, español, S/, capas en el backend | — | Código limpio, catálogo en capas |
-| **1** | Modelo de datos del negocio (migración V3) | 0 | Tablas de personalización, mayoreo y pedidos |
+| **1** | Modelo de datos del negocio (migración V4) | 0 | Tablas de personalización, mayoreo y pedidos |
 | **2** | API del flujo de compra | 1 | Cotizar, subir diseño, crear pedido, pagar (simulado), admin de pedidos |
 | **3** | Frontend del flujo de compra | 2 | Personalizador, carrito, checkout, confirmación, «Mis pedidos» |
 | **4** | Evento de dominio `OrderStatusChanged` | 2 | Notificaciones al cliente y auditoría |
@@ -172,16 +172,15 @@ Las fases 2 y 3 pueden avanzar en paralelo una vez acordados los contratos de la
 - [x] `CatalogController` → `CatalogService` → `ProductRepository` (`JdbcTemplate`).
 - [x] `AdminProductController` → `ProductAdminService` (validaciones y `@Transactional`)
       → `ProductRepository`.
-- [x] `CjImportController` → `CjImportService` → `ProductRepository` + `CjClient`
-      (reutilizar la inserción de producto; sin SQL duplicado).
 - [x] `AdminOverviewController` → `StatsService` → `StatsRepository`.
 - [x] `GlobalExceptionHandler` (`@RestControllerAdvice`): 400 / 404 / 409 / 422 / 500
       con JSON uniforme.
 - [x] Mensajes de error en español en todo el backend.
 - [x] `SecurityConfig`: dejar solo las reglas de rutas que existen o existirán en la fase 2.
-- [ ] Rotar la clave de CJ (el Word indica que fue expuesta). **Acción manual del dueño de la cuenta CJ**: generar una clave nueva y actualizar `CJ_API_KEY` en Railway.
+- [x] Eliminar la integración con CJ Dropshipping (D8): clases, pantalla de importación y
+      migración `V3__remove_external_product_sources.sql`, que retira las columnas `cj_*`.
 
-**Estado (2026-10-07):** completada salvo la rotación de la clave de CJ. Commits `0d4dace`, `27d43da` y `08f332a` en la rama `fase-0-orden`.
+**Estado (2026-10-07):** completada en la rama `fase-0-orden`.
 
 **Hecho cuando:** el frontend arranca sin archivos muertos y en español; ningún controller
 usa `JdbcTemplate`; los endpoints actuales responden igual que antes.
@@ -191,11 +190,11 @@ usa `JdbcTemplate`; los endpoints actuales responden igual que antes.
 ## Fase 1 — Modelo de datos del negocio
 
 **Objetivo:** que la base de datos soporte personalización, mayoreo, pedidos, pagos y
-seguimiento. Se entrega como `backend/src/main/resources/db/migration/V3__negocio_personalizacion.sql`
-(más `V4` para datos semilla si se separan).
+seguimiento. Se entrega como `backend/src/main/resources/db/migration/V4__negocio_personalizacion.sql`
+(más `V5` para datos semilla si se separan). La `V3` ya existe: retira las columnas de CJ.
 
 > `orders` y `order_items` existen desde la V1, pero ningún flujo los usa todavía y
-> están vacías; la V3 puede **recrearlas** con la estructura definitiva.
+> están vacías; la V4 puede **recrearlas** con la estructura definitiva.
 
 ### 1.1 Catálogo
 
@@ -242,7 +241,7 @@ PENDIENTE_PAGO ──pago aprobado──► PAGADO ──► EN_PRODUCCION ─�
 
 ### 1.6 Tareas
 
-- [ ] Escribir `V3__negocio_personalizacion.sql` con las tablas y restricciones anteriores.
+- [ ] Escribir `V4__negocio_personalizacion.sql` con las tablas y restricciones anteriores.
 - [ ] Semilla: tipos, técnicas, zonas, `product_type_zones` con recargos, escalas de
       mayoreo y métodos de envío.
 - [ ] Asignar `product_type_id` a los productos existentes.
@@ -250,7 +249,7 @@ PENDIENTE_PAGO ──pago aprobado──► PAGADO ──► EN_PRODUCCION ─�
       diagramas ER del entregable 2).
 - [ ] Diagrama ER actualizado (`python scripts/figuras.py`).
 
-**Hecho cuando:** el backend arranca, Flyway aplica la V3 sin errores y JPA valida el
+**Hecho cuando:** el backend arranca, Flyway aplica la V4 sin errores y JPA valida el
 esquema (`ddl-auto=validate`).
 
 ---
@@ -491,6 +490,5 @@ Se retoman solo si el núcleo (fases 0 a 5) está terminado:
 - Cupones de descuento.
 - Reseñas de productos.
 - Banners administrables (la tabla `banners` ya existe).
-- Sincronización de stock y precios con CJ Dropshipping (D8).
 - Recuperación de contraseña por correo.
 - Correo de confirmación de pedido (nuevo consumidor del evento de la fase 4).

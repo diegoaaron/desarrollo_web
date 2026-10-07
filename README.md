@@ -161,11 +161,10 @@ Configurations… → Backend**):
 | `DB_URL` | sí | URL JDBC de PostgreSQL |
 | `DB_USER` | sí | usuario de la base |
 | `DB_PASSWORD` | sí | contraseña de la base |
-| `CJ_API_KEY` | no | clave de CJ Dropshipping; solo la usa la importación de productos del panel admin |
 
 > La clave `coralshop` solo vale para la base local en Docker, por eso puede ir en el
-> repositorio. **Nunca** agregues a `.run/` claves reales (`CJ_API_KEY`, credenciales de
-> Railway): si necesitas `CJ_API_KEY`, crea una copia de la configuración **Backend**
+> repositorio. **Nunca** agregues a `.run/` claves reales (credenciales de Railway o de
+> servicios de pago): si necesitas una, crea una copia de la configuración **Backend**
 > desmarcando *Store as project file*, para que quede solo en tu máquina.
 
 ### Paso 7 — (Opcional) Ver la base de datos desde IntelliJ

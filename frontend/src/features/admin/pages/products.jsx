@@ -1,4 +1,4 @@
-import { Package, Plus, Search } from "lucide-react";
+import { Package, Plus } from "lucide-react";
 import { Link } from "react-router";
 import {
   AdminBadge,
@@ -8,7 +8,6 @@ import {
   ErrorState,
 } from "../components/admin-ui";
 import { primaryButtonStyles } from "../components/admin-styles";
-import { secondaryButtonStyles } from "../components/admin-styles";
 import { useProducts } from "../hooks/use-products";
 import { formatPrice } from "../../../shared/utils/format-price";
 
@@ -25,14 +24,11 @@ export function Products() {
         eyebrow="Catálogo"
         title="Productos"
         description="Agrega prendas a tu catálogo. La edición y la eliminación estarán disponibles en una próxima actualización."
-        actions={<div className="flex flex-wrap gap-3">
-          <Link to="/admin/products/import" className={secondaryButtonStyles}>
-            <Search className="h-4 w-4" aria-hidden="true" /> Importar desde CJ
-          </Link>
+        actions={
           <Link to="/admin/products/new" className={primaryButtonStyles}>
             <Plus className="h-4 w-4" aria-hidden="true" /> Agregar producto
           </Link>
-        </div>}
+        }
       />
 
       <AdminPanel>

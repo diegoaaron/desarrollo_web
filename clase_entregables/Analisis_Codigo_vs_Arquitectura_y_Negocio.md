@@ -2,6 +2,12 @@
 
 **Grupo 1 · Desarrollo Web Integrado (UTP) · 7 de octubre de 2026**
 
+> **Actualización (7 de octubre de 2026).** Tras este análisis el equipo decidió **eliminar
+> por completo la integración con CJ Dropshipping**: la tienda no obtiene productos de
+> otros comercios; todos los productos base a personalizar se cargan y configuran desde el
+> panel admin de Coral Shop (decisión D8 de `fases.md`). Las menciones a CJ que siguen
+> abajo describen el código tal como estaba al momento del análisis.
+
 Fuentes comparadas:
 
 1. `clase_referencias/Coral_Shop_Arquitectura_Actual_y_Evolucion_v1.docx` (v1.1, octubre 2026).
@@ -38,7 +44,7 @@ Fuentes comparadas:
 **Camino recomendado (detalle en §7):** mantener Spring Boot, ordenar las capas como en
 clase, y construir **el flujo vertical completo** *producto → personalizar → cantidad →
 carrito → checkout → pedido → seguimiento hasta la entrega* antes que cualquier otra
-cosa. Dejar CJ Dropshipping fuera del núcleo.
+cosa. Eliminar la integración con CJ Dropshipping (ya ejecutado, ver D8).
 
 ---
 
@@ -151,8 +157,7 @@ pedido (§7, fase 4).
 - **CJ Dropshipping vs. personalización.** CJ vende productos terminados que se envían
   desde el proveedor; la personalización exige **prendas en blanco en stock local** que se
   estampan o bordan en el taller. La integración CJ (≈ 25 % del backend) no aporta al flujo
-  principal. Recomendación: dejarla como funcionalidad secundaria de abastecimiento y **no
-  invertir más en ella**.
+  principal. Decisión: **eliminarla** (D8).
 - **Moneda y mercado.** Los precios se muestran como `$` y la importación usa USD; la
   empresa es peruana: debe ser **S/ (PEN)**, con distritos/provincias de Perú en la
   dirección.
@@ -199,7 +204,6 @@ pedido (§7, fase 4).
 - Rutas autorizadas en `SecurityConfig` que no tienen controller (`/api/users/**`,
   `/api/orders/**`, `/api/categories/**` para escritura).
 - Sin pruebas, sin paginación, sin manejo global de errores (`@RestControllerAdvice`).
-- El Word indica que una clave de CJ fue expuesta: **debe rotarse**.
 - Despliegue: sesión y CSRF con frontend en Vercel y backend en Railway requieren que
   `/api` se sirva por el mismo dominio (el `vercel.json` ya hace *rewrite*; verificar el
   login en producción).
@@ -219,7 +223,7 @@ pedido (§7, fase 4).
 | D5 | Zonas | Predefinidas por **tipo de producto**: polo y polera (pecho izquierdo, pecho centro, espalda, manga), gorra (frente, lateral), tote (cara A, cara B). Cada zona tiene medidas máximas y recargo. |
 | D6 | Pago | **Simulado** (tarjeta de prueba / Yape simulado) con estados reales; no integrar una pasarela real para el curso. |
 | D7 | Archivos subidos | PNG/JPG ≤ 5 MB. Guardarlos en PostgreSQL (`bytea`) o en un volumen de Railway; el disco de Railway es efímero. |
-| D8 | CJ Dropshipping | Congelado: se conserva lo que existe, sin nuevas inversiones. |
+| D8 | Origen de los productos | **Sin proveedores externos**: todos los productos base se cargan desde el panel admin. La integración CJ se **elimina**. |
 | D9 | Idioma y moneda | Español y **S/**. |
 
 ### 7.2 Fases
@@ -298,4 +302,4 @@ real y demostrable en la exposición, sin broker.
 
 > **En una frase:** primero una sola historia de punta a punta —*un cliente personaliza
 > 12 polos con su logo en el pecho, paga y ve su pedido pasar de PAGADO a ENTREGADO*—; todo
-> lo demás (CJ, favoritos, banners, cupones) espera.
+> lo demás (favoritos, banners, cupones) espera.

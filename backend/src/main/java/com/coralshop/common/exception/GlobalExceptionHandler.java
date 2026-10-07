@@ -85,12 +85,6 @@ public class GlobalExceptionHandler {
         return respond(HttpStatus.UNPROCESSABLE_ENTITY, exception.getMessage());
     }
 
-    @ExceptionHandler(ExternalServiceException.class)
-    public ResponseEntity<ApiError> externalService(ExternalServiceException exception) {
-        log.warn("Falla de servicio externo: {}", exception.getMessage(), exception.getCause());
-        return respond(exception.getStatus(), exception.getMessage());
-    }
-
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiError> unexpected(Exception exception) {
         log.error("Error inesperado", exception);

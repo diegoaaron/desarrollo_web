@@ -10,13 +10,34 @@ export const fieldStyles =
 export const selectStyles =
   "min-h-10 rounded-xl border border-stone-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 outline-none transition focus:border-[#ff5331] focus:ring-4 focus:ring-[#ff5331]/10";
 
+// Los valores (PENDING, ROLE_ADMIN…) viajan en inglés a la API; solo se traduce la etiqueta.
+export const ORDER_STATUS_LABELS = {
+  PENDING: "Pendiente",
+  SHIPPED: "Enviado",
+  DELIVERED: "Entregado",
+  CANCELLED: "Cancelado",
+};
+
+export const ROLE_LABELS = {
+  ROLE_ADMIN: "Administrador",
+  ROLE_USER: "Cliente",
+};
+
+export const BADGE_LABELS = {
+  ...ORDER_STATUS_LABELS,
+  ACTIVE: "Activo",
+  INACTIVE: "Inactivo",
+  ADMIN: "Administrador",
+  USER: "Cliente",
+};
+
 export function formatAdminDate(value) {
   if (!value) return "—";
 
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return "—";
 
-  return date.toLocaleDateString(undefined, {
+  return date.toLocaleDateString("es-PE", {
     month: "short",
     day: "numeric",
     year: "numeric",

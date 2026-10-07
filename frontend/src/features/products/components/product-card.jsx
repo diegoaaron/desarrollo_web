@@ -1,4 +1,5 @@
 import { Link } from "react-router";
+import { formatPrice } from "../../../shared/utils/format-price";
 
 export function ProductCard({ product }) {
   const { imageUrl, name, basePrice, categoryName, totalStock } = product;
@@ -10,7 +11,7 @@ export function ProductCard({ product }) {
           {imageUrl ? (
             <img className="w-full h-full object-contain mx-auto transition-transform duration-300 group-hover:scale-105" src={imageUrl} alt={name} />
           ) : (
-            <span className="text-sm text-gray-400">Image coming soon</span>
+            <span className="text-sm text-gray-400">Imagen próximamente</span>
           )}
         </div>
         <div className="px-5">
@@ -22,9 +23,9 @@ export function ProductCard({ product }) {
       </Link>
       <div className="px-5 pb-5">
         <div className="flex items-center justify-between gap-4">
-          <p className="text-xl text-[#ff5331]">${basePrice.toFixed(2)}</p>
+          <p className="text-xl text-[#ff5331]">{formatPrice(basePrice)}</p>
           <Link to={`/product/${product.id}`} className="rounded-md bg-[#ff5331] px-4 py-2 text-sm font-semibold text-white hover:bg-[#e94727]">
-            {totalStock > 0 ? "Choose options" : "View product"}
+            {totalStock > 0 ? "Elegir opciones" : "Ver producto"}
           </Link>
         </div>
       </div>

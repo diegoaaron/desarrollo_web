@@ -1,34 +1,45 @@
 import { ShieldCheck, UserRound } from "lucide-react";
 import {
+  ActionAlert,
   AdminBadge,
   AdminPageHeader,
   AdminPanel,
   EmptyState,
   ErrorState,
 } from "../components/admin-ui";
-import { formatAdminDate, selectStyles } from "../components/admin-styles";
+import { ROLE_LABELS, formatAdminDate, selectStyles } from "../components/admin-styles";
 import { useUsers } from "../hooks/use-users";
 
 const SKELETONS = Array.from({ length: 5 }, (_, index) => index);
 
 export function Users() {
-  const { users, loading, error, updateRole } = useUsers();
+  const {
+    users,
+    loading,
+    error,
+    actionError,
+    updatingId,
+    updateRole,
+    clearActionError,
+  } = useUsers();
 
   if (error) return <ErrorState error={error} />;
 
   return (
     <div>
       <AdminPageHeader
-        eyebrow="Community"
-        title="Users"
-        description="Review customer accounts and manage access to the admin workspace."
+        eyebrow="Comunidad"
+        title="Usuarios"
+        description="Revisa las cuentas de los clientes y administra el acceso al panel de administración."
         actions={
           <div className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-stone-200 bg-white px-4 text-sm font-bold text-slate-600 shadow-sm sm:w-auto">
             <UserRound className="h-4 w-4 text-[#e94727]" aria-hidden="true" />
-            {users.length} total
+            {users.length} en total
           </div>
         }
       />
+
+      <ActionAlert message={actionError} onDismiss={clearActionError} />
 
       <AdminPanel>
         <div className="flex items-center gap-3 border-b border-stone-200/80 px-5 py-5 sm:px-7">
@@ -36,8 +47,8 @@ export function Users() {
             <ShieldCheck className="h-4 w-4" aria-hidden="true" />
           </span>
           <div>
-            <h2 className="font-black text-slate-900">Account access</h2>
-            <p className="text-xs text-slate-400">Assign roles carefully to protect your store.</p>
+            <h2 className="font-black text-slate-900">Acceso a cuentas</h2>
+            <p className="text-xs text-slate-400">Asigna los roles con cuidado para proteger tu tienda.</p>
           </div>
         </div>
 
@@ -57,16 +68,17 @@ export function Users() {
                   </div>
                   <div className="mt-5 flex items-end gap-4">
                     <div className="flex-1">
-                      <p className="text-[0.65rem] font-black uppercase tracking-wider text-slate-400">Joined</p>
+                      <p className="text-[0.65rem] font-black uppercase tracking-wider text-slate-400">Registro</p>
                       <p className="mt-1 text-sm font-bold text-slate-600">{formatAdminDate(user.createdAt)}</p>
                     </div>
                     <div>
-                      <label className="sr-only" htmlFor={`user-${user.id}-role`}>Update {user.username}'s role</label>
+                      <label className="sr-only" htmlFor={`user-${user.id}-role`}>Actualizar el rol de {user.username}</label>
                       <select
                         id={`user-${user.id}-role`}
                         value={user.roleId}
                         onChange={(event) => updateRole(user.id, Number(event.target.value))}
-                        className={selectStyles}
+                        disabled={updatingId === user.id}
+                        className={`${selectStyles} disabled:opacity-50`}
                       >
                         <RoleOptions />
                       </select>
@@ -81,11 +93,11 @@ export function Users() {
                 <thead className="bg-stone-50/80">
                   <tr className="text-[0.66rem] font-black uppercase tracking-[0.14em] text-slate-400">
                     <th className="px-6 py-4">ID</th>
-                    <th className="px-6 py-4">User</th>
-                    <th className="px-6 py-4">Email</th>
-                    <th className="px-6 py-4">Role</th>
-                    <th className="px-6 py-4">Joined</th>
-                    <th className="px-6 py-4 text-right">Access</th>
+                    <th className="px-6 py-4">Usuario</th>
+                    <th className="px-6 py-4">Correo</th>
+                    <th className="px-6 py-4">Rol</th>
+                    <th className="px-6 py-4">Registro</th>
+                    <th className="px-6 py-4 text-right">Acceso</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-stone-100">
@@ -97,12 +109,13 @@ export function Users() {
                       <td className="px-6 py-4"><RoleBadge role={user.roleName} /></td>
                       <td className="px-6 py-4 text-sm text-slate-500">{formatAdminDate(user.createdAt)}</td>
                       <td className="px-6 py-4 text-right">
-                        <label className="sr-only" htmlFor={`desktop-user-${user.id}-role`}>Update {user.username}'s role</label>
+                        <label className="sr-only" htmlFor={`desktop-user-${user.id}-role`}>Actualizar el rol de {user.username}</label>
                         <select
                           id={`desktop-user-${user.id}-role`}
                           value={user.roleId}
                           onChange={(event) => updateRole(user.id, Number(event.target.value))}
-                          className={selectStyles}
+                          disabled={updatingId === user.id}
+                          className={`${selectStyles} disabled:opacity-50`}
                         >
                           <RoleOptions />
                         </select>
@@ -114,7 +127,7 @@ export function Users() {
             </div>
           </>
         ) : (
-          <EmptyState title="No users found" description="Registered customer accounts will appear here." />
+          <EmptyState title="No se encontraron usuarios" description="Aquí aparecerán las cuentas de clientes registradas." />
         )}
       </AdminPanel>
     </div>
@@ -123,14 +136,14 @@ export function Users() {
 
 function RoleBadge({ role }) {
   const isAdmin = role === "ROLE_ADMIN";
-  return <AdminBadge value={isAdmin ? "ADMIN" : "USER"} label={isAdmin ? "Admin" : "User"} />;
+  return <AdminBadge value={isAdmin ? "ADMIN" : "USER"} label={ROLE_LABELS[isAdmin ? "ROLE_ADMIN" : "ROLE_USER"]} />;
 }
 
 function RoleOptions() {
   return (
     <>
-      <option value={1}>Admin</option>
-      <option value={2}>User</option>
+      <option value={1}>{ROLE_LABELS.ROLE_ADMIN}</option>
+      <option value={2}>{ROLE_LABELS.ROLE_USER}</option>
     </>
   );
 }

@@ -1,6 +1,6 @@
 import {
   ArrowUpRight,
-  DollarSign,
+  Banknote,
   Package,
   ShoppingCart,
   Users,
@@ -15,6 +15,7 @@ import {
 } from "../components/admin-ui";
 import { formatAdminDate } from "../components/admin-styles";
 import { StatsCard } from "../components/stats-card";
+import { formatPrice } from "../../../shared/utils/format-price";
 import { useStats } from "../hooks/use-stats";
 
 const STAT_SKELETONS = Array.from({ length: 4 }, (_, index) => index);
@@ -27,34 +28,34 @@ export function Overview() {
     return (
       <ErrorState
         error={error}
-        detail="Make sure the backend server is running on localhost:8082."
+        detail="Verifica que el servidor backend esté en ejecución en localhost:8082."
       />
     );
   }
 
   const statsData = [
     {
-      title: "Total users",
+      title: "Usuarios",
       value: stats?.totalUsers ?? 0,
       icon: Users,
       color: "bg-blue-50 text-blue-700",
     },
     {
-      title: "Products",
+      title: "Productos",
       value: stats?.totalProducts ?? 0,
       icon: Package,
       color: "bg-[#fff0eb] text-[#e94727]",
     },
     {
-      title: "Orders",
+      title: "Pedidos",
       value: stats?.totalOrders ?? 0,
       icon: ShoppingCart,
       color: "bg-emerald-50 text-emerald-700",
     },
     {
-      title: "Revenue",
-      value: `$${(stats?.totalRevenue ?? 0).toLocaleString()}`,
-      icon: DollarSign,
+      title: "Ingresos",
+      value: formatPrice(stats?.totalRevenue),
+      icon: Banknote,
       color: "bg-violet-50 text-violet-700",
     },
   ];
@@ -64,15 +65,15 @@ export function Overview() {
   return (
     <div>
       <AdminPageHeader
-        eyebrow="Store pulse"
-        title="Dashboard"
-        description="A clear view of your shop's activity, customers, and latest orders."
+        eyebrow="Pulso de la tienda"
+        title="Panel"
+        description="Una vista clara de la actividad de tu tienda, tus clientes y los últimos pedidos."
         actions={
           <Link
             to="/admin/products/new"
             className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-stone-200 bg-white px-4 py-2.5 text-sm font-bold text-slate-700 shadow-sm transition hover:border-stone-300 hover:bg-stone-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff5331] sm:w-auto"
           >
-            Add a product
+            Agregar producto
             <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
           </Link>
         }
@@ -88,17 +89,17 @@ export function Overview() {
         <div className="flex items-center justify-between gap-4 border-b border-stone-200/80 px-5 py-5 sm:px-7">
           <div>
             <p className="text-[0.65rem] font-black uppercase tracking-[0.18em] text-[#e94727]">
-              Live activity
+              Actividad en vivo
             </p>
             <h2 className="mt-1 text-xl font-black tracking-tight text-slate-950">
-              Recent orders
+              Pedidos recientes
             </h2>
           </div>
           <Link
             to="/admin/orders"
             className="text-sm font-bold text-slate-500 transition hover:text-[#e94727] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff5331]"
           >
-            View all
+            Ver todos
           </Link>
         </div>
 
@@ -122,7 +123,7 @@ export function Overview() {
                 <article key={order.id} className="p-5">
                   <div className="flex items-start justify-between gap-4">
                     <div>
-                      <p className="font-black text-slate-950">Order #{order.id}</p>
+                      <p className="font-black text-slate-950">Pedido #{order.id}</p>
                       <p className="mt-1 text-sm text-slate-500">{order.username}</p>
                     </div>
                     <AdminBadge value={order.status} />
@@ -130,7 +131,7 @@ export function Overview() {
                   <div className="mt-5 flex items-end justify-between gap-4">
                     <div>
                       <p className="text-xs font-bold uppercase tracking-wider text-slate-400">Total</p>
-                      <p className="mt-1 font-black text-slate-900">${order.totalAmount?.toFixed(2)}</p>
+                      <p className="mt-1 font-black text-slate-900">{formatPrice(order.totalAmount)}</p>
                     </div>
                     <time className="text-xs font-semibold text-slate-400">
                       {formatAdminDate(order.createdAt)}
@@ -144,11 +145,11 @@ export function Overview() {
               <table className="w-full text-left">
                 <thead className="bg-stone-50/80">
                   <tr className="text-[0.66rem] font-black uppercase tracking-[0.14em] text-slate-400">
-                    <th className="px-7 py-4">Order</th>
-                    <th className="px-7 py-4">Customer</th>
+                    <th className="px-7 py-4">Pedido</th>
+                    <th className="px-7 py-4">Cliente</th>
                     <th className="px-7 py-4">Total</th>
-                    <th className="px-7 py-4">Status</th>
-                    <th className="px-7 py-4">Date</th>
+                    <th className="px-7 py-4">Estado</th>
+                    <th className="px-7 py-4">Fecha</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-stone-100">
@@ -156,7 +157,7 @@ export function Overview() {
                     <tr key={order.id} className="transition-colors hover:bg-[#fffaf7]">
                       <td className="px-7 py-4 text-sm font-black text-slate-900">#{order.id}</td>
                       <td className="px-7 py-4 text-sm font-semibold text-slate-600">{order.username}</td>
-                      <td className="px-7 py-4 text-sm font-black text-slate-900">${order.totalAmount?.toFixed(2)}</td>
+                      <td className="px-7 py-4 text-sm font-black text-slate-900">{formatPrice(order.totalAmount)}</td>
                       <td className="px-7 py-4"><AdminBadge value={order.status} /></td>
                       <td className="px-7 py-4 text-sm text-slate-500">{formatAdminDate(order.createdAt)}</td>
                     </tr>
@@ -166,7 +167,7 @@ export function Overview() {
             </div>
           </>
         ) : (
-          <EmptyState title="No recent orders" description="New orders will appear here as soon as they arrive." />
+          <EmptyState title="No hay pedidos recientes" description="Los nuevos pedidos aparecerán aquí apenas lleguen." />
         )}
       </AdminPanel>
     </div>

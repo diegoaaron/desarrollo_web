@@ -5,6 +5,8 @@ export function useOrders() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [actionError, setActionError] = useState(null);
+  const [updatingId, setUpdatingId] = useState(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -28,10 +30,30 @@ export function useOrders() {
   }, []);
 
   const updateStatus = async (id, status) => {
-    await ordersService.updateStatus(id, status);
-    const data = await ordersService.getAll();
-    setOrders(data);
+    setActionError(null);
+    setUpdatingId(id);
+    try {
+      await ordersService.updateStatus(id, status);
+      const data = await ordersService.getAll();
+      setOrders(data);
+      return true;
+    } catch (err) {
+      setActionError(`No se pudo actualizar el pedido #${id}: ${err.message}`);
+      return false;
+    } finally {
+      setUpdatingId(null);
+    }
   };
 
-  return { orders, loading, error, updateStatus };
+  const clearActionError = () => setActionError(null);
+
+  return {
+    orders,
+    loading,
+    error,
+    actionError,
+    updatingId,
+    updateStatus,
+    clearActionError,
+  };
 }

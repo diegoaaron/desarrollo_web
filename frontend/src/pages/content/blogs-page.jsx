@@ -3,29 +3,29 @@ import { ContentCard, ContentPage } from "./components/content-page";
 
 const ARTICLES = [
   {
-    category: "Design",
-    readTime: "5 min read",
-    title: "The Art of Handcrafted Jewelry",
+    category: "Diseño",
+    readTime: "5 min de lectura",
+    title: "El arte del estampado artesanal",
     description:
-      "Explore the intricate process and dedication behind every handcrafted piece in our spring collection.",
+      "Descubre el proceso minucioso y la dedicación detrás de cada prenda que estampamos en nuestra nueva colección.",
     icon: Gem,
     accent: "from-rose-100 to-orange-50",
   },
   {
-    category: "Sustainability",
-    readTime: "4 min read",
-    title: "An Eco-Friendly Packaging Guide",
+    category: "Sostenibilidad",
+    readTime: "4 min de lectura",
+    title: "Guía de empaques ecoamigables",
     description:
-      "Learn how recyclable and compostable materials help us deliver every order with less impact.",
+      "Conoce cómo los materiales reciclables y compostables nos ayudan a entregar cada pedido con menos impacto.",
     icon: Leaf,
     accent: "from-emerald-100 to-lime-50",
   },
   {
-    category: "Lifestyle",
-    readTime: "6 min read",
-    title: "Decorating with Artisan Goods",
+    category: "Estilo de vida",
+    readTime: "6 min de lectura",
+    title: "Viste tu personalidad",
     description:
-      "Bring warmth and personality into your home through objects made slowly, thoughtfully, and by hand.",
+      "Lleva tu estilo a todas partes con prendas hechas con calma, con intención y pensadas por ti.",
     icon: House,
     accent: "from-amber-100 to-stone-50",
   },
@@ -34,9 +34,9 @@ const ARTICLES = [
 export function BlogsPage() {
   return (
     <ContentPage
-      eyebrow="Stories & inspiration"
-      title="Notes from the Coral community"
-      description="Thoughtful stories about craft, conscious living, and the people behind the pieces we love."
+      eyebrow="Historias e inspiración"
+      title="Notas de la comunidad Coral"
+      description="Historias sobre el oficio, el consumo consciente y las personas detrás de las prendas que amamos."
       icon={BookOpen}
     >
       <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
@@ -70,7 +70,7 @@ export function BlogsPage() {
                   {article.description}
                 </p>
                 <p className="mt-5 inline-flex items-center gap-2 text-sm font-bold text-[#e94727]">
-                  Article coming soon
+                  Artículo próximamente
                   <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
                 </p>
               </div>

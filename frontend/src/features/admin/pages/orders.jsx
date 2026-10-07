@@ -1,20 +1,34 @@
 import { SlidersHorizontal } from "lucide-react";
 import { useState } from "react";
 import {
+  ActionAlert,
   AdminBadge,
   AdminPageHeader,
   AdminPanel,
   EmptyState,
   ErrorState,
 } from "../components/admin-ui";
-import { formatAdminDate, selectStyles } from "../components/admin-styles";
+import {
+  ORDER_STATUS_LABELS,
+  formatAdminDate,
+  selectStyles,
+} from "../components/admin-styles";
+import { formatPrice } from "../../../shared/utils/format-price";
 import { useOrders } from "../hooks/use-orders";
 
 const STATUSES = ["ALL", "PENDING", "SHIPPED", "DELIVERED", "CANCELLED"];
 const SKELETONS = Array.from({ length: 5 }, (_, index) => index);
 
 export function Orders() {
-  const { orders, loading, error, updateStatus } = useOrders();
+  const {
+    orders,
+    loading,
+    error,
+    actionError,
+    updatingId,
+    updateStatus,
+    clearActionError,
+  } = useOrders();
   const [filter, setFilter] = useState("ALL");
   const filteredOrders = filter === "ALL" ? orders : orders.filter((order) => order.status === filter);
 
@@ -23,18 +37,20 @@ export function Orders() {
   return (
     <div>
       <AdminPageHeader
-        eyebrow="Fulfillment"
-        title="Orders"
-        description="Follow every order from checkout to delivery and keep customers informed."
+        eyebrow="Despacho"
+        title="Pedidos"
+        description="Sigue cada pedido desde el pago hasta la entrega y mantén informados a los clientes."
       />
+
+      <ActionAlert message={actionError} onDismiss={clearActionError} />
 
       <AdminPanel>
         <div className="border-b border-stone-200/80 px-5 py-5 sm:px-7">
           <div className="mb-4 flex items-center gap-2">
             <SlidersHorizontal className="h-4 w-4 text-[#e94727]" aria-hidden="true" />
-            <p className="text-xs font-black uppercase tracking-[0.16em] text-slate-500">Filter orders</p>
+            <p className="text-xs font-black uppercase tracking-[0.16em] text-slate-500">Filtrar pedidos</p>
           </div>
-          <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1" aria-label="Order status filter">
+          <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1" aria-label="Filtro por estado del pedido">
             {STATUSES.map((status) => (
               <button
                 key={status}
@@ -47,7 +63,7 @@ export function Orders() {
                 }`}
                 aria-pressed={filter === status}
               >
-                {status === "ALL" ? `All (${orders.length})` : status}
+                {status === "ALL" ? `Todos (${orders.length})` : ORDER_STATUS_LABELS[status]}
               </button>
             ))}
           </div>
@@ -62,7 +78,7 @@ export function Orders() {
                 <article key={order.id} className="p-5 sm:p-6">
                   <div className="flex items-start justify-between gap-4">
                     <div>
-                      <p className="font-black text-slate-950">Order #{order.id}</p>
+                      <p className="font-black text-slate-950">Pedido #{order.id}</p>
                       <p className="mt-1 text-sm font-semibold text-slate-500">{order.username}</p>
                     </div>
                     <AdminBadge value={order.status} />
@@ -70,21 +86,22 @@ export function Orders() {
                   <div className="mt-5 grid grid-cols-2 gap-4 rounded-2xl bg-stone-50 p-4">
                     <div>
                       <p className="text-[0.65rem] font-black uppercase tracking-wider text-slate-400">Total</p>
-                      <p className="mt-1 font-black text-slate-900">${order.totalAmount?.toFixed(2)}</p>
+                      <p className="mt-1 font-black text-slate-900">{formatPrice(order.totalAmount)}</p>
                     </div>
                     <div>
-                      <p className="text-[0.65rem] font-black uppercase tracking-wider text-slate-400">Placed</p>
+                      <p className="text-[0.65rem] font-black uppercase tracking-wider text-slate-400">Fecha</p>
                       <p className="mt-1 text-sm font-bold text-slate-600">{formatAdminDate(order.createdAt)}</p>
                     </div>
                   </div>
                   <label className="mt-4 block text-xs font-black uppercase tracking-wider text-slate-400" htmlFor={`order-${order.id}-status`}>
-                    Update status
+                    Actualizar estado
                   </label>
                   <select
                     id={`order-${order.id}-status`}
                     value={order.status}
                     onChange={(event) => updateStatus(order.id, event.target.value)}
-                    className={`${selectStyles} mt-2 w-full`}
+                    disabled={updatingId === order.id}
+                    className={`${selectStyles} mt-2 w-full disabled:opacity-50`}
                   >
                     <StatusOptions />
                   </select>
@@ -96,12 +113,12 @@ export function Orders() {
               <table className="w-full min-w-[58rem] text-left">
                 <thead className="bg-stone-50/80">
                   <tr className="text-[0.66rem] font-black uppercase tracking-[0.14em] text-slate-400">
-                    <th className="px-6 py-4">Order</th>
-                    <th className="px-6 py-4">Customer</th>
+                    <th className="px-6 py-4">Pedido</th>
+                    <th className="px-6 py-4">Cliente</th>
                     <th className="px-6 py-4">Total</th>
-                    <th className="px-6 py-4">Status</th>
-                    <th className="px-6 py-4">Date</th>
-                    <th className="px-6 py-4 text-right">Update</th>
+                    <th className="px-6 py-4">Estado</th>
+                    <th className="px-6 py-4">Fecha</th>
+                    <th className="px-6 py-4 text-right">Actualizar</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-stone-100">
@@ -109,16 +126,17 @@ export function Orders() {
                     <tr key={order.id} className="transition-colors hover:bg-[#fffaf7]">
                       <td className="px-6 py-4 text-sm font-black text-slate-900">#{order.id}</td>
                       <td className="px-6 py-4 text-sm font-semibold text-slate-600">{order.username}</td>
-                      <td className="px-6 py-4 text-sm font-black text-slate-900">${order.totalAmount?.toFixed(2)}</td>
+                      <td className="px-6 py-4 text-sm font-black text-slate-900">{formatPrice(order.totalAmount)}</td>
                       <td className="px-6 py-4"><AdminBadge value={order.status} /></td>
                       <td className="px-6 py-4 text-sm text-slate-500">{formatAdminDate(order.createdAt)}</td>
                       <td className="px-6 py-4 text-right">
-                        <label className="sr-only" htmlFor={`desktop-order-${order.id}-status`}>Update order {order.id} status</label>
+                        <label className="sr-only" htmlFor={`desktop-order-${order.id}-status`}>Actualizar el estado del pedido {order.id}</label>
                         <select
                           id={`desktop-order-${order.id}-status`}
                           value={order.status}
                           onChange={(event) => updateStatus(order.id, event.target.value)}
-                          className={selectStyles}
+                          disabled={updatingId === order.id}
+                          className={`${selectStyles} disabled:opacity-50`}
                         >
                           <StatusOptions />
                         </select>
@@ -130,7 +148,7 @@ export function Orders() {
             </div>
           </>
         ) : (
-          <EmptyState title="No matching orders" description="Try another status filter or check back when new orders arrive." />
+          <EmptyState title="No hay pedidos que coincidan" description="Prueba con otro filtro de estado o vuelve cuando lleguen nuevos pedidos." />
         )}
       </AdminPanel>
     </div>
@@ -140,10 +158,9 @@ export function Orders() {
 function StatusOptions() {
   return (
     <>
-      <option value="PENDING">Pending</option>
-      <option value="SHIPPED">Shipped</option>
-      <option value="DELIVERED">Delivered</option>
-      <option value="CANCELLED">Cancelled</option>
+      {Object.entries(ORDER_STATUS_LABELS).map(([value, label]) => (
+        <option key={value} value={value}>{label}</option>
+      ))}
     </>
   );
 }

@@ -1,5 +1,8 @@
 const MIN_ITEMS = 1;
-export const MAX_CART_ITEMS = 5;
+
+function canIncrease(item) {
+  return item.quantity < (item.maxQuantity ?? Infinity);
+}
 
 export const CART_ACTIONS = {
   add: "cart/add",
@@ -19,7 +22,7 @@ export function cartReducer(cart, action) {
       }
 
       return cart.map((item) =>
-        item.id === action.item.id && item.quantity < Math.min(MAX_CART_ITEMS, item.maxQuantity ?? MAX_CART_ITEMS)
+        item.id === action.item.id && canIncrease(item)
           ? { ...item, quantity: item.quantity + 1 }
           : item,
       );
@@ -30,7 +33,7 @@ export function cartReducer(cart, action) {
 
     case CART_ACTIONS.increase:
       return cart.map((item) =>
-        item.id === action.id && item.quantity < Math.min(MAX_CART_ITEMS, item.maxQuantity ?? MAX_CART_ITEMS)
+        item.id === action.id && canIncrease(item)
           ? { ...item, quantity: item.quantity + 1 }
           : item,
       );

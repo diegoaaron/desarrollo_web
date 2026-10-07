@@ -38,7 +38,7 @@ export function ProductForm() {
     const combos = variants.map((variant) => `${variant.sizeId}:${variant.colorId}`);
     const skus = variants.map((variant) => variant.sku.trim());
     if (new Set(combos).size !== combos.length || new Set(skus).size !== skus.length) {
-      setSubmitError("Each size/color combination and SKU must be unique.");
+      setSubmitError("Cada combinación de talla y color, y cada SKU, debe ser única.");
       return;
     }
     setSaving(true);
@@ -67,29 +67,29 @@ export function ProductForm() {
   return (
     <div className="mx-auto max-w-5xl">
       <Link to="/admin/products" className="mb-5 inline-flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-[#e94727]">
-        <ArrowLeft className="h-4 w-4" aria-hidden="true" /> Back to products
+        <ArrowLeft className="h-4 w-4" aria-hidden="true" /> Volver a productos
       </Link>
-      <AdminPageHeader eyebrow="Catalog · New item" title="Create product" description="Add a garment with a photo, price, and at least one size/color variant." />
+      <AdminPageHeader eyebrow="Catálogo · Nuevo producto" title="Crear producto" description="Agrega una prenda con foto, precio y al menos una variante de talla y color." />
 
       {submitError ? <p role="alert" className="mb-6 rounded-xl border border-red-200 bg-red-50 px-5 py-4 text-sm text-red-700">{submitError}</p> : null}
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_18rem]">
           <AdminPanel className="space-y-5 p-5 sm:p-7">
-            <h2 className="flex items-center gap-3 text-lg font-black text-slate-950"><PackagePlus className="h-5 w-5 text-[#e94727]" aria-hidden="true" /> Product details</h2>
-            <Field id="product-name" label="Product name">
-              <input id="product-name" required maxLength={180} value={form.name} onChange={(event) => setForm({ ...form, name: event.target.value })} className={`${fieldStyles} mt-2`} placeholder="e.g. Linen shirt" />
+            <h2 className="flex items-center gap-3 text-lg font-black text-slate-950"><PackagePlus className="h-5 w-5 text-[#e94727]" aria-hidden="true" /> Datos del producto</h2>
+            <Field id="product-name" label="Nombre del producto">
+              <input id="product-name" required maxLength={180} value={form.name} onChange={(event) => setForm({ ...form, name: event.target.value })} className={`${fieldStyles} mt-2`} placeholder="p. ej. Polo de algodón" />
             </Field>
-            <Field id="product-description" label="Description" required={false}>
-              <textarea id="product-description" rows={4} value={form.description} onChange={(event) => setForm({ ...form, description: event.target.value })} className={`${fieldStyles} mt-2 resize-y`} placeholder="Materials, fit and care details" />
+            <Field id="product-description" label="Descripción" required={false}>
+              <textarea id="product-description" rows={4} value={form.description} onChange={(event) => setForm({ ...form, description: event.target.value })} className={`${fieldStyles} mt-2 resize-y`} placeholder="Materiales, calce y cuidados" />
             </Field>
             <div className="grid gap-5 sm:grid-cols-2">
-              <Field id="product-price" label="Price ($)">
+              <Field id="product-price" label="Precio (S/)">
                 <input id="product-price" required type="number" min="0" max="9999999999.99" step="0.01" value={form.basePrice} onChange={(event) => setForm({ ...form, basePrice: event.target.value })} className={`${fieldStyles} mt-2`} />
               </Field>
-              <Field id="product-category" label="Category">
+              <Field id="product-category" label="Categoría">
                 <select id="product-category" required value={form.categoryId} onChange={(event) => setForm({ ...form, categoryId: event.target.value })} className={`${fieldStyles} mt-2`}>
-                  <option value="">Select category</option>
+                  <option value="">Selecciona una categoría</option>
                   {categories.map((category) => <option key={category.id} value={category.id}>{category.name}</option>)}
                 </select>
               </Field>
@@ -98,21 +98,21 @@ export function ProductForm() {
 
           <div className="space-y-5">
             <AdminPanel className="space-y-4 p-5 sm:p-6">
-              <h2 className="flex items-center gap-2 font-black text-slate-950"><Image className="h-5 w-5 text-[#e94727]" aria-hidden="true" /> Product image</h2>
-              <Field id="product-image" label="Image URL">
-                <input id="product-image" type="url" required pattern="https?://.+" value={form.imageUrl} onChange={(event) => setForm({ ...form, imageUrl: event.target.value })} className={`${fieldStyles} mt-2`} placeholder="https://example.com/shirt.jpg" />
+              <h2 className="flex items-center gap-2 font-black text-slate-950"><Image className="h-5 w-5 text-[#e94727]" aria-hidden="true" /> Imagen del producto</h2>
+              <Field id="product-image" label="URL de la imagen">
+                <input id="product-image" type="url" required pattern="https?://.+" value={form.imageUrl} onChange={(event) => setForm({ ...form, imageUrl: event.target.value })} className={`${fieldStyles} mt-2`} placeholder="https://ejemplo.com/polo.jpg" />
               </Field>
-              <p className="text-xs leading-5 text-slate-500">Paste a public HTTPS image URL. File uploads are not available yet.</p>
+              <p className="text-xs leading-5 text-slate-500">Pega la URL pública (HTTPS) de una imagen. La subida de archivos aún no está disponible.</p>
               {form.imageUrl.startsWith("https://") || form.imageUrl.startsWith("http://") ? (
-                <img src={form.imageUrl} alt="Product preview" className="h-40 w-full rounded-xl bg-stone-50 object-contain" />
+                <img src={form.imageUrl} alt="Vista previa del producto" className="h-40 w-full rounded-xl bg-stone-50 object-contain" />
               ) : null}
             </AdminPanel>
             <AdminPanel className="p-5 sm:p-6">
               <label htmlFor="product-active" className="flex items-center gap-3 text-sm font-bold text-slate-900">
                 <input id="product-active" type="checkbox" checked={form.isActive} onChange={(event) => setForm({ ...form, isActive: event.target.checked })} className="h-5 w-5 accent-[#ff5331]" />
-                Visible in the storefront
+                Visible en la tienda
               </label>
-              <p className="mt-2 text-xs text-slate-500">Uncheck to save without publishing.</p>
+              <p className="mt-2 text-xs text-slate-500">Desmárcalo para guardar sin publicar.</p>
             </AdminPanel>
           </div>
         </div>
@@ -120,30 +120,30 @@ export function ProductForm() {
         <AdminPanel className="p-5 sm:p-7">
           <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
             <div>
-              <h2 className="text-lg font-black text-slate-950">Sizes, colors & stock</h2>
-              <p className="text-sm text-slate-500">Add one row per size and color. SKU must be unique across the catalog.</p>
+              <h2 className="text-lg font-black text-slate-950">Tallas, colores y stock</h2>
+              <p className="text-sm text-slate-500">Agrega una fila por cada talla y color. El SKU debe ser único en todo el catálogo.</p>
             </div>
             <button type="button" onClick={() => setVariants((current) => [...current, newVariant(Math.max(...current.map((item) => item.key)) + 1)])} className={secondaryButtonStyles}>
-              <Plus className="h-4 w-4" aria-hidden="true" /> Add variant
+              <Plus className="h-4 w-4" aria-hidden="true" /> Agregar variante
             </button>
           </div>
           <div className="space-y-4">
             {variants.map((variant, index) => (
               <div key={variant.key} className="rounded-2xl border border-stone-200 bg-stone-50 p-4">
                 <div className="mb-3 flex items-center justify-between">
-                  <h3 className="text-sm font-bold text-slate-700">Variant {index + 1}</h3>
-                  <button type="button" disabled={variants.length === 1} onClick={() => setVariants((current) => current.filter((item) => item.key !== variant.key))} aria-label={`Remove variant ${index + 1}`} className="rounded-lg p-2 text-slate-500 hover:bg-red-50 hover:text-red-600 disabled:opacity-40"><Trash2 className="h-4 w-4" aria-hidden="true" /></button>
+                  <h3 className="text-sm font-bold text-slate-700">Variante {index + 1}</h3>
+                  <button type="button" disabled={variants.length === 1} onClick={() => setVariants((current) => current.filter((item) => item.key !== variant.key))} aria-label={`Quitar variante ${index + 1}`} className="rounded-lg p-2 text-slate-500 hover:bg-red-50 hover:text-red-600 disabled:opacity-40"><Trash2 className="h-4 w-4" aria-hidden="true" /></button>
                 </div>
                 <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                  <Field id={`size-${variant.key}`} label="Size">
+                  <Field id={`size-${variant.key}`} label="Talla">
                     <select id={`size-${variant.key}`} required value={variant.sizeId} onChange={(event) => updateVariant(variant.key, "sizeId", event.target.value)} className={`${fieldStyles} mt-2`}>
-                      <option value="">Select size</option>
+                      <option value="">Selecciona una talla</option>
                       {options?.sizes.map((size) => <option key={size.id} value={size.id}>{size.name}</option>)}
                     </select>
                   </Field>
                   <Field id={`color-${variant.key}`} label="Color">
                     <select id={`color-${variant.key}`} required value={variant.colorId} onChange={(event) => updateVariant(variant.key, "colorId", event.target.value)} className={`${fieldStyles} mt-2`}>
-                      <option value="">Select color</option>
+                      <option value="">Selecciona un color</option>
                       {options?.colors.map((color) => <option key={color.id} value={color.id}>{color.name}</option>)}
                     </select>
                   </Field>
@@ -160,9 +160,9 @@ export function ProductForm() {
         </AdminPanel>
 
         <div className="flex flex-col-reverse gap-3 rounded-2xl border border-stone-200 bg-white p-5 sm:flex-row sm:justify-end">
-          <Link to="/admin/products" className={secondaryButtonStyles}>Cancel</Link>
+          <Link to="/admin/products" className={secondaryButtonStyles}>Cancelar</Link>
           <button type="submit" disabled={saving || loadingCategories || !options || categories.length === 0} className={primaryButtonStyles}>
-            {saving ? "Saving..." : "Create product"}
+            {saving ? "Guardando..." : "Crear producto"}
           </button>
         </div>
       </form>

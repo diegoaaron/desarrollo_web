@@ -4,7 +4,7 @@ async function requestProducts(endpoint = "", { signal } = {}) {
   const response = await fetch(`${PRODUCTS_API_URL}${endpoint}`, { signal });
 
   if (!response.ok) {
-    throw new Error(`Unable to load products (${response.status})`);
+    throw new Error(`No se pudieron cargar los productos (${response.status})`);
   }
 
   return response.json();

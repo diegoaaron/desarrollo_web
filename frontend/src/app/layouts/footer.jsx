@@ -1,55 +1,57 @@
 import { Link } from "react-router";
+import {
+  categoryPath,
+  useCategories,
+} from "../../features/categories/hooks/use-categories";
 
-const FOOTER_SECTIONS = [
-  {
-    id: 1,
-    section: "Catalog",
-    links: [
-      { id: "c1", name: "All Products", url: "/products" },
-      {
-        id: "c2",
-        name: "Men's Clothing",
-        url: "/products?category=Hombre",
-      },
-      {
-        id: "c3",
-        name: "Women's Clothing",
-        url: "/products?category=Mujer",
-      },
-      { id: "c4", name: "Unisex", url: "/products?category=Unisex" },
-      {
-        id: "c5",
-        name: "Price: Low to High",
-        url: "/products?sort=price-low",
-      },
-    ],
-  },
+const STATIC_SECTIONS = [
   {
     id: 2,
-    section: "About Us",
+    section: "Nosotros",
     links: [
-      { id: "au1", name: "Our Story", url: "/our-story" },
-      { id: "au2", name: "Careers", url: "/careers" },
-      { id: "au3", name: "Press", url: "/press" },
-      { id: "au4", name: "Sustainability", url: "/sustainability" },
-      { id: "au5", name: "Blogs", url: "/blogs" },
+      { id: "au1", name: "Nuestra historia", url: "/our-story" },
+      { id: "au2", name: "Trabaja con nosotros", url: "/careers" },
+      { id: "au3", name: "Prensa", url: "/press" },
+      { id: "au4", name: "Sostenibilidad", url: "/sustainability" },
+      { id: "au5", name: "Blog", url: "/blogs" },
     ],
   },
   {
     id: 3,
-    section: "Customer Service",
+    section: "Atención al cliente",
     links: [
-      { id: "cs1", name: "Contact Us", url: "/contact-us" },
-      { id: "cs2", name: "Shipping Info", url: "/shipping-info" },
-      { id: "cs3", name: "Returns", url: "/returns" },
-      { id: "cs4", name: "FAQ", url: "/faq" },
-      { id: "cs5", name: "Size Guide", url: "/size-guide" },
+      { id: "cs1", name: "Contáctanos", url: "/contact-us" },
+      { id: "cs2", name: "Información de envío", url: "/shipping-info" },
+      { id: "cs3", name: "Cambios y devoluciones", url: "/returns" },
+      { id: "cs4", name: "Preguntas frecuentes", url: "/faq" },
+      { id: "cs5", name: "Guía de tallas", url: "/size-guide" },
     ],
   },
 ];
 
 export function Footer() {
   const currentYear = new Date().getFullYear();
+  const { categories } = useCategories();
+  const footerSections = [
+    {
+      id: 1,
+      section: "Catálogo",
+      links: [
+        { id: "c-all", name: "Todos los productos", url: "/products" },
+        ...categories.map((category) => ({
+          id: `c-${category.id ?? category.name}`,
+          name: category.name,
+          url: categoryPath(category.name),
+        })),
+        {
+          id: "c-price",
+          name: "Precio: menor a mayor",
+          url: "/products?sort=price-low",
+        },
+      ],
+    },
+    ...STATIC_SECTIONS,
+  ];
 
   return (
     <footer className="bg-linear-to-b from-[#101727] to-[#000000] text-gray-400 pt-16 pb-8 border-t border-gray-800">
@@ -60,13 +62,13 @@ export function Footer() {
               CORAL
             </h2>
             <p className="text-sm leading-relaxed max-w-sm">
-              Your marketplace for unique, handcrafted items. Discover
-              one-of-a-kind pieces created by independent artisans from around
-              the world.
+              Ropa juvenil con estampado personalizable, hecha en Lima. Diseña
+              tu polo, polera, gorra o tote bag y llévalo a cualquier parte del
+              Perú.
             </p>
           </div>
 
-          {FOOTER_SECTIONS.map((group) => (
+          {footerSections.map((group) => (
             <div key={group.id} className="flex flex-col gap-4">
               <h3 className="text-white font-semibold uppercase tracking-wider text-sm">
                 {group.section}
@@ -88,13 +90,13 @@ export function Footer() {
         </div>
 
         <div className="border-t border-gray-800 pt-8 mt-4 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
-          <p>&copy; {currentYear} Coral Store. All rights reserved.</p>
+          <p>&copy; {currentYear} Coral Shop S.A.C. Todos los derechos reservados.</p>
           <div className="flex gap-6">
             <Link to="/privacy-policy" className="hover:text-white transition-colors">
-              Privacy Policy
+              Política de privacidad
             </Link>
             <Link to="/terms-of-service" className="hover:text-white transition-colors">
-              Terms of Service
+              Términos del servicio
             </Link>
           </div>
         </div>

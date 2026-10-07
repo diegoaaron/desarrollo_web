@@ -29,7 +29,7 @@ export function RegisterPage() {
     } catch (requestError) {
       setError(
         requestError instanceof TypeError
-          ? "We couldn't reach the server. Please check that the backend is running."
+          ? "No pudimos conectar con el servidor. Verifica que el backend esté en ejecución."
           : requestError.message,
       );
     } finally {
@@ -45,38 +45,38 @@ export function RegisterPage() {
           className="inline-flex items-center gap-2 rounded text-sm font-semibold text-slate-500 hover:text-[#e94727] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff623f]"
         >
           <ArrowLeft className="h-4 w-4" aria-hidden="true" />
-          Back to store
+          Volver a la tienda
         </Link>
 
         {registeredUser ? (
           <div className="pt-10" role="status">
             <span className="inline-flex rounded-full bg-orange-50 px-3 py-1 text-xs font-bold uppercase tracking-wider text-[#e94727]">
-              Account created
+              Cuenta creada
             </span>
             <h1 className="mt-5 text-3xl font-semibold tracking-tight text-slate-950">
-              Welcome to Coral, {registeredUser.username}.
+              Te damos la bienvenida a Coral, {registeredUser.username}.
             </h1>
             <p className="mt-4 leading-7 text-slate-600">
-              Your account has been saved. Sign in to access your account.
+              Tu cuenta se guardó correctamente. Inicia sesión para acceder a ella.
             </p>
             <Link
               to="/login"
               className="mt-8 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#ff623f] px-5 py-3 font-semibold text-white transition hover:bg-[#e94727] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff623f]"
             >
-              Sign in <ArrowRight className="h-4 w-4" aria-hidden="true" />
+              Iniciar sesión <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </Link>
           </div>
         ) : (
           <>
             <div className="mb-8 mt-8">
               <span className="text-xs font-bold uppercase tracking-[0.2em] text-[#e94727]">
-                Join the collection
+                Únete a la comunidad
               </span>
               <h1 className="mt-3 text-3xl font-semibold tracking-tight text-slate-950">
-                Create your account
+                Crea tu cuenta
               </h1>
               <p className="mt-2 text-sm leading-6 text-slate-600">
-                One small step toward the pieces you love.
+                Un pequeño paso hacia las prendas que te encantan.
               </p>
             </div>
 
@@ -89,31 +89,31 @@ export function RegisterPage() {
             <form onSubmit={handleSubmit} className="space-y-5">
               <div>
                 <label htmlFor="register-username" className="mb-2 block text-sm font-semibold text-slate-700">
-                  Username
+                  Nombre de usuario
                 </label>
                 <div className="relative">
                   <UserRound className="pointer-events-none absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" aria-hidden="true" />
-                  <input id="register-username" name="username" type="text" autoComplete="username" minLength={3} maxLength={80} required className={inputStyles} placeholder="Your username" />
+                  <input id="register-username" name="username" type="text" autoComplete="username" minLength={3} maxLength={80} required className={inputStyles} placeholder="Tu nombre de usuario" />
                 </div>
               </div>
 
               <div>
                 <label htmlFor="register-email" className="mb-2 block text-sm font-semibold text-slate-700">
-                  Email address
+                  Correo electrónico
                 </label>
                 <div className="relative">
                   <Mail className="pointer-events-none absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" aria-hidden="true" />
-                  <input id="register-email" name="email" type="email" autoComplete="email" maxLength={255} required className={inputStyles} placeholder="you@example.com" />
+                  <input id="register-email" name="email" type="email" autoComplete="email" maxLength={255} required className={inputStyles} placeholder="tu@correo.com" />
                 </div>
               </div>
 
               <div>
                 <label htmlFor="register-password" className="mb-2 block text-sm font-semibold text-slate-700">
-                  Password
+                  Contraseña
                 </label>
                 <div className="relative">
                   <LockKeyhole className="pointer-events-none absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" aria-hidden="true" />
-                  <input id="register-password" name="password" type="password" autoComplete="new-password" minLength={8} maxLength={72} required className={inputStyles} placeholder="At least 8 characters" />
+                  <input id="register-password" name="password" type="password" autoComplete="new-password" minLength={8} maxLength={72} required className={inputStyles} placeholder="Mínimo 8 caracteres" />
                 </div>
               </div>
 
@@ -122,15 +122,15 @@ export function RegisterPage() {
                 disabled={saving}
                 className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#ff623f] px-5 py-3 font-semibold text-white transition hover:bg-[#e94727] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff623f] disabled:cursor-wait disabled:opacity-60"
               >
-                {saving ? "Creating account..." : "Create account"}
+                {saving ? "Creando cuenta..." : "Crear cuenta"}
                 {!saving ? <ArrowRight className="h-4 w-4" aria-hidden="true" /> : null}
               </button>
             </form>
 
             <p className="mt-7 text-center text-sm text-slate-600">
-              Already have an account?{" "}
+              ¿Ya tienes una cuenta?{" "}
               <Link to="/login" className="font-semibold text-[#e94727] hover:underline">
-                Sign in
+                Inicia sesión
               </Link>
             </p>
           </>

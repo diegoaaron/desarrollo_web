@@ -6,6 +6,14 @@ import { fieldStyles, primaryButtonStyles, secondaryButtonStyles } from "../comp
 import { useCategories } from "../hooks/use-categories";
 import { productsService } from "../services/products-service";
 
+const USD_FORMATTER = new Intl.NumberFormat("es-PE", { style: "currency", currency: "USD" });
+
+// Los precios de CJ son de proveedor y están realmente en dólares.
+function formatSupplierPrice(value) {
+  const amount = Number(value ?? 0);
+  return USD_FORMATTER.format(Number.isFinite(amount) ? amount : 0);
+}
+
 export function CjImportPage() {
   const navigate = useNavigate();
   const { categories, error: categoriesError } = useCategories();
@@ -84,12 +92,12 @@ export function CjImportPage() {
     if (busy || !product) return;
     const variants = Object.values(selected);
     if (!variants.length) {
-      setError("Select at least one CJ variant.");
+      setError("Selecciona al menos una variante de CJ.");
       return;
     }
     const combinations = variants.map((variant) => `${variant.sizeId}:${variant.colorId}`);
     if (new Set(combinations).size !== combinations.length) {
-      setError("Each imported variant must have a distinct size/color combination.");
+      setError("Cada variante importada debe tener una combinación de talla y color distinta.");
       return;
     }
     setBusy(true);
@@ -116,69 +124,69 @@ export function CjImportPage() {
   return (
     <div className="mx-auto max-w-5xl">
       <Link to="/admin/products" className="mb-5 inline-flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-[#e94727]">
-        <ArrowLeft className="h-4 w-4" aria-hidden="true" /> Back to products
+        <ArrowLeft className="h-4 w-4" aria-hidden="true" /> Volver a productos
       </Link>
-      <AdminPageHeader eyebrow="Catalog · CJdropshipping" title="Import a product" description="Search CJ, review its images and variants, then set Coral's selling price and inventory." />
+      <AdminPageHeader eyebrow="Catálogo · CJdropshipping" title="Importar un producto" description="Busca en CJ, revisa sus imágenes y variantes, y luego define el precio de venta y el inventario de Coral." />
 
       <p className="mb-6 rounded-2xl border border-amber-200 bg-amber-50 px-5 py-4 text-sm leading-6 text-amber-900">
-        CJ prices are supplier prices in USD, not your selling prices. Stock is entered manually and will not sync with CJ. Imports are saved as drafts unless you choose to publish.
+        Los precios de CJ son precios de proveedor en dólares (US$), no tus precios de venta. El stock se ingresa manualmente y no se sincroniza con CJ. Las importaciones se guardan como borrador, salvo que elijas publicarlas.
       </p>
       {categoriesError || optionsError || error ? <p role="alert" className="mb-6 rounded-xl bg-red-50 px-5 py-4 text-sm text-red-700">{categoriesError || optionsError || error}</p> : null}
 
       <AdminPanel className="p-5 sm:p-7">
         <form onSubmit={(event) => { event.preventDefault(); search(keyword); }} className="flex flex-col gap-3 sm:flex-row">
-          <label htmlFor="cj-keyword" className="sr-only">Search CJ products</label>
-          <input id="cj-keyword" value={keyword} onChange={(event) => setKeyword(event.target.value)} minLength={2} maxLength={100} required placeholder="Search in English, e.g. linen shirt" className={`${fieldStyles} flex-1`} />
-          <button type="submit" disabled={loading || busy} className={primaryButtonStyles}><Search className="h-4 w-4" aria-hidden="true" /> {loading ? "Searching..." : "Search CJ"}</button>
+          <label htmlFor="cj-keyword" className="sr-only">Buscar productos en CJ</label>
+          <input id="cj-keyword" value={keyword} onChange={(event) => setKeyword(event.target.value)} minLength={2} maxLength={100} required placeholder="Busca en inglés, p. ej. linen shirt" className={`${fieldStyles} flex-1`} />
+          <button type="submit" disabled={loading || busy} className={primaryButtonStyles}><Search className="h-4 w-4" aria-hidden="true" /> {loading ? "Buscando..." : "Buscar en CJ"}</button>
         </form>
       </AdminPanel>
 
       {results ? (
-        <section className="mt-6" aria-label="CJ search results">
+        <section className="mt-6" aria-label="Resultados de búsqueda en CJ">
           <div className="mb-4 flex items-center justify-between gap-3">
-            <h2 className="text-lg font-black text-slate-950">Results for “{query}”</h2>
-            <span className="text-xs font-semibold text-slate-500">Page {page} of {totalPages}</span>
+            <h2 className="text-lg font-black text-slate-950">Resultados para «{query}»</h2>
+            <span className="text-xs font-semibold text-slate-500">Página {page} de {totalPages}</span>
           </div>
           {results.length ? (
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {results.map((item) => (
                 <button key={item.pid} type="button" disabled={busy} onClick={() => choose(item.pid)} className="overflow-hidden rounded-2xl border border-stone-200 bg-white text-left transition hover:border-[#ff5331] hover:shadow-md disabled:opacity-60">
                   <div className="grid h-48 place-items-center bg-stone-50">{item.imageUrl?.startsWith("https://") ? <img src={item.imageUrl} alt="" className="h-full w-full object-contain" loading="lazy" /> : <ShoppingBag className="text-stone-300" aria-hidden="true" />}</div>
-                  <div className="p-4"><h3 className="line-clamp-2 text-sm font-bold text-slate-900">{item.name}</h3><p className="mt-2 text-xs text-slate-500">CJ supplier price: ${item.supplierPrice} USD</p></div>
+                  <div className="p-4"><h3 className="line-clamp-2 text-sm font-bold text-slate-900">{item.name}</h3><p className="mt-2 text-xs text-slate-500">{formatSupplierPrice(item.supplierPrice)} (proveedor CJ)</p></div>
                 </button>
               ))}
             </div>
-          ) : <p className="rounded-2xl bg-white p-8 text-center text-slate-500">No products found. Try another search.</p>}
+          ) : <p className="rounded-2xl bg-white p-8 text-center text-slate-500">No se encontraron productos. Prueba con otra búsqueda.</p>}
           <div className="mt-5 flex justify-end gap-3">
-            <button type="button" disabled={loading || page <= 1} onClick={() => search(query, page - 1)} className={secondaryButtonStyles}>Previous</button>
-            <button type="button" disabled={loading || page >= totalPages} onClick={() => search(query, page + 1)} className={secondaryButtonStyles}>Next <ArrowRight className="h-4 w-4" aria-hidden="true" /></button>
+            <button type="button" disabled={loading || page <= 1} onClick={() => search(query, page - 1)} className={secondaryButtonStyles}>Anterior</button>
+            <button type="button" disabled={loading || page >= totalPages} onClick={() => search(query, page + 1)} className={secondaryButtonStyles}>Siguiente <ArrowRight className="h-4 w-4" aria-hidden="true" /></button>
           </div>
         </section>
       ) : null}
 
       {product ? (
-        <form onSubmit={importProduct} className="mt-8 space-y-6" aria-label="Review CJ product">
+        <form onSubmit={importProduct} className="mt-8 space-y-6" aria-label="Revisar producto de CJ">
           <AdminPanel className="grid gap-6 p-5 sm:p-7 md:grid-cols-[12rem_1fr]">
             <img src={product.imageUrl} alt={product.name} className="h-52 w-full rounded-xl bg-stone-50 object-contain" />
             <div className="space-y-4">
-              <p className="text-xs font-bold uppercase tracking-wider text-[#e94727]">Selected from CJ</p>
+              <p className="text-xs font-bold uppercase tracking-wider text-[#e94727]">Seleccionado de CJ</p>
               <h2 className="text-lg font-black text-slate-950">{product.name}</h2>
-              <p className="text-sm text-slate-500">CJ supplier price: ${product.supplierPrice} USD. Confirm your own retail price, shipping costs and availability before publishing.</p>
-              {product.alreadyImported ? <p className="text-sm font-bold text-red-700">Already imported to Coral.</p> : null}
+              <p className="text-sm text-slate-500">Precio de proveedor CJ: {formatSupplierPrice(product.supplierPrice)}. Confirma tu precio de venta, los costos de envío y la disponibilidad antes de publicar.</p>
+              {product.alreadyImported ? <p className="text-sm font-bold text-red-700">Ya se importó a Coral.</p> : null}
               <div className="grid gap-4 sm:grid-cols-2">
-                <label className="text-sm font-bold text-slate-700">Coral product name
+                <label className="text-sm font-bold text-slate-700">Nombre del producto en Coral
                   <input required maxLength={180} value={form.name} onChange={(event) => setForm({ ...form, name: event.target.value })} className={`${fieldStyles} mt-2`} />
                 </label>
-                <label className="text-sm font-bold text-slate-700">Selling price (USD)
+                <label className="text-sm font-bold text-slate-700">Precio de venta (S/)
                   <input required type="number" min="0" step="0.01" value={form.basePrice} onChange={(event) => setForm({ ...form, basePrice: event.target.value })} className={`${fieldStyles} mt-2`} />
                 </label>
-                <label className="text-sm font-bold text-slate-700">Coral category
+                <label className="text-sm font-bold text-slate-700">Categoría en Coral
                   <select required value={form.categoryId} onChange={(event) => setForm({ ...form, categoryId: event.target.value })} className={`${fieldStyles} mt-2`}>
-                    <option value="">Select category</option>
+                    <option value="">Selecciona una categoría</option>
                     {categories.map((category) => <option key={category.id} value={category.id}>{category.name}</option>)}
                   </select>
                 </label>
-                <label className="text-sm font-bold text-slate-700">Description (plain text)
+                <label className="text-sm font-bold text-slate-700">Descripción (texto plano)
                   <textarea rows={2} maxLength={4000} value={form.description} onChange={(event) => setForm({ ...form, description: event.target.value })} className={`${fieldStyles} mt-2 resize-y`} />
                 </label>
               </div>
@@ -186,47 +194,47 @@ export function CjImportPage() {
           </AdminPanel>
 
           <AdminPanel className="p-5 sm:p-7">
-            <h2 className="text-lg font-black text-slate-950">Choose variants</h2>
-            <p className="mt-1 text-sm text-slate-500">Choose up to 30. Map each CJ option to Coral's size and color. Enter only stock you have confirmed.</p>
+            <h2 className="text-lg font-black text-slate-950">Elige las variantes</h2>
+            <p className="mt-1 text-sm text-slate-500">Elige hasta 30. Asocia cada opción de CJ con una talla y un color de Coral. Ingresa solo el stock que hayas confirmado.</p>
             <div className="mt-5 space-y-3">
               {product.variants.map((variant) => (
                 <div key={variant.vid} className="rounded-xl border border-stone-200 bg-stone-50 p-4">
                   <label className="flex cursor-pointer items-start gap-3 text-sm font-bold text-slate-900">
                     <input type="checkbox" checked={Boolean(selected[variant.vid])} onChange={() => toggleVariant(variant)} className="mt-1 h-4 w-4 accent-[#ff5331]" />
-                    <span>{variant.optionKey || variant.sku}<span className="mt-1 block text-xs font-normal text-slate-500">SKU {variant.sku} · CJ ${variant.supplierPrice}</span></span>
+                    <span>{variant.optionKey || variant.sku}<span className="mt-1 block text-xs font-normal text-slate-500">SKU {variant.sku} · {formatSupplierPrice(variant.supplierPrice)} (proveedor)</span></span>
                   </label>
                   {selected[variant.vid] ? (
                     <div className="mt-4 grid gap-3 sm:grid-cols-3">
-                      <label className="text-xs font-bold text-slate-700">Coral size
+                      <label className="text-xs font-bold text-slate-700">Talla en Coral
                         <select required value={selected[variant.vid].sizeId} onChange={(event) => updateVariant(variant.vid, "sizeId", event.target.value)} className={`${fieldStyles} mt-1`}>
-                          <option value="">Select size</option>
+                          <option value="">Selecciona una talla</option>
                           {options?.sizes.map((size) => <option key={size.id} value={size.id}>{size.name}</option>)}
                         </select>
                       </label>
-                      <label className="text-xs font-bold text-slate-700">Coral color
+                      <label className="text-xs font-bold text-slate-700">Color en Coral
                         <select required value={selected[variant.vid].colorId} onChange={(event) => updateVariant(variant.vid, "colorId", event.target.value)} className={`${fieldStyles} mt-1`}>
-                          <option value="">Select color</option>
+                          <option value="">Selecciona un color</option>
                           {options?.colors.map((color) => <option key={color.id} value={color.id}>{color.name}</option>)}
                         </select>
                       </label>
-                      <label className="text-xs font-bold text-slate-700">Confirmed stock
+                      <label className="text-xs font-bold text-slate-700">Stock confirmado
                         <input required type="number" min="0" max="2147483647" step="1" value={selected[variant.vid].stock} onChange={(event) => updateVariant(variant.vid, "stock", event.target.value)} className={`${fieldStyles} mt-1`} />
                       </label>
                     </div>
                   ) : null}
                 </div>
               ))}
-              {!product.variants.length ? <p className="text-sm text-slate-500">CJ provided no variants for this product.</p> : null}
+              {!product.variants.length ? <p className="text-sm text-slate-500">CJ no proporcionó variantes para este producto.</p> : null}
             </div>
           </AdminPanel>
 
           <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-stone-200 bg-white p-5">
             <label className="flex items-center gap-3 text-sm font-bold text-slate-900">
               <input type="checkbox" checked={form.isActive} onChange={(event) => setForm({ ...form, isActive: event.target.checked })} className="h-5 w-5 accent-[#ff5331]" />
-              Publish in storefront now
+              Publicar en la tienda ahora
             </label>
             <button type="submit" disabled={busy || !options || product.alreadyImported || !product.variants.length} className={primaryButtonStyles}>
-              {busy ? "Importing..." : "Import to Coral"}
+              {busy ? "Importando..." : "Importar a Coral"}
             </button>
           </div>
         </form>

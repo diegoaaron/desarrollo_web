@@ -4,34 +4,34 @@ import { LegalDocument } from "./components/legal-document";
 
 const PRIVACY_SECTIONS = [
   {
-    title: "Information We Collect",
+    title: "Información que recopilamos",
     content:
-      "We collect information you provide directly to us, including your name, email address, shipping address, payment information, and details shared when you contact our team or create an account.",
+      "Recopilamos la información que nos proporcionas directamente, como tu nombre, correo electrónico, dirección de envío, datos de pago y los detalles que compartes al contactar a nuestro equipo o crear una cuenta.",
   },
   {
-    title: "How We Use Your Information",
+    title: "Cómo usamos tu información",
     content:
-      "We use this information to process transactions, provide order updates, respond to questions, support your account, improve our services, and send marketing communications when you have given consent.",
+      "Usamos esta información para procesar transacciones, informarte sobre el estado de tus pedidos, responder tus consultas, dar soporte a tu cuenta, mejorar nuestros servicios y enviarte comunicaciones comerciales cuando nos hayas dado tu consentimiento.",
   },
   {
-    title: "Information Sharing",
+    title: "Información compartida con terceros",
     content:
-      "We do not sell or trade your personal information. We may share necessary information with trusted service providers who help operate our store and who agree to protect its confidentiality.",
+      "No vendemos ni intercambiamos tu información personal. Podemos compartir la información necesaria con proveedores de confianza que nos ayudan a operar la tienda y que se comprometen a proteger su confidencialidad.",
   },
   {
-    title: "Data Security",
+    title: "Seguridad de los datos",
     content:
-      "We use appropriate technical and organizational safeguards to protect personal information. Access is limited to authorized people who need it to provide our services.",
+      "Aplicamos medidas técnicas y organizativas adecuadas para proteger la información personal. El acceso se limita a las personas autorizadas que la necesitan para prestar nuestros servicios.",
   },
   {
     title: "Cookies",
     content:
-      "Cookies help us remember preferences, understand how the store is used, and improve your experience. You can manage or disable cookies through your browser settings.",
+      "Las cookies nos ayudan a recordar tus preferencias, entender cómo se usa la tienda y mejorar tu experiencia. Puedes administrarlas o desactivarlas desde la configuración de tu navegador.",
   },
   {
-    title: "Your Rights",
+    title: "Tus derechos",
     content:
-      "You may request access to, correction of, or deletion of your personal information. You can also unsubscribe from marketing emails at any time using the link included in each message.",
+      "Puedes solicitar el acceso, la rectificación o la eliminación de tu información personal. También puedes darte de baja de los correos comerciales en cualquier momento mediante el enlace incluido en cada mensaje.",
   },
 ];
 
@@ -39,13 +39,13 @@ export function PrivacyPolicyPage() {
   return (
     <ContentPage
       eyebrow="Legal"
-      title="Privacy, explained clearly"
-      description="Last updated September 2026. This policy explains what we collect, why we use it, and the choices available to you."
+      title="Tu privacidad, explicada con claridad"
+      description="Última actualización: septiembre de 2026. Esta política explica qué datos recopilamos, para qué los usamos y qué opciones tienes."
       icon={ShieldCheck}
     >
       <LegalDocument
         sections={PRIVACY_SECTIONS}
-        contactEmail="privacy@coralshop.com"
+        contactEmail="privacidad@coralshop.pe"
       />
     </ContentPage>
   );

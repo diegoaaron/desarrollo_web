@@ -3,38 +3,38 @@ import { ContentCard, ContentPage } from "./components/content-page";
 
 const OPEN_ROLES = [
   {
-    title: "Frontend Developer",
-    location: "Remote",
-    schedule: "Full-time",
-    area: "Product & Technology",
+    title: "Desarrollador frontend",
+    location: "Remoto",
+    schedule: "Tiempo completo",
+    area: "Producto y tecnología",
   },
   {
-    title: "Marketing Manager",
-    location: "New York, NY",
-    schedule: "Full-time",
-    area: "Brand & Growth",
+    title: "Jefe de marketing",
+    location: "Lima, Perú",
+    schedule: "Tiempo completo",
+    area: "Marca y crecimiento",
   },
   {
-    title: "Customer Success Specialist",
-    location: "Remote",
-    schedule: "Part-time",
-    area: "Customer Experience",
+    title: "Especialista en atención al cliente",
+    location: "Remoto",
+    schedule: "Medio tiempo",
+    area: "Experiencia del cliente",
   },
 ];
 
 export function CareersPage() {
   return (
     <ContentPage
-      eyebrow="Join our team"
-      title="Build a more thoughtful marketplace"
-      description="We are a curious, collaborative team helping independent makers share meaningful work with the world."
+      eyebrow="Únete a nuestro equipo"
+      title="Construyamos una tienda más consciente"
+      description="Somos un equipo curioso y colaborativo que ayuda a cada cliente a llevar sus propias ideas en lo que viste."
       icon={BriefcaseBusiness}
     >
       <div className="mb-8 grid gap-4 sm:grid-cols-3">
         {[
-          ["Flexible", "Work with autonomy and trust"],
-          ["Human", "People come before processes"],
-          ["Purposeful", "Build with lasting impact"],
+          ["Flexible", "Trabaja con autonomía y confianza"],
+          ["Humano", "Las personas van antes que los procesos"],
+          ["Con propósito", "Construye con un impacto duradero"],
         ].map(([title, text]) => (
           <div
             key={title}
@@ -66,10 +66,10 @@ export function CareersPage() {
               </p>
             </div>
             <a
-              href={`mailto:careers@coralshop.com?subject=${encodeURIComponent(role.title)}`}
+              href={`mailto:empleos@coralshop.pe?subject=${encodeURIComponent(role.title)}`}
               className="mt-7 inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-slate-950 px-4 py-3 text-sm font-bold text-white transition hover:-translate-y-0.5 hover:bg-[#ff5331] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff5331] motion-reduce:transform-none"
             >
-              Apply for this role
+              Postular a este puesto
               <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
             </a>
           </ContentCard>

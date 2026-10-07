@@ -10,27 +10,18 @@ import {
 import { useEffect, useRef } from "react";
 import { Link, useLocation } from "react-router";
 import { useAuth } from "../../features/auth/hooks/use-auth";
-
-const CATEGORY_LINKS = [
-  {
-    label: "Men's Clothing",
-    to: "/products?category=Hombre",
-  },
-  {
-    label: "Women's Clothing",
-    to: "/products?category=Mujer",
-  },
-  { label: "Unisex", to: "/products?category=Unisex" },
-  { label: "Price: Low to High", to: "/products?sort=price-low" },
-];
+import {
+  categoryPath,
+  useCategories,
+} from "../../features/categories/hooks/use-categories";
 
 const HELP_LINKS = [
-  { label: "Our Story", to: "/our-story" },
-  { label: "Frequently Asked Questions", to: "/faq" },
-  { label: "Shipping Information", to: "/shipping-info" },
-  { label: "Returns & Exchanges", to: "/returns" },
-  { label: "Size Guide", to: "/size-guide" },
-  { label: "Contact Us", to: "/contact-us" },
+  { label: "Nuestra historia", to: "/our-story" },
+  { label: "Preguntas frecuentes", to: "/faq" },
+  { label: "Información de envío", to: "/shipping-info" },
+  { label: "Cambios y devoluciones", to: "/returns" },
+  { label: "Guía de tallas", to: "/size-guide" },
+  { label: "Contáctanos", to: "/contact-us" },
 ];
 
 const FOCUSABLE_ELEMENTS =
@@ -38,6 +29,14 @@ const FOCUSABLE_ELEMENTS =
 
 export function MobileMenu({ cartItemCount, onClose }) {
   const { account } = useAuth();
+  const { categories } = useCategories();
+  const categoryLinks = [
+    ...categories.map((category) => ({
+      label: category.name,
+      to: categoryPath(category.name),
+    })),
+    { label: "Precio: menor a mayor", to: "/products?sort=price-low" },
+  ];
   const accountPath = account?.role === "ROLE_ADMIN" ? "/admin" : account ? "/account" : "/login";
   const location = useLocation();
   const panelRef = useRef(null);
@@ -96,7 +95,7 @@ export function MobileMenu({ cartItemCount, onClose }) {
       <button
         type="button"
         className="mobile-menu-backdrop fixed inset-0 z-[70] cursor-default bg-slate-950/50 backdrop-blur-[2px]"
-        aria-label="Close navigation menu"
+        aria-label="Cerrar menú de navegación"
         onClick={onClose}
       />
 
@@ -121,7 +120,7 @@ export function MobileMenu({ cartItemCount, onClose }) {
             ref={closeButtonRef}
             type="button"
             className="grid h-11 w-11 place-items-center rounded-full text-slate-500 transition-colors hover:bg-stone-100 hover:text-slate-950 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff5331]"
-            aria-label="Close navigation menu"
+            aria-label="Cerrar menú de navegación"
             onClick={onClose}
           >
             <X className="h-5 w-5" aria-hidden="true" />
@@ -130,10 +129,10 @@ export function MobileMenu({ cartItemCount, onClose }) {
 
         <nav
           className="flex-1 overflow-y-auto overscroll-contain px-4 py-5"
-          aria-label="Mobile navigation"
+          aria-label="Navegación móvil"
         >
           <p className="mb-2 px-3 text-[0.68rem] font-black uppercase tracking-[0.18em] text-slate-400">
-            Explore
+            Explorar
           </p>
 
           <div className="space-y-1">
@@ -143,7 +142,7 @@ export function MobileMenu({ cartItemCount, onClose }) {
               isActive={isCurrentPath("/")}
               onClick={onClose}
             >
-              Home
+              Inicio
             </MobileNavLink>
             <MobileNavLink
               to="/products"
@@ -151,7 +150,7 @@ export function MobileMenu({ cartItemCount, onClose }) {
               isActive={isCurrentPath("/products") && !location.search}
               onClick={onClose}
             >
-              All Products
+              Todos los productos
             </MobileNavLink>
 
             <details className="group rounded-2xl open:bg-stone-50">
@@ -159,14 +158,14 @@ export function MobileMenu({ cartItemCount, onClose }) {
                 <span className="grid h-9 w-9 place-items-center rounded-xl bg-white text-slate-500 shadow-sm">
                   <ShoppingBag className="h-4 w-4" aria-hidden="true" />
                 </span>
-                <span className="flex-1">Shop by Category</span>
+                <span className="flex-1">Comprar por categoría</span>
                 <ChevronDown
                   className="h-4 w-4 text-slate-400 transition-transform group-open:rotate-180 motion-reduce:transition-none"
                   aria-hidden="true"
                 />
               </summary>
               <ul className="space-y-1 pb-2 pl-[3.75rem] pr-2 pt-1">
-                {CATEGORY_LINKS.map((link) => (
+                {categoryLinks.map((link) => (
                   <li key={link.to}>
                     <Link
                       to={link.to}
@@ -187,7 +186,7 @@ export function MobileMenu({ cartItemCount, onClose }) {
               onClick={onClose}
               badge={cartItemCount}
             >
-              Shopping Cart
+              Carrito de compras
             </MobileNavLink>
             <MobileNavLink
               to={accountPath}
@@ -195,21 +194,21 @@ export function MobileMenu({ cartItemCount, onClose }) {
               isActive={isCurrentPath(accountPath)}
               onClick={onClose}
             >
-              {account ? account.username : "Sign in"}
+              {account ? account.username : "Iniciar sesión"}
             </MobileNavLink>
           </div>
 
           <div className="my-5 h-px bg-stone-200" />
 
           <p className="mb-2 px-3 text-[0.68rem] font-black uppercase tracking-[0.18em] text-slate-400">
-            Support
+            Soporte
           </p>
           <details className="group rounded-2xl open:bg-stone-50">
             <summary className="flex min-h-12 cursor-pointer list-none items-center gap-3 rounded-2xl px-3 text-sm font-bold text-slate-700 transition-colors hover:bg-stone-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff5331] [&::-webkit-details-marker]:hidden">
               <span className="grid h-9 w-9 place-items-center rounded-xl bg-white text-slate-500 shadow-sm">
                 <CircleHelp className="h-4 w-4" aria-hidden="true" />
               </span>
-              <span className="flex-1">Help & Information</span>
+              <span className="flex-1">Ayuda e información</span>
               <ChevronDown
                 className="h-4 w-4 text-slate-400 transition-transform group-open:rotate-180 motion-reduce:transition-none"
                 aria-hidden="true"
@@ -238,7 +237,7 @@ export function MobileMenu({ cartItemCount, onClose }) {
               onClick={onClose}
               className="rounded-md py-2 transition-colors hover:text-slate-800 focus-visible:outline-2 focus-visible:outline-[#ff5331]"
             >
-              Privacy
+              Privacidad
             </Link>
             <span aria-hidden="true">•</span>
             <Link
@@ -246,7 +245,7 @@ export function MobileMenu({ cartItemCount, onClose }) {
               onClick={onClose}
               className="rounded-md py-2 transition-colors hover:text-slate-800 focus-visible:outline-2 focus-visible:outline-[#ff5331]"
             >
-              Terms
+              Términos
             </Link>
             <span className="ml-auto text-[#ff5331]">Coral © 2026</span>
           </div>

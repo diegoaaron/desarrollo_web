@@ -3,21 +3,21 @@ import { ContentCard, ContentPage } from "./components/content-page";
 
 const COMMITMENTS = [
   {
-    title: "Ethical sourcing",
+    title: "Abastecimiento ético",
     description:
-      "We partner with studios that guarantee fair wages, safe conditions, and transparent supply chains.",
+      "Trabajamos con talleres que garantizan salarios justos, condiciones seguras y cadenas de suministro transparentes.",
     icon: Scale,
   },
   {
-    title: "Better materials",
+    title: "Mejores materiales",
     description:
-      "We prioritize organically grown fibers, low-impact dyes, and durable materials designed to last.",
+      "Priorizamos fibras de cultivo orgánico, tintes de bajo impacto y materiales resistentes pensados para durar.",
     icon: Leaf,
   },
   {
-    title: "Thoughtful packaging",
+    title: "Empaques conscientes",
     description:
-      "Our packaging is recyclable or compostable, with less material used in every shipment.",
+      "Nuestros empaques son reciclables o compostables, y usamos menos material en cada envío.",
     icon: PackageCheck,
   },
 ];
@@ -25,9 +25,9 @@ const COMMITMENTS = [
 export function SustainabilityPage() {
   return (
     <ContentPage
-      eyebrow="Our commitment"
-      title="Beautiful things should respect the earth"
-      description="We are building a more responsible marketplace through better partnerships, materials, and everyday decisions."
+      eyebrow="Nuestro compromiso"
+      title="Lo bonito también debe respetar el planeta"
+      description="Construimos una tienda más responsable a través de mejores alianzas, mejores materiales y decisiones del día a día."
       icon={Earth}
     >
       <div className="grid gap-5 md:grid-cols-3">
@@ -53,21 +53,21 @@ export function SustainabilityPage() {
         <div className="grid gap-8 p-6 sm:p-8 lg:grid-cols-[1fr_auto] lg:items-center lg:p-10">
           <div className="max-w-2xl">
             <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-300">
-              Progress, not perfection
+              Progreso, no perfección
             </p>
             <h2 className="mt-3 text-2xl font-black tracking-tight sm:text-3xl">
-              Every order is a chance to do a little better
+              Cada pedido es una oportunidad para hacerlo un poco mejor
             </h2>
             <p className="mt-3 text-sm leading-6 text-emerald-100/75 sm:text-base">
-              We continually measure our footprint and work with our maker
-              community to reduce waste without compromising craft.
+              Medimos constantemente nuestra huella y trabajamos con nuestra
+              comunidad de creadores para reducir residuos sin sacrificar la calidad.
             </p>
           </div>
           <div className="flex items-center gap-4 rounded-2xl bg-white/10 p-5 backdrop-blur">
             <Recycle className="h-9 w-9 text-emerald-300" aria-hidden="true" />
             <div>
               <p className="text-3xl font-black">100%</p>
-              <p className="text-sm text-emerald-100/70">recyclable packaging</p>
+              <p className="text-sm text-emerald-100/70">empaques reciclables</p>
             </div>
           </div>
         </div>

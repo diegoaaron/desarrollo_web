@@ -8,7 +8,7 @@ import {
 } from "lucide-react";
 import { useEffect, useRef } from "react";
 import { Link } from "react-router";
-import { MAX_CART_ITEMS } from "../model/cart-reducer";
+import { formatPrice } from "../../../shared/utils/format-price";
 
 const FOCUSABLE_ELEMENTS =
   'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])';
@@ -69,7 +69,7 @@ export function CartDropDown({
       <button
         type="button"
         className="cart-backdrop fixed inset-0 z-50 cursor-default bg-slate-950/45 backdrop-blur-[2px] sm:bg-slate-950/10 sm:backdrop-blur-none"
-        aria-label="Close shopping cart"
+        aria-label="Cerrar carrito de compras"
         onClick={onClose}
       />
 
@@ -93,10 +93,10 @@ export function CartDropDown({
                 id="shopping-cart-title"
                 className="text-lg font-bold tracking-tight text-slate-900"
               >
-                Your bag
+                Tu carrito
               </h2>
               <p className="text-sm text-slate-500">
-                {itemCount === 1 ? "1 item selected" : `${itemCount} items selected`}
+                {itemCount === 1 ? "1 producto seleccionado" : `${itemCount} productos seleccionados`}
               </p>
             </div>
           </div>
@@ -105,7 +105,7 @@ export function CartDropDown({
             ref={closeButtonRef}
             type="button"
             className="grid h-10 w-10 shrink-0 place-items-center rounded-full text-slate-500 transition-colors hover:bg-stone-100 hover:text-slate-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff5331]"
-            aria-label="Close shopping cart"
+            aria-label="Cerrar carrito de compras"
             onClick={onClose}
           >
             <X className="h-5 w-5" aria-hidden="true" />
@@ -121,17 +121,17 @@ export function CartDropDown({
               </div>
             </div>
             <h3 className="text-xl font-bold tracking-tight text-slate-900">
-              Your bag is waiting
+              Tu carrito te espera
             </h3>
             <p className="mt-2 max-w-64 text-sm leading-6 text-slate-500">
-              Discover something special and it will appear right here.
+              Descubre algo especial y aparecerá justo aquí.
             </p>
             <Link
               to="/products"
               onClick={onClose}
               className="mt-7 inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-[#ff5331] px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-[#ff5331]/20 transition hover:-translate-y-0.5 hover:bg-[#e94727] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff5331] motion-reduce:transform-none"
             >
-              Explore products
+              Explorar productos
               <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </Link>
           </div>
@@ -166,14 +166,14 @@ export function CartDropDown({
                           {item.title}
                         </Link>
                         <p className="mt-1 text-xs text-slate-400">
-                          ${item.price.toFixed(2)} each
+                          {formatPrice(item.price)} c/u
                         </p>
                       </div>
 
                       <button
                         type="button"
                         className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-slate-400 transition-colors hover:bg-red-50 hover:text-red-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-500"
-                        aria-label={`Remove ${item.title} from cart`}
+                        aria-label={`Quitar ${item.title} del carrito`}
                         onClick={() => removeFromCart(item.id)}
                       >
                         <Trash2 className="h-4 w-4" aria-hidden="true" />
@@ -185,7 +185,7 @@ export function CartDropDown({
                         <button
                           type="button"
                           className="grid h-8 w-8 place-items-center rounded-lg text-slate-600 transition-colors hover:bg-white hover:text-slate-950 disabled:cursor-not-allowed disabled:opacity-35 focus-visible:outline-2 focus-visible:outline-[#ff5331]"
-                          aria-label={`Decrease quantity of ${item.title}`}
+                          aria-label={`Disminuir la cantidad de ${item.title}`}
                           disabled={item.quantity <= 1}
                           onClick={() => decreaseQuantity(item.id)}
                         >
@@ -193,15 +193,15 @@ export function CartDropDown({
                         </button>
                         <span
                           className="min-w-8 text-center text-sm font-bold tabular-nums text-slate-800"
-                          aria-label={`Quantity: ${item.quantity}`}
+                          aria-label={`Cantidad: ${item.quantity}`}
                         >
                           {item.quantity}
                         </span>
                         <button
                           type="button"
                           className="grid h-8 w-8 place-items-center rounded-lg text-slate-600 transition-colors hover:bg-white hover:text-slate-950 disabled:cursor-not-allowed disabled:opacity-35 focus-visible:outline-2 focus-visible:outline-[#ff5331]"
-                          aria-label={`Increase quantity of ${item.title}`}
-                          disabled={item.quantity >= Math.min(MAX_CART_ITEMS, item.maxQuantity ?? MAX_CART_ITEMS)}
+                          aria-label={`Aumentar la cantidad de ${item.title}`}
+                          disabled={item.quantity >= (item.maxQuantity ?? Infinity)}
                           onClick={() => increaseQuantity(item.id)}
                         >
                           <Plus className="h-3.5 w-3.5" aria-hidden="true" />
@@ -209,7 +209,7 @@ export function CartDropDown({
                       </div>
 
                       <p className="text-base font-extrabold tabular-nums text-slate-900">
-                        ${(item.price * item.quantity).toFixed(2)}
+                        {formatPrice(item.price * item.quantity)}
                       </p>
                     </div>
                   </div>
@@ -222,11 +222,11 @@ export function CartDropDown({
                 <div>
                   <p className="text-sm font-medium text-slate-500">Subtotal</p>
                   <p className="mt-0.5 text-xs text-slate-400">
-                    Shipping calculated at checkout
+                    El envío se calcula al pagar
                   </p>
                 </div>
                 <p className="text-2xl font-black tracking-tight tabular-nums text-slate-900">
-                  ${cartTotal.toFixed(2)}
+                  {formatPrice(cartTotal)}
                 </p>
               </div>
 
@@ -235,7 +235,7 @@ export function CartDropDown({
                 onClick={onClose}
                 className="flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-[#ff5331] px-5 py-3 text-sm font-bold text-white shadow-lg shadow-[#ff5331]/20 transition hover:-translate-y-0.5 hover:bg-[#e94727] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff5331] motion-reduce:transform-none"
               >
-                Review your bag
+                Revisar mi carrito
                 <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </Link>
 
@@ -245,7 +245,7 @@ export function CartDropDown({
                 className="mx-auto mt-3 flex min-h-10 items-center justify-center gap-2 rounded-lg px-3 text-xs font-semibold text-slate-500 transition-colors hover:bg-red-50 hover:text-red-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-500"
               >
                 <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
-                Clear shopping bag
+                Vaciar carrito
               </button>
             </footer>
           </>

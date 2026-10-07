@@ -11,7 +11,7 @@ export function Brands() {
     <section className="bg-[#F9FAFC] py-16">
       <div className="max-w-7xl w-[90%] mx-auto">
         <h2 className="text-4xl mb-10 font-semibold text-center">
-          Trusted by Leanding Brands
+          Marcas que confían en nosotros
         </h2>
         <ul className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
           {brands.map((brand) => (

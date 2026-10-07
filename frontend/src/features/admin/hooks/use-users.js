@@ -5,6 +5,8 @@ export function useUsers() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [actionError, setActionError] = useState(null);
+  const [updatingId, setUpdatingId] = useState(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -28,14 +30,30 @@ export function useUsers() {
   }, []);
 
   const updateRole = async (id, roleId) => {
+    setActionError(null);
+    setUpdatingId(id);
     try {
       await usersService.updateRole(id, roleId);
       const data = await usersService.getAll();
       setUsers(data);
+      return true;
     } catch (err) {
-      setError(err.message);
+      setActionError(`No se pudo cambiar el rol del usuario #${id}: ${err.message}`);
+      return false;
+    } finally {
+      setUpdatingId(null);
     }
   };
 
-  return { users, loading, error, updateRole };
+  const clearActionError = () => setActionError(null);
+
+  return {
+    users,
+    loading,
+    error,
+    actionError,
+    updatingId,
+    updateRole,
+    clearActionError,
+  };
 }

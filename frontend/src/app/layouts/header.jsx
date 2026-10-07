@@ -1,29 +1,20 @@
 import { Menu, Search, ShoppingCart, User, X } from "lucide-react";
 import { useCallback, useRef, useState } from "react";
-import { Link, useLocation } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { CartDropDown } from "../../features/cart/components/cart-dropdown";
 import { useCart } from "../../features/cart/hooks/use-cart";
 import { useAuth } from "../../features/auth/hooks/use-auth";
+import {
+  categoryPath,
+  useCategories,
+} from "../../features/categories/hooks/use-categories";
 import { MobileMenu } from "./mobile-menu";
-
-const HEADER_LINKS = [
-  { id: 1, name: "All Products", url: "/products" },
-  {
-    id: 2,
-    name: "Men's Clothing",
-    url: "/products?category=Hombre",
-  },
-  {
-    id: 3,
-    name: "Women's Clothing",
-    url: "/products?category=Mujer",
-  },
-  { id: 4, name: "Unisex", url: "/products?category=Unisex" },
-  { id: 5, name: "Price: Low to High", url: "/products?sort=price-low" },
-];
 
 export function Header() {
   const { account, checking } = useAuth();
+  const { categories } = useCategories();
+  const navigate = useNavigate();
+  const [searchTerm, setSearchTerm] = useState("");
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const cartButtonRef = useRef(null);
@@ -38,8 +29,6 @@ export function Header() {
     clearCart,
   } = useCart();
 
-  const location = useLocation();
-  const hideSearch = location.pathname === "/products";
 
   const closeCart = useCallback(() => {
     setIsCartOpen(false);
@@ -69,6 +58,13 @@ export function Header() {
     }
   };
 
+  const handleSearchSubmit = (event) => {
+    event.preventDefault();
+    const query = searchTerm.trim();
+    navigate(query ? `/products?q=${encodeURIComponent(query)}` : "/products");
+    setSearchTerm("");
+  };
+
   const cartItemCount = cart.reduce(
     (total, item) => total + item.quantity,
     0,
@@ -78,7 +74,7 @@ export function Header() {
   return (
     <header className="sticky top-0 z-50">
       <p className="bg-[#ff5331] py-4 text-center text-white">
-        ✨ Free shipping on orders over $50 | Spring Sale: Up to 40% Off
+        ✨ Prendas personalizadas con tu diseño | Envíos a todo el Perú
       </p>
       <div className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto w-[90%] py-4">
@@ -94,8 +90,8 @@ export function Header() {
                 }`}
                 aria-label={
                   isMobileMenuOpen
-                    ? "Close navigation menu"
-                    : "Open navigation menu"
+                    ? "Cerrar menú de navegación"
+                    : "Abrir menú de navegación"
                 }
                 aria-expanded={isMobileMenuOpen}
                 aria-controls="mobile-navigation"
@@ -114,14 +110,14 @@ export function Header() {
             </div>
             <div className="relative col-start-2 col-end-3 flex justify-end gap-3 md:col-start-3 md:col-end-4">
               {checking ? (
-                <span className="grid h-10 w-10 place-items-center text-slate-400" role="status" aria-label="Loading account">
+                <span className="grid h-10 w-10 place-items-center text-slate-400" role="status" aria-label="Cargando cuenta">
                   <User aria-hidden="true" />
                 </span>
               ) : (
                 <Link
                   to={accountPath}
                   className={`grid h-10 w-10 place-items-center rounded-full transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff5331] ${account ? "bg-[#ff5331] text-white hover:bg-[#e94727]" : "text-slate-700 hover:bg-stone-100"}`}
-                  aria-label={account ? `Open ${account.username}'s ${account.role === "ROLE_ADMIN" ? "dashboard" : "account"}` : "Sign in"}
+                  aria-label={account ? `Abrir ${account.role === "ROLE_ADMIN" ? "el panel" : "la cuenta"} de ${account.username}` : "Iniciar sesión"}
                 >
                   {account ? (
                     <span aria-hidden="true" className="text-base font-bold uppercase">
@@ -139,8 +135,8 @@ export function Header() {
                     : "text-slate-700 hover:bg-stone-100"
                 }`}
                 onClick={toggleCart}
-                aria-label={`Open shopping cart with ${cartItemCount} ${
-                  cartItemCount === 1 ? "item" : "items"
+                aria-label={`Abrir carrito de compras con ${cartItemCount} ${
+                  cartItemCount === 1 ? "producto" : "productos"
                 }`}
                 aria-expanded={isCartOpen}
                 aria-controls="shopping-cart-panel"
@@ -165,29 +161,36 @@ export function Header() {
                 />
               )}
             </div>
-            {!hideSearch && (
-              <div className="col-span-full md:row-start-1 md:col-start-2 md:col-end-3 flex items-center gap-2 border border-gray-200 bg-white px-4 py-2 rounded-xl shadow-sm focus-within:ring-2 focus-within:ring-orange-200">
-                <Search className="text-gray-400 w-4 h-4" />
-
-                <input
-                  className="w-full bg-transparent text-sm text-gray-700 placeholder-gray-400 focus:outline-none md:hidden"
-                  type="text"
-                  placeholder="Search..."
-                />
-
-                <input
-                  className="w-full bg-transparent text-sm text-gray-700 placeholder-gray-400 focus:outline-none hidden md:block"
-                  type="text"
-                  placeholder="Search for products..."
-                />
-              </div>
-            )}
+            <form
+              role="search"
+              onSubmit={handleSearchSubmit}
+              className="col-span-full md:row-start-1 md:col-start-2 md:col-end-3 flex items-center gap-2 border border-gray-200 bg-white px-4 py-2 rounded-xl shadow-sm focus-within:ring-2 focus-within:ring-orange-200"
+            >
+              <Search className="text-gray-400 w-4 h-4" aria-hidden="true" />
+              <input
+                className="w-full bg-transparent text-sm text-gray-700 placeholder-gray-400 focus:outline-none"
+                type="search"
+                value={searchTerm}
+                onChange={(event) => setSearchTerm(event.target.value)}
+                placeholder="Buscar productos..."
+                aria-label="Buscar productos"
+              />
+              <button type="submit" className="sr-only">
+                Buscar
+              </button>
+            </form>
             <ul className="hidden md:col-span-full md:flex md:justify-between md:gap-4 md:border-t md:border-gray-200 md:pt-4">
-              {HEADER_LINKS.map((link) => (
-                <li key={link.id}>
-                  <Link to={link.url}>{link.name}</Link>
+              <li>
+                <Link to="/products">Todos los productos</Link>
+              </li>
+              {categories.map((category) => (
+                <li key={category.id ?? category.name}>
+                  <Link to={categoryPath(category.name)}>{category.name}</Link>
                 </li>
               ))}
+              <li>
+                <Link to="/products?sort=price-low">Precio: menor a mayor</Link>
+              </li>
             </ul>
           </div>
         </div>

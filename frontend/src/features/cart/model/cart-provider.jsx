@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from "react";
 import { CartContext } from "./cart-context";
-import { CART_ACTIONS, MAX_CART_ITEMS, cartReducer } from "./cart-reducer";
+import { CART_ACTIONS, cartReducer } from "./cart-reducer";
+import { loadCart, saveCart } from "./cart-storage";
 
 const NOTIFICATION_DURATION = 3000;
 
 export function CartProvider({ children }) {
-  const [cart, dispatch] = useReducer(cartReducer, []);
+  const [cart, dispatch] = useReducer(cartReducer, undefined, loadCart);
   const [notification, setNotification] = useState(null);
   const notificationIdRef = useRef(0);
   const notificationTimerRef = useRef(null);
@@ -26,6 +27,10 @@ export function CartProvider({ children }) {
     }, NOTIFICATION_DURATION);
   }, []);
 
+  useEffect(() => {
+    saveCart(cart);
+  }, [cart]);
+
   useEffect(
     () => () => window.clearTimeout(notificationTimerRef.current),
     [],
@@ -34,7 +39,7 @@ export function CartProvider({ children }) {
   const addToCart = useCallback(
     (item) => {
       const existingItem = cart.find((cartItem) => cartItem.id === item.id);
-      if (existingItem?.quantity >= Math.min(MAX_CART_ITEMS, existingItem.maxQuantity ?? MAX_CART_ITEMS)) return;
+      if (existingItem && existingItem.quantity >= (existingItem.maxQuantity ?? Infinity)) return;
 
       dispatch({ type: CART_ACTIONS.add, item });
       showNotification("Producto agregado al carrito correctamente.", "success");

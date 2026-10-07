@@ -1,7 +1,8 @@
+import { queryString } from "../../../shared/api/http-client";
 import { api } from "./api";
 
 export const ordersService = {
-  // La bandeja está paginada en la API; por ahora se muestra la página máxima (100 pedidos).
-  getAll: () => api.get("/orders?size=100").then((page) => page.items),
-  updateStatus: (id, status) => api.put(`/orders/${id}/status`, { status }),
+  getPage: ({ status, page = 0, size = 20 } = {}) => api.get(`/orders${queryString({ status, page, size })}`),
+  getById: (id) => api.get(`/orders/${id}`),
+  updateStatus: (id, status, comment) => api.put(`/orders/${id}/status`, { status, comment: comment || null }),
 };

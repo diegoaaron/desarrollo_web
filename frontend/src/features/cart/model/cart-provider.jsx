@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from "react";
+import { cartUnits } from "./cart-line";
 import { CartContext } from "./cart-context";
 import { CART_ACTIONS, cartReducer } from "./cart-reducer";
 import { loadCart, saveCart } from "./cart-storage";
@@ -36,73 +37,45 @@ export function CartProvider({ children }) {
     [],
   );
 
-  const addToCart = useCallback(
-    (item) => {
-      const existingItem = cart.find((cartItem) => cartItem.id === item.id);
-      if (existingItem && existingItem.quantity >= (existingItem.maxQuantity ?? Infinity)) return;
-
-      dispatch({ type: CART_ACTIONS.add, item });
-      showNotification("Producto agregado al carrito correctamente.", "success");
+  const addLine = useCallback(
+    (line) => {
+      dispatch({ type: CART_ACTIONS.add, line });
+      showNotification("Tu diseño se agregó al carrito.", "success");
     },
-    [cart, showNotification],
+    [showNotification],
   );
 
-  const removeFromCart = useCallback(
+  const removeLine = useCallback(
     (id) => {
-      const itemExists = cart.some((item) => item.id === id);
-      if (!itemExists) return;
-
       dispatch({ type: CART_ACTIONS.remove, id });
       showNotification("Producto eliminado del carrito.", "error");
     },
-    [cart, showNotification],
+    [showNotification],
   );
 
-  const decreaseQuantity = useCallback((id) => {
-    dispatch({ type: CART_ACTIONS.decrease, id });
+  const setItemQuantity = useCallback((id, variantId, quantity) => {
+    dispatch({ type: CART_ACTIONS.setQuantity, id, variantId, quantity: Math.max(0, quantity) });
   }, []);
 
-  const increaseQuantity = useCallback((id) => {
-    dispatch({ type: CART_ACTIONS.increase, id });
-  }, []);
-
-  const clearCart = useCallback(() => {
-    if (cart.length === 0) return;
-
+  // silent: al confirmar un pedido el carrito se vacía sin aviso de «eliminado».
+  const clearCart = useCallback(({ silent = false } = {}) => {
     dispatch({ type: CART_ACTIONS.clear });
-    showNotification("Productos eliminados del carrito.", "error");
-  }, [cart.length, showNotification]);
+    if (!silent) showNotification("Productos eliminados del carrito.", "error");
+  }, [showNotification]);
 
-  const cartTotal = useMemo(
-    () =>
-      cart.reduce(
-        (total, item) => total + item.quantity * item.price,
-        0,
-      ),
-    [cart],
-  );
+  const itemCount = useMemo(() => cartUnits(cart), [cart]);
 
   const value = useMemo(
     () => ({
       cart,
-      cartTotal,
+      itemCount,
       notification,
-      addToCart,
-      removeFromCart,
-      increaseQuantity,
-      decreaseQuantity,
+      addLine,
+      removeLine,
+      setItemQuantity,
       clearCart,
     }),
-    [
-      cart,
-      cartTotal,
-      notification,
-      addToCart,
-      removeFromCart,
-      increaseQuantity,
-      decreaseQuantity,
-      clearCart,
-    ],
+    [cart, itemCount, notification, addLine, removeLine, setItemQuantity, clearCart],
   );
 
   return (

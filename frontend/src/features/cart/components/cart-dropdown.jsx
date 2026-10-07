@@ -1,30 +1,25 @@
-import {
-  ArrowRight,
-  Minus,
-  Plus,
-  ShoppingBag,
-  Trash2,
-  X,
-} from "lucide-react";
+import { ArrowRight, ShoppingBag, Trash2, X } from "lucide-react";
 import { useEffect, useRef } from "react";
 import { Link } from "react-router";
 import { formatPrice } from "../../../shared/utils/format-price";
+import { lineSummary, lineUnits } from "../model/cart-line";
+import { CartLineThumb } from "./cart-line-thumb";
 
 const FOCUSABLE_ELEMENTS =
   'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
 export function CartDropDown({
   cart,
-  removeFromCart,
-  increaseQuantity,
-  decreaseQuantity,
-  cartTotal,
+  itemCount,
+  removeLine,
   clearCart,
   onClose,
 }) {
   const panelRef = useRef(null);
   const closeButtonRef = useRef(null);
-  const itemCount = cart.reduce((total, item) => total + item.quantity, 0);
+  const estimatedTotal = cart.every((line) => line.estimatedTotal != null)
+    ? cart.reduce((total, line) => total + Number(line.estimatedTotal), 0)
+    : null;
 
   useEffect(() => {
     const previousOverflow = document.body.style.overflow;
@@ -96,7 +91,7 @@ export function CartDropDown({
                 Tu carrito
               </h2>
               <p className="text-sm text-slate-500">
-                {itemCount === 1 ? "1 producto seleccionado" : `${itemCount} productos seleccionados`}
+                {itemCount === 1 ? "1 unidad" : `${itemCount} unidades`} · {cart.length === 1 ? "1 diseño" : `${cart.length} diseños`}
               </p>
             </div>
           </div>
@@ -138,79 +133,36 @@ export function CartDropDown({
         ) : (
           <>
             <div className="flex-1 space-y-3 overflow-y-auto overscroll-contain px-4 py-4 sm:px-5">
-              {cart.map((item) => (
+              {cart.map((line) => (
                 <article
-                  key={item.id}
-                  className="grid grid-cols-[4.5rem_minmax(0,1fr)] gap-3 rounded-2xl border border-stone-200/80 bg-white p-3 shadow-[0_8px_24px_-20px_rgba(15,23,42,0.35)] sm:grid-cols-[5rem_minmax(0,1fr)] sm:gap-4"
+                  key={line.id}
+                  className="grid grid-cols-[4.5rem_minmax(0,1fr)] gap-3 rounded-2xl border border-stone-200/80 bg-white p-3 shadow-[0_8px_24px_-20px_rgba(15,23,42,0.35)]"
                 >
-                  <Link
-                    to={`/product/${item.productId ?? item.id}`}
-                    onClick={onClose}
-                    className="grid h-20 w-18 place-items-center overflow-hidden rounded-xl bg-stone-50 p-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff5331] sm:h-24 sm:w-20"
-                  >
-                    <img
-                      className="h-full w-full object-contain mix-blend-multiply"
-                      src={item.image}
-                      alt=""
-                    />
-                  </Link>
-
-                  <div className="flex min-w-0 flex-col justify-between gap-3">
+                  <CartLineThumb line={line} className="h-18 w-18" />
+                  <div className="flex min-w-0 flex-col gap-1">
                     <div className="flex items-start justify-between gap-2">
-                      <div className="min-w-0">
-                        <Link
-                          to={`/product/${item.productId ?? item.id}`}
-                          onClick={onClose}
-                          className="line-clamp-2 text-sm font-semibold leading-5 text-slate-800 transition-colors hover:text-[#ff5331] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff5331] sm:text-[0.95rem]"
-                        >
-                          {item.title}
-                        </Link>
-                        <p className="mt-1 text-xs text-slate-400">
-                          {formatPrice(item.price)} c/u
-                        </p>
-                      </div>
-
+                      <Link
+                        to={`/product/${line.productId}`}
+                        onClick={onClose}
+                        className="line-clamp-2 text-sm font-semibold leading-5 text-slate-800 hover:text-[#ff5331]"
+                      >
+                        {line.productName}
+                      </Link>
                       <button
                         type="button"
-                        className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-slate-400 transition-colors hover:bg-red-50 hover:text-red-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-500"
-                        aria-label={`Quitar ${item.title} del carrito`}
-                        onClick={() => removeFromCart(item.id)}
+                        className="grid h-8 w-8 shrink-0 place-items-center rounded-full text-slate-400 transition-colors hover:bg-red-50 hover:text-red-600"
+                        aria-label={`Quitar ${line.productName} del carrito`}
+                        onClick={() => removeLine(line.id)}
                       >
                         <Trash2 className="h-4 w-4" aria-hidden="true" />
                       </button>
                     </div>
-
+                    <p className="truncate text-xs text-slate-500">{lineSummary(line)}</p>
                     <div className="flex items-center justify-between gap-3">
-                      <div className="inline-flex items-center rounded-xl border border-stone-200 bg-stone-50 p-1">
-                        <button
-                          type="button"
-                          className="grid h-8 w-8 place-items-center rounded-lg text-slate-600 transition-colors hover:bg-white hover:text-slate-950 disabled:cursor-not-allowed disabled:opacity-35 focus-visible:outline-2 focus-visible:outline-[#ff5331]"
-                          aria-label={`Disminuir la cantidad de ${item.title}`}
-                          disabled={item.quantity <= 1}
-                          onClick={() => decreaseQuantity(item.id)}
-                        >
-                          <Minus className="h-3.5 w-3.5" aria-hidden="true" />
-                        </button>
-                        <span
-                          className="min-w-8 text-center text-sm font-bold tabular-nums text-slate-800"
-                          aria-label={`Cantidad: ${item.quantity}`}
-                        >
-                          {item.quantity}
-                        </span>
-                        <button
-                          type="button"
-                          className="grid h-8 w-8 place-items-center rounded-lg text-slate-600 transition-colors hover:bg-white hover:text-slate-950 disabled:cursor-not-allowed disabled:opacity-35 focus-visible:outline-2 focus-visible:outline-[#ff5331]"
-                          aria-label={`Aumentar la cantidad de ${item.title}`}
-                          disabled={item.quantity >= (item.maxQuantity ?? Infinity)}
-                          onClick={() => increaseQuantity(item.id)}
-                        >
-                          <Plus className="h-3.5 w-3.5" aria-hidden="true" />
-                        </button>
-                      </div>
-
-                      <p className="text-base font-extrabold tabular-nums text-slate-900">
-                        {formatPrice(item.price * item.quantity)}
-                      </p>
+                      <p className="text-xs font-semibold text-slate-600">{lineUnits(line)} u. · {line.items.map((item) => `${item.size}×${item.quantity}`).join(" ")}</p>
+                      {line.estimatedTotal != null ? (
+                        <p className="text-sm font-extrabold tabular-nums text-slate-900">{formatPrice(line.estimatedTotal)}</p>
+                      ) : null}
                     </div>
                   </div>
                 </article>
@@ -220,13 +172,13 @@ export function CartDropDown({
             <footer className="border-t border-stone-200/80 bg-white/95 px-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] pt-4 backdrop-blur sm:px-6 sm:pb-6">
               <div className="mb-4 flex items-end justify-between gap-4">
                 <div>
-                  <p className="text-sm font-medium text-slate-500">Subtotal</p>
+                  <p className="text-sm font-medium text-slate-500">Total estimado</p>
                   <p className="mt-0.5 text-xs text-slate-400">
-                    El envío se calcula al pagar
+                    Se confirma en el carrito; el envío, al pagar
                   </p>
                 </div>
                 <p className="text-2xl font-black tracking-tight tabular-nums text-slate-900">
-                  {formatPrice(cartTotal)}
+                  {estimatedTotal != null ? formatPrice(estimatedTotal) : "—"}
                 </p>
               </div>
 
@@ -241,7 +193,7 @@ export function CartDropDown({
 
               <button
                 type="button"
-                onClick={clearCart}
+                onClick={() => clearCart()}
                 className="mx-auto mt-3 flex min-h-10 items-center justify-center gap-2 rounded-lg px-3 text-xs font-semibold text-slate-500 transition-colors hover:bg-red-50 hover:text-red-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-500"
               >
                 <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />

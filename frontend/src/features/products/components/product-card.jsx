@@ -1,17 +1,25 @@
+import { Shirt } from "lucide-react";
+import { useState } from "react";
 import { Link } from "react-router";
 import { formatPrice } from "../../../shared/utils/format-price";
 
 export function ProductCard({ product }) {
-  const { imageUrl, name, basePrice, categoryName, totalStock } = product;
+  const { imageUrl, name, basePrice, categoryName, totalStock, isCustomizable } = product;
+  const [imageFailed, setImageFailed] = useState(false);
 
   return (
     <article className="group rounded-2xl bg-gray-50 transition-transform duration-300 hover:-translate-y-2 shadow-md">
       <Link to={`/product/${product.id}`} className="block">
         <div className="h-80 flex items-center justify-center p-4">
-          {imageUrl ? (
-            <img className="w-full h-full object-contain mx-auto transition-transform duration-300 group-hover:scale-105" src={imageUrl} alt={name} />
+          {imageUrl && !imageFailed ? (
+            <img
+              className="w-full h-full object-contain mx-auto transition-transform duration-300 group-hover:scale-105"
+              src={imageUrl}
+              alt={name}
+              onError={() => setImageFailed(true)}
+            />
           ) : (
-            <span className="text-sm text-gray-400">Imagen próximamente</span>
+            <Shirt className="h-24 w-24 text-stone-300" aria-label={name} />
           )}
         </div>
         <div className="px-5">
@@ -25,7 +33,7 @@ export function ProductCard({ product }) {
         <div className="flex items-center justify-between gap-4">
           <p className="text-xl text-[#ff5331]">{formatPrice(basePrice)}</p>
           <Link to={`/product/${product.id}`} className="rounded-md bg-[#ff5331] px-4 py-2 text-sm font-semibold text-white hover:bg-[#e94727]">
-            {totalStock > 0 ? "Elegir opciones" : "Ver producto"}
+            {totalStock < 1 ? "Ver producto" : isCustomizable ? "Personalizar" : "Elegir opciones"}
           </Link>
         </div>
       </div>

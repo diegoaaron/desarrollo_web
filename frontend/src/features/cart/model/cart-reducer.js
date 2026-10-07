@@ -1,49 +1,40 @@
-const MIN_ITEMS = 1;
-
-function canIncrease(item) {
-  return item.quantity < (item.maxQuantity ?? Infinity);
-}
+import { designKey, mergeItems } from "./cart-line";
 
 export const CART_ACTIONS = {
   add: "cart/add",
   remove: "cart/remove",
-  increase: "cart/increase",
-  decrease: "cart/decrease",
+  setQuantity: "cart/set-quantity",
   clear: "cart/clear",
 };
 
 export function cartReducer(cart, action) {
   switch (action.type) {
     case CART_ACTIONS.add: {
-      const existingItem = cart.find((item) => item.id === action.item.id);
+      const key = designKey(action.line);
+      const existing = cart.find((line) => designKey(line) === key);
+      if (!existing) return [...cart, action.line];
 
-      if (!existingItem) {
-        return [...cart, { ...action.item, quantity: MIN_ITEMS }];
-      }
-
-      return cart.map((item) =>
-        item.id === action.item.id && canIncrease(item)
-          ? { ...item, quantity: item.quantity + 1 }
-          : item,
+      return cart.map((line) =>
+        line === existing
+          ? { ...line, items: mergeItems(line.items, action.line.items), estimatedTotal: null }
+          : line,
       );
     }
 
     case CART_ACTIONS.remove:
-      return cart.filter((item) => item.id !== action.id);
+      return cart.filter((line) => line.id !== action.id);
 
-    case CART_ACTIONS.increase:
-      return cart.map((item) =>
-        item.id === action.id && canIncrease(item)
-          ? { ...item, quantity: item.quantity + 1 }
-          : item,
-      );
-
-    case CART_ACTIONS.decrease:
-      return cart.map((item) =>
-        item.id === action.id && item.quantity > MIN_ITEMS
-          ? { ...item, quantity: item.quantity - 1 }
-          : item,
-      );
+    // Cambia la cantidad de una talla/color; en 0 se quita y, si la línea queda vacía, también.
+    case CART_ACTIONS.setQuantity:
+      return cart
+        .map((line) => {
+          if (line.id !== action.id) return line;
+          const items = line.items
+            .map((item) => (item.variantId === action.variantId ? { ...item, quantity: action.quantity } : item))
+            .filter((item) => item.quantity > 0);
+          return { ...line, items, estimatedTotal: null };
+        })
+        .filter((line) => line.items.length > 0);
 
     case CART_ACTIONS.clear:
       return [];

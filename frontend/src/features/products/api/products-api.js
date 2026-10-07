@@ -1,21 +1,14 @@
-const PRODUCTS_API_URL = "/api/products";
+import { http, queryString } from "../../../shared/api/http-client";
 
-async function requestProducts(endpoint = "", { signal } = {}) {
-  const response = await fetch(`${PRODUCTS_API_URL}${endpoint}`, { signal });
-
-  if (!response.ok) {
-    throw new Error(`No se pudieron cargar los productos (${response.status})`);
-  }
-
-  return response.json();
-}
-
-// La API pagina el catálogo; mientras el filtrado siga en el navegador (fase 3), se pide la página máxima.
-export async function getProducts(options) {
-  const page = await requestProducts("?size=100", options);
-  return page.items;
+// Catálogo paginado y filtrado en el servidor: { items, page, size, totalItems, totalPages }.
+export function getProductsPage({ type, categoryId, q, page = 0, size = 12 } = {}, options) {
+  return http.get(`/products${queryString({ type, category: categoryId, q, page, size })}`, options);
 }
 
 export function getProduct(id, options) {
-  return requestProducts(`/${encodeURIComponent(id)}`, options);
+  return http.get(`/products/${encodeURIComponent(id)}`, options);
+}
+
+export function getProductTypes(options) {
+  return http.get("/product-types", options);
 }

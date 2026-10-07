@@ -457,20 +457,46 @@ queda para la fase 5.
 
 ### 3.3 Tareas
 
-- [ ] `features/customization/`: hooks de opciones, subida de diseño, componente de vista
+- [x] `features/customization/`: hooks de opciones, subida de diseño, componente de vista
       previa, tabla de reparto por tallas.
-- [ ] Carrito con líneas personalizadas, guardado en `localStorage` y cotizado al abrir
+- [x] Carrito con líneas personalizadas, guardado en `localStorage` y cotizado al abrir
       `/cart` y `/checkout`.
-- [ ] `features/checkout/`: direcciones, métodos de envío, creación del pedido y pago
+- [x] `features/checkout/`: direcciones, métodos de envío, creación del pedido y pago
       simulado.
-- [ ] `features/orders/`: confirmación, «Mis pedidos», detalle con línea de tiempo.
-- [ ] Admin: bandeja de pedidos conectada, detalle con descarga del diseño, cambio de
+- [x] `features/orders/`: confirmación, «Mis pedidos», detalle con línea de tiempo.
+- [x] Admin: bandeja de pedidos conectada, detalle con descarga del diseño, cambio de
       estado solo a los estados permitidos.
-- [ ] Guardas: checkout y cuenta exigen sesión; al iniciar sesión se vuelve al paso en que
+- [x] Guardas: checkout y cuenta exigen sesión; al iniciar sesión se vuelve al paso en que
       estaba el cliente.
 
 **Hecho cuando:** la historia de referencia (§1) se completa en el navegador sin usar
 Postman.
+
+**Estado (2026-10-07):** completada en la rama `fase-3-frontend`. La historia de referencia
+se recorrió en el navegador (Edge automatizado con Playwright): 12 polos bordados en el pecho
+izquierdo (4 S, 4 M, 4 L) → carrito → checkout con dirección → pago rechazado y luego aprobado
+→ el admin avanza el pedido hasta ENTREGADO → el cliente ve la línea de tiempo completa.
+
+### 3.4 Decisiones fijadas al implementar
+
+- **Vista previa**: siluetas SVG por tipo de producto en un lienzo de 100 × 100, de modo que
+  las coordenadas `preview_*` (porcentajes) se usan tal cual. `ESPALDA` y `TOTE_CARA_B` se
+  dibujan en la vista de espalda. La foto del producto queda solo como referencia.
+- **Diseño y sesión**: subir la imagen exige sesión (`/api/designs` es de cliente). Sin
+  sesión la imagen sirve de vista previa local; el borrador del personalizador (color,
+  técnica, zonas, cantidades y diseño ya subido) se guarda en `sessionStorage`, así que al
+  volver del login solo hay que elegir la imagen otra vez.
+- **Producto personalizable**: se compra siempre con técnica, zona y diseño. Un producto no
+  personalizable se compra sin esos pasos.
+- **Carrito v2** (`coralshop.cart.v2`): una línea = un diseño repartido entre variantes; si se
+  agrega el mismo diseño otra vez, las cantidades se suman. El carrito v1 se descarta.
+- **Pedido creado = carrito vacío**: tras `POST /api/orders` el stock queda reservado y el
+  carrito se vacía; un pago rechazado se reintenta en el checkout o desde «Mis pedidos».
+- **Catálogo**: tipo, categoría, búsqueda y página van al servidor. La categoría sigue en la
+  URL por nombre (enlaces del menú) y se traduce a id. El orden por precio solo ordena la
+  página visible, porque la API no tiene parámetro de orden.
+- **Un solo cliente HTTP** (`shared/api/http-client.js`) para la tienda y el panel: sesión por
+  cookie, token CSRF en cada escritura y errores `{ message, errors }` de la API.
 
 ---
 

@@ -5,7 +5,7 @@ import { ErrorState } from "../../../shared/components/error-state";
 import { LoadingState } from "../../../shared/components/loading-state";
 
 export function FeaturedProducts() {
-  const { products, isLoading, error } = useProducts();
+  const { products, isLoading, error } = useProducts({ size: 3 });
 
   if (isLoading) return <LoadingState message="Cargando productos destacados..." />;
   if (error) return <ErrorState message={error} />;

@@ -11,6 +11,9 @@ public record ProductView(
         Long categoryId,
         String categoryName,
         String brandName,
+        Long productTypeId,
+        String productTypeCode,
+        boolean isCustomizable,
         String imageUrl,
         int totalStock,
         boolean isActive,
@@ -18,7 +21,7 @@ public record ProductView(
 ) {
 
     public ProductView withVariants(List<VariantView> productVariants) {
-        return new ProductView(id, name, description, basePrice, categoryId, categoryName, brandName, imageUrl,
-                totalStock, isActive, productVariants);
+        return new ProductView(id, name, description, basePrice, categoryId, categoryName, brandName, productTypeId,
+                productTypeCode, isCustomizable, imageUrl, totalStock, isActive, productVariants);
     }
 }

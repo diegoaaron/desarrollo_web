@@ -18,6 +18,8 @@ public record CreateProductRequest(
         String description,
         @NotNull @DecimalMin("0.00") @Digits(integer = 10, fraction = 2) BigDecimal basePrice,
         @NotNull @Positive Long categoryId,
+        @Positive Long productTypeId,
+        boolean isCustomizable,
         @NotBlank @Pattern(regexp = "https?://.+", message = "La imagen debe ser una URL HTTP(S)") String imageUrl,
         boolean isActive,
         @NotEmpty @Valid List<Variant> variants

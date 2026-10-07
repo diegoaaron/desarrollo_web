@@ -134,7 +134,7 @@ export function LoginPage() {
 
             <p className="mt-8 text-center text-sm text-gray-600">
               ¿No tienes una cuenta?{" "}
-              <Link to="/register" className="font-medium text-[#FF623F] hover:underline">
+              <Link to="/register" state={location.state} className="font-medium text-[#FF623F] hover:underline">
                 Regístrate
               </Link>
             </p>

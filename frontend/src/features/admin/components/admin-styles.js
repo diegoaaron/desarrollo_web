@@ -1,3 +1,5 @@
+import { ORDER_STATUS_LABELS } from "../../orders/model/order-status";
+
 export const primaryButtonStyles =
   "inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-[#ff5331] px-4 py-2.5 text-sm font-bold text-white shadow-lg shadow-[#ff5331]/15 transition hover:-translate-y-0.5 hover:bg-[#e94727] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff5331] disabled:cursor-not-allowed disabled:opacity-50 motion-reduce:transform-none";
 
@@ -10,16 +12,7 @@ export const fieldStyles =
 export const selectStyles =
   "min-h-10 rounded-xl border border-stone-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 outline-none transition focus:border-[#ff5331] focus:ring-4 focus:ring-[#ff5331]/10";
 
-// Los valores (PENDIENTE_PAGO, ROLE_ADMIN…) viajan como códigos a la API; solo se traduce la etiqueta.
-export const ORDER_STATUS_LABELS = {
-  PENDIENTE_PAGO: "Pendiente de pago",
-  PAGADO: "Pagado",
-  EN_PRODUCCION: "En producción",
-  LISTO_PARA_ENVIO: "Listo para envío",
-  ENVIADO: "Enviado",
-  ENTREGADO: "Entregado",
-  CANCELADO: "Cancelado",
-};
+export { ORDER_STATUS_LABELS };
 
 export const ROLE_LABELS = {
   ROLE_ADMIN: "Administrador",

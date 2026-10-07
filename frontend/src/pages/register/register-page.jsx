@@ -1,12 +1,13 @@
 import { ArrowLeft, ArrowRight, LockKeyhole, Mail, UserRound } from "lucide-react";
 import { useState } from "react";
-import { Link } from "react-router";
+import { Link, useLocation } from "react-router";
 import { registerUser } from "../../features/auth/api/auth-api";
 
 const inputStyles =
   "block w-full rounded-xl border border-stone-200 bg-stone-50 px-4 py-3 pl-11 text-slate-900 outline-none transition focus:border-[#ff623f] focus:bg-white focus:ring-2 focus:ring-[#ff623f]/15";
 
 export function RegisterPage() {
+  const location = useLocation();
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [registeredUser, setRegisteredUser] = useState(null);
@@ -141,7 +142,7 @@ export function RegisterPage() {
 
             <p className="mt-7 text-center text-sm text-slate-600">
               ¿Ya tienes una cuenta?{" "}
-              <Link to="/login" className="font-semibold text-[#e94727] hover:underline">
+              <Link to="/login" state={location.state} className="font-semibold text-[#e94727] hover:underline">
                 Inicia sesión
               </Link>
             </p>

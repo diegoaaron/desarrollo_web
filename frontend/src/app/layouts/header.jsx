@@ -21,15 +21,7 @@ export function Header() {
   const cartButtonRef = useRef(null);
   const menuButtonRef = useRef(null);
 
-  const {
-    cart,
-    removeFromCart,
-    increaseQuantity,
-    decreaseQuantity,
-    cartTotal,
-    clearCart,
-  } = useCart();
-
+  const { cart, itemCount: cartItemCount, removeLine, clearCart } = useCart();
 
   const closeCart = useCallback(() => {
     setIsCartOpen(false);
@@ -66,10 +58,6 @@ export function Header() {
     setSearchTerm("");
   };
 
-  const cartItemCount = cart.reduce(
-    (total, item) => total + item.quantity,
-    0,
-  );
   const accountPath = account ? "/account" : "/login";
   // Visible para visitantes (lleva al login y luego al panel) y para administradores.
   const showAdminLink = !account || account.role === "ROLE_ADMIN";
@@ -164,10 +152,8 @@ export function Header() {
               {isCartOpen && (
                 <CartDropDown
                   cart={cart}
-                  removeFromCart={removeFromCart}
-                  increaseQuantity={increaseQuantity}
-                  decreaseQuantity={decreaseQuantity}
-                  cartTotal={cartTotal}
+                  itemCount={cartItemCount}
+                  removeLine={removeLine}
                   clearCart={clearCart}
                   onClose={closeCart}
                 />

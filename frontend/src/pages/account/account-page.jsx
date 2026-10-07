@@ -1,4 +1,4 @@
-import { ArrowLeft, Heart, LogOut, Mail, ShieldCheck, UserRound } from "lucide-react";
+import { ArrowLeft, ArrowRight, LogOut, Mail, Package, ShieldCheck, UserRound } from "lucide-react";
 import { useState } from "react";
 import { Link, Navigate, useNavigate } from "react-router";
 import { useAuth } from "../../features/auth/hooks/use-auth";
@@ -41,7 +41,7 @@ export function AccountPage() {
           <div>
             <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#e94727]">Tu espacio</p>
             <h1 className="mt-2 text-3xl font-semibold text-slate-950 sm:text-4xl">Hola, {account.firstName}</h1>
-            <p className="mt-2 text-slate-600">Los datos de tu cuenta y tus prendas guardadas, todo en un solo lugar.</p>
+            <p className="mt-2 text-slate-600">Los datos de tu cuenta y tus pedidos, todo en un solo lugar.</p>
           </div>
           <div className="flex flex-wrap gap-3">
             {account.role === "ROLE_ADMIN" ? (
@@ -88,16 +88,22 @@ export function AccountPage() {
             </dl>
           </section>
 
-          <section className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm" aria-labelledby="favorites-title">
+          <section className="flex flex-col rounded-2xl border border-stone-200 bg-white p-6 shadow-sm" aria-labelledby="orders-title">
             <div className="mb-6 flex items-center gap-3">
               <span className="grid h-10 w-10 place-items-center rounded-xl bg-[#fff0eb] text-[#e94727]">
-                <Heart className="h-5 w-5" aria-hidden="true" />
+                <Package className="h-5 w-5" aria-hidden="true" />
               </span>
-              <h2 id="favorites-title" className="text-xl font-semibold text-slate-950">Favoritos</h2>
+              <h2 id="orders-title" className="text-xl font-semibold text-slate-950">Mis pedidos</h2>
             </div>
             <p className="text-sm leading-6 text-slate-600">
-              Muy pronto podrás guardar tus productos favoritos. Por ahora no hay nada guardado aquí.
+              Revisa el estado de tus pedidos, paga los pendientes y sigue cada paso hasta la entrega.
             </p>
+            <Link
+              to="/account/orders"
+              className="mt-auto inline-flex w-fit items-center gap-2 pt-5 text-sm font-bold text-[#e94727] hover:underline"
+            >
+              Ver mis pedidos <ArrowRight className="h-4 w-4" aria-hidden="true" />
+            </Link>
           </section>
         </div>
       </div>

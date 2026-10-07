@@ -1,59 +1,50 @@
-import { useState, useEffect } from "react";
+import { useCallback, useState } from "react";
+import { useRequest } from "../../../shared/hooks/use-request";
 import { ordersService } from "../services/orders-service";
 
-export function useOrders() {
-  const [orders, setOrders] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+const PAGE_SIZE = 20;
+
+// Bandeja paginada y filtrada en el servidor.
+export function useOrders({ status, page }) {
+  const fetcher = useCallback(() => ordersService.getPage({ status, page, size: PAGE_SIZE }), [status, page]);
+  const { data, error, isLoading } = useRequest(fetcher);
+  return {
+    orders: data?.items ?? [],
+    totalItems: data?.totalItems ?? 0,
+    totalPages: data?.totalPages ?? 0,
+    loading: isLoading,
+    error: error?.message ?? null,
+  };
+}
+
+export function useAdminOrder(id) {
+  const fetcher = useCallback(() => ordersService.getById(id), [id]);
+  const { data, setData, error, isLoading } = useRequest(fetcher);
+  const [updating, setUpdating] = useState(false);
   const [actionError, setActionError] = useState(null);
-  const [updatingId, setUpdatingId] = useState(null);
 
-  useEffect(() => {
-    let cancelled = false;
-
-    async function fetchOrders() {
-      try {
-        const data = await ordersService.getAll();
-        if (!cancelled) setOrders(data);
-      } catch (err) {
-        if (!cancelled) setError(err.message);
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    }
-
-    fetchOrders();
-
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  const updateStatus = async (id, status) => {
+  const changeStatus = async (status, comment) => {
+    setUpdating(true);
     setActionError(null);
-    setUpdatingId(id);
     try {
-      await ordersService.updateStatus(id, status);
-      const data = await ordersService.getAll();
-      setOrders(data);
+      // La API devuelve el detalle ya actualizado (historial y siguientes estados incluidos).
+      setData(await ordersService.updateStatus(id, status, comment));
       return true;
-    } catch (err) {
-      setActionError(`No se pudo actualizar el pedido #${id}: ${err.message}`);
+    } catch (requestError) {
+      setActionError(requestError.message);
       return false;
     } finally {
-      setUpdatingId(null);
+      setUpdating(false);
     }
   };
 
-  const clearActionError = () => setActionError(null);
-
   return {
-    orders,
-    loading,
-    error,
+    order: data,
+    loading: isLoading,
+    error: error?.message ?? null,
+    updating,
     actionError,
-    updatingId,
-    updateStatus,
-    clearActionError,
+    changeStatus,
+    clearActionError: () => setActionError(null),
   };
 }

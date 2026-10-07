@@ -1,12 +1,15 @@
 import { createBrowserRouter, Navigate } from "react-router";
 import { AdminLayout } from "../features/admin/components/admin-layout";
 import { Categories } from "../features/admin/pages/categories";
+import { OrderDetail as AdminOrderDetail } from "../features/admin/pages/order-detail";
 import { Orders } from "../features/admin/pages/orders";
+import { RequireAuth } from "../features/auth/components/require-auth";
 import { Overview } from "../features/admin/pages/overview";
 import { ProductForm } from "../features/admin/pages/product-form";
 import { Products as AdminProducts } from "../features/admin/pages/products";
 import { Users } from "../features/admin/pages/users";
 import { CartPage } from "../pages/cart/cart-page";
+import { CheckoutPage } from "../pages/checkout/checkout-page";
 import { AccountPage } from "../pages/account/account-page";
 import { BlogsPage } from "../pages/content/blogs-page";
 import { CareersPage } from "../pages/content/careers-page";
@@ -22,6 +25,9 @@ import { SustainabilityPage } from "../pages/content/sustainability-page";
 import { TermsOfServicePage } from "../pages/content/terms-of-service-page";
 import { HomePage } from "../pages/home/home-page";
 import { LoginPage } from "../pages/login/login-page";
+import { MyOrdersPage } from "../pages/orders/my-orders-page";
+import { OrderConfirmationPage } from "../pages/orders/order-confirmation-page";
+import { OrderDetailPage } from "../pages/orders/order-detail-page";
 import { ProductDetailPage } from "../pages/product-detail/product-detail-page";
 import { ProductsPage } from "../pages/products/products-page";
 import { RegisterPage } from "../pages/register/register-page";
@@ -40,6 +46,15 @@ export const router = createBrowserRouter([
           { path: "product/:id", Component: ProductDetailPage },
           { path: "cart", Component: CartPage },
           { path: "account", Component: AccountPage },
+          {
+            Component: RequireAuth,
+            children: [
+              { path: "checkout", Component: CheckoutPage },
+              { path: "orders/:code/confirmation", Component: OrderConfirmationPage },
+              { path: "account/orders", Component: MyOrdersPage },
+              { path: "account/orders/:code", Component: OrderDetailPage },
+            ],
+          },
 
           // About us
           { path: "blogs", Component: BlogsPage },
@@ -89,6 +104,7 @@ export const router = createBrowserRouter([
           { path: "products/new", Component: ProductForm },
           { path: "products/:id/edit", element: <Navigate to="/admin/products" replace /> },
           { path: "orders", Component: Orders },
+          { path: "orders/:id", Component: AdminOrderDetail },
           { path: "categories", Component: Categories },
         ],
       },

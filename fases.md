@@ -54,7 +54,7 @@ pecho (4 S, 4 M, 4 L), paga y ve su pedido pasar de PAGADO a ENTREGADO.*
 | D4 | Técnicas: **ESTAMPADO** y **BORDADO** (el bordado tiene zonas y tamaños más limitados y mayor costo base) | ✅ Definida |
 | D5 | Zonas predefinidas **por tipo de producto** (polo/polera: pecho izq., pecho centro, espalda, mangas; gorra: frente, lateral; tote: cara A, cara B) | ✅ Definida |
 | D6 | Pago **simulado** en las fases 2 y 3; **pasarela real en la fase 6** | ✅ Definida |
-| D7 | Imágenes del cliente: PNG/JPG de hasta 5 MB, guardadas en PostgreSQL (`bytea`), porque el disco de Railway es efímero | ✅ Definida |
+| D7 | Imágenes del cliente: PNG/JPG de hasta 5 MB, guardadas en PostgreSQL (`bytea`), porque el disco de los servicios de despliegue suele ser efímero | ✅ Definida |
 | D8 | **Sin proveedores externos**: todos los productos base a personalizar se cargan y configuran desde el panel admin de Coral Shop. La integración con CJ Dropshipping que traía el backend se **eliminó** | ✅ Definida |
 | D9 | Interfaz en **español**; moneda **S/ (PEN)**; direcciones con departamento, provincia y distrito | ✅ Definida |
 | D10 | El servidor **siempre recalcula** precio y stock; nunca confía en importes enviados por el navegador | ✅ Definida |
@@ -507,8 +507,8 @@ y si la transacción falla no se publica ningún evento.
       fotos, variantes y stock; clientes y pedidos en distintos estados. **Datos
       ficticios**.
 - [ ] Colección Postman (o Swagger con `springdoc-openapi`) de toda la API.
-- [ ] Verificar el despliegue: Vercel + Railway, con login, subida de diseño y pedido en
-      producción.
+- [ ] Desplegar y verificar: frontend en Vercel (variable `BACKEND_URL`, ver README) y
+      backend en el servicio que se elija, con login, subida de diseño y pedido en producción.
 
 ### 5.3 Documentación del entregable 2
 

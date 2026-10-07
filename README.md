@@ -163,7 +163,7 @@ Configurations… → Backend**):
 | `DB_PASSWORD` | sí | contraseña de la base |
 
 > La clave `coralshop` solo vale para la base local en Docker, por eso puede ir en el
-> repositorio. **Nunca** agregues a `.run/` claves reales (credenciales de Railway o de
+> repositorio. **Nunca** agregues a `.run/` claves reales (credenciales de producción o de
 > servicios de pago): si necesitas una, crea una copia de la configuración **Backend**
 > desmarcando *Store as project file*, para que quede solo en tu máquina.
 
@@ -207,7 +207,7 @@ contraseña.
 > Si ya existía una cuenta con ese correo, el backend **no la modifica** (conserva
 > su contraseña y su rol). Las credenciales están en
 > `backend/src/main/resources/application-dev.properties` y solo valen en local: en
-> Railway el perfil `dev` no está activo y este usuario no se crea.
+> producción el perfil `dev` no se activa y este usuario no se crea.
 
 **Dar el rol de administrador a otra cuenta.** Toda cuenta creada con **Regístrate**
 (<http://localhost:5173/register>) nace como `ROLE_USER`. Para hacerla administradora
@@ -251,13 +251,10 @@ export SPRING_PROFILES_ACTIVE=dev   # crea el administrador de desarrollo
 ./mvnw spring-boot:run
 ```
 
-**Frontend** (en otra terminal). Por defecto envía las llamadas `/api` al backend
-publicado en la nube; para que use tu backend local, crea `frontend/.env.local` con esta
-línea (no se sube al repositorio y Vite solo lo lee al arrancar):
-
-```env
-API_PROXY_TARGET=http://localhost:8082
-```
+**Frontend** (en otra terminal). Envía las llamadas `/api` al backend local
+(`http://localhost:8082`). Para usar otro backend, copia `frontend/.env.example` como
+`frontend/.env.local` y cambia `API_PROXY_TARGET` (no se sube al repositorio y Vite solo
+lo lee al arrancar).
 
 ```bash
 cd frontend
@@ -282,8 +279,31 @@ npm run dev
 | `npm run preview` | sirve `dist/` en local para probar el build |
 | `npm run build:compilado` | genera `compilado/index.html`, un único archivo que se abre con doble clic |
 
-El despliegue en Vercel usa `frontend/vercel.json`, que redirige `/api/*` al backend
-publicado.
+El despliegue en Vercel se configura con `frontend/vercel.mjs` (ver sección
+«Desplegar el frontend en Vercel»).
+
+### Desplegar el frontend en Vercel
+
+Todavía no hay despliegue. Cuando se decida, el frontend queda listo para Vercel y solo
+hace falta configurar valores en el proyecto de Vercel, sin tocar el código:
+
+| Ajuste en Vercel | Valor |
+|---|---|
+| Root Directory | `frontend` |
+| Framework Preset | Vite (lo detecta solo) |
+| Build Command / Output Directory | `npm run build` / `dist` (por defecto) |
+| Variable de entorno `BACKEND_URL` | URL pública **https** del backend, sin `/api` al final (por ejemplo `https://api.coralshop.pe`) |
+
+`frontend/vercel.mjs` lee `BACKEND_URL` al desplegar y crea dos reglas: `/api/*` se
+reenvía al backend y cualquier otra ruta sirve `index.html` (React Router). Si la
+variable falta o no es https, el despliegue falla con un mensaje claro en lugar de
+publicar una tienda sin API.
+
+El navegador solo habla con el dominio de Vercel, así que la sesión (cookie
+`JSESSIONID`) y el token CSRF funcionan igual que en local: el backend no necesita CORS.
+El backend se despliega aparte (cualquier servicio que ejecute el JAR con `DB_URL`,
+`DB_USER` y `DB_PASSWORD`, sin el perfil `dev`). Al desplegar, comprueba que la subida de
+un diseño de casi 5 MB pasa por el reenvío de Vercel.
 
 ### Backend (`backend/`)
 
@@ -335,7 +355,7 @@ scripts, no el Word ni la PPT.
 | `Port 8082 was already in use` | El backend ya está corriendo (otra pestaña de *Run*) u otro proceso usa el puerto. |
 | El comando `docker run` falla en PowerShell con varias líneas | Escríbelo en una sola línea, como en el paso 4. |
 | `npm` no se reconoce | Node.js no está instalado o falta reiniciar IntelliJ/la PC tras instalarlo. |
-| El frontend muestra datos pero no los tuyos | Está usando el backend de la nube. En IntelliJ, ejecútalo con la configuración **Frontend** (no con el ▶ de `package.json`); en terminal, crea `frontend/.env.local` (sección 4) y reinicia `npm run dev`. |
+| El frontend muestra datos que no son los de tu base | `frontend/.env.local` apunta a otro backend con `API_PROXY_TARGET`. Bórralo (o corrígelo) y reinicia `npm run dev`. |
 | `./mvnw: Permission denied` (macOS/Linux) | `chmod +x mvnw` |
 
 ---

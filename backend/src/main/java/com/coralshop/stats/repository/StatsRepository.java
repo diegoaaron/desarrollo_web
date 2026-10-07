@@ -31,7 +31,7 @@ public class StatsRepository {
 
     public BigDecimal deliveredRevenue() {
         return jdbc.queryForObject(
-                "SELECT COALESCE(SUM(total_amount), 0) FROM orders WHERE status = 'DELIVERED'", BigDecimal.class);
+                "SELECT COALESCE(SUM(total_amount), 0) FROM orders WHERE status = 'ENTREGADO'", BigDecimal.class);
     }
 
     public List<RecentOrder> recentOrders(int limit) {

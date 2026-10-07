@@ -244,13 +244,36 @@ PENDIENTE_PAGO ──pago aprobado──► PAGADO ──► EN_PRODUCCION ─�
 
 ### 1.6 Tareas
 
-- [ ] Escribir `V5__negocio_personalizacion.sql` con las tablas y restricciones anteriores.
-- [ ] Semilla: tipos, técnicas, zonas, `product_type_zones` con recargos, escalas de
+- [x] Escribir `V5__negocio_personalizacion.sql` con las tablas y restricciones anteriores.
+- [x] Semilla: tipos, técnicas, zonas, `product_type_zones` con recargos, escalas de
       mayoreo y métodos de envío.
-- [ ] Asignar `product_type_id` a los productos existentes.
-- [ ] Actualizar `scripts/esquema.py` para que refleje **el modelo real** (fuente de los
+- [x] Asignar `product_type_id` a los productos existentes.
+- [x] Actualizar `scripts/esquema.py` para que refleje **el modelo real** (fuente de los
       diagramas ER del entregable 2).
-- [ ] Diagrama ER actualizado (`python scripts/figuras.py`).
+- [x] Diagrama ER actualizado (`python scripts/figuras.py`).
+
+**Estado (2026-10-07):** completada en la rama `fase-1-modelo`. Flyway aplica la V5 y JPA
+valida el esquema. Modelo resultante: 25 tablas, 178 campos, 29 claves foráneas.
+
+Ajustes respecto de las tablas de arriba, decididos al escribir la V5:
+
+- `products.product_type_id` admite NULL: la V5 asigna el tipo por el nombre del producto
+  (polo, polera, gorra, tote) y los que no encajan quedan sin tipo y **no
+  personalizables** hasta que el administrador los clasifique. Un CHECK impide marcar
+  `is_customizable` sin tipo.
+- `shipping_methods.requires_address`: el recojo en tienda no lleva dirección, así que en
+  `orders` los campos de dirección van completos o todos en NULL (CHECK). `receiver_name`
+  y `phone` son siempre obligatorios.
+- `order_lines.technique_id` y `design_upload_id` admiten NULL a la vez (producto sin
+  personalizar); un CHECK obliga a que vayan juntos.
+- `orders.total_amount = subtotal - discount_amount + shipping_cost` se valida con CHECK.
+- `payments`: un solo pago `APROBADO` por pedido (índice único parcial); `provider` sin
+  lista cerrada para que la fase 6 no altere la tabla.
+- Los códigos de estado del pedido ya son los de la sección 1.5; el panel admin y
+  `StatsRepository` (ingresos = pedidos `ENTREGADO`) se actualizaron a esos códigos.
+- Semilla de recargos y medidas (`product_type_zones`): 23 combinaciones tipo × zona ×
+  técnica; el bordado solo en pecho izquierdo y mangas (polo/polera), gorra y cara A del
+  tote. Valores **tentativos**, ajustables desde la fase 2.
 
 **Hecho cuando:** el backend arranca, Flyway aplica la V5 sin errores y JPA valida el
 esquema (`ddl-auto=validate`).

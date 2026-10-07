@@ -579,7 +579,7 @@ def _caja_entidad(ax, x, y, w, tabla, color, size_f=6.2):
     mapa = {}
     yy = top - h_head - h_row / 2 - 0.3
     for nombre, tipo, llave, _ in campos:
-        if llave == "PK":
+        if llave.startswith("PK"):
             marca, mc, bold = "PK", "#B8860B", True
         elif llave.startswith("FK"):
             marca, mc, bold = "FK", color, False
@@ -589,7 +589,9 @@ def _caja_entidad(ax, x, y, w, tabla, color, size_f=6.2):
             marca, mc, bold = "", MUTED, False
         if marca:
             texto(ax, x + 1.2, yy, marca, size=5.2, color=mc, bold=True)
-        texto(ax, x + 4.6, yy, nombre, size=size_f, color=TEXT, bold=bold)
+        # nombre y tipo largos se cruzarían: el nombre baja un punto
+        size_n = size_f - 1.0 if len(nombre) + len(tipo) > 33 else size_f
+        texto(ax, x + 4.6, yy, nombre, size=size_n, color=TEXT, bold=bold)
         texto(ax, x + w - 1.2, yy, tipo, size=5.4, color=MUTED, ha="right")
         mapa[nombre] = yy
         yy -= h_row
@@ -680,34 +682,36 @@ def fig_er_1():
         "Modelo entidad-relación (1 de 2): usuarios, catálogo e inventario",
         "Figura 8 · Diseño de base de datos",
         [
-            ["role", "app_user", "password_reset_token"],
-            ["address", "category", "size"],
-            ["color", "product", "product_image"],
-            ["product_variant", "inventory_movement"],
+            ["roles", "users", "addresses"],
+            ["categories", "brands", "product_types"],
+            ["products", "product_images"],
+            ["sizes", "colors", "product_variants"],
+            ["favorites", "banners"],
         ],
-        9.0, 4.8, 165, 88,
-        nota="El stock no vive en product sino en product_variant: cada combinación de producto, talla y color tiene su propio SKU y su propio stock.")
+        9.0, 4.8, 185, 88,
+        nota="El stock no vive en products sino en product_variants: cada combinación de producto, talla y color tiene su propio SKU y su propio stock.")
 
 
 def fig_er_2():
     _er("09_er_personalizacion_compra.png",
-        "Modelo entidad-relación (2 de 2): personalización, carrito, pedidos y soporte",
+        "Modelo entidad-relación (2 de 2): personalización, mayoreo, pedidos y pagos",
         "Figura 9 · Diseño de base de datos",
         [
-            ["print_technique", "print_zone", "print_size", "design"],
-            ["customization", "cart", "cart_item"],
-            ["orders", "coupon", "shipping_method"],
-            ["order_item", "payment", "order_status_history"],
-            ["review", "wishlist_item", "notification", "audit_log"],
+            ["customization_techniques", "print_zones", "quantity_tiers"],
+            ["product_type_zones", "design_uploads"],
+            ["order_lines", "order_line_zones"],
+            ["orders", "shipping_methods"],
+            ["order_items", "order_status_history", "payments"],
         ],
-        9.0, 5.08, 195, 110,
-        nota="order_item copia nombre, SKU, talla, color y precio al momento de comprar: el pedido queda inmutable aunque el catálogo cambie después.")
+        9.0, 5.0, 178, 92,
+        nota="order_lines y order_items copian nombre, SKU, talla, color y precios al comprar: el pedido queda inmutable aunque el catálogo cambie después.")
 
 
 def fig_er_global():
     fig, ax = lienzo(14, 7.4, 140, 74)
+    n_tablas, n_campos, n_fk = esquema.totales()
     titulo_figura(ax, 5, 68, "Figura 10 · Mapa global del modelo de datos",
-                  "28 tablas agrupadas en cinco módulos funcionales")
+                  f"{n_tablas} tablas agrupadas en {len(esquema.MODULOS)} módulos funcionales")
 
     # (modulo, x, ancho, borde_superior, columnas)
     grupos = [
@@ -733,13 +737,13 @@ def fig_er_global():
             bx = x + 1.5 + c_ * (cw + 1.2)
             by = y + h - 8.6 - r_ * 5.4
             caja(ax, bx, by, cw, 4.4, fill=WHITE, edge=color, lw=0.8, r=0.4)
-            n_campos = len(esquema.TABLA_POR_NOMBRE[tn]["campos"])
+            campos_tabla = len(esquema.TABLA_POR_NOMBRE[tn]["campos"])
             texto(ax, bx + cw / 2, by + 2.8, tn, size=6.9, color=color, bold=True, ha="center")
-            texto(ax, bx + cw / 2, by + 1.2, f"{n_campos} campos", size=5.6, color=MUTED,
+            texto(ax, bx + cw / 2, by + 1.2, f"{campos_tabla} campos", size=5.6, color=MUTED,
                   ha="center")
 
-    resumen = [("28", "tablas"), ("222", "campos"),
-               ("39", "claves foráneas"), ("5", "módulos funcionales")]
+    resumen = [(str(n_tablas), "tablas"), (str(n_campos), "campos"),
+               (str(n_fk), "claves foráneas"), (str(len(esquema.MODULOS)), "módulos funcionales")]
     for i, (n, d) in enumerate(resumen):
         x = 6 + i * 33
         texto(ax, x, 6.0, n, size=19, color=PRIMARY, bold=True, font=TITLE_FONT)

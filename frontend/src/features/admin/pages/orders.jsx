@@ -16,7 +16,7 @@ import {
 import { formatPrice } from "../../../shared/utils/format-price";
 import { useOrders } from "../hooks/use-orders";
 
-const STATUSES = ["ALL", "PENDING", "SHIPPED", "DELIVERED", "CANCELLED"];
+const STATUSES = ["ALL", ...Object.keys(ORDER_STATUS_LABELS)];
 const SKELETONS = Array.from({ length: 5 }, (_, index) => index);
 
 export function Orders() {

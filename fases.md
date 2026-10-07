@@ -136,7 +136,7 @@ Las fases 2 y 3 pueden avanzar en paralelo una vez acordados los contratos de la
 
 ### 0.1 Frontend: limpieza
 
-- [ ] Borrar el código muerto (no alcanzable desde `main.jsx`):
+- [x] Borrar el código muerto (no alcanzable desde `main.jsx`):
   - `src/app.jsx`, `src/router/router.jsx`
   - `src/app/home/`, `src/app/login/`, `src/app/products/`
   - `src/common/` (completa), `src/components/` (completa), `src/pages/home.jsx`
@@ -145,41 +145,43 @@ Las fases 2 y 3 pueden avanzar en paralelo una vez acordados los contratos de la
   - `src/features/products/component/`, `src/features/products/pages/`
   - `src/features/products/hooks/use-get-products.js`, `use-get-products-by-id.js` y
     `src/features/products/services/` (llaman a `fakestoreapi.com`)
-- [ ] Verificar que `npm run build` y `npm run lint` pasan tras la limpieza.
+- [x] Verificar que `npm run build` y `npm run lint` pasan tras la limpieza.
 
 ### 0.2 Frontend: idioma, moneda y errores
 
-- [ ] Traducir la interfaz al español (`index.html` con `lang="es"`).
-- [ ] Utilidad `formatPrice()` en `shared/` con S/; reemplazar todos los `$x.toFixed(2)`.
-- [ ] Categorías del header, del menú móvil y del home desde `GET /api/categories` (hoy
+- [x] Traducir la interfaz al español (`index.html` con `lang="es"`).
+- [x] Utilidad `formatPrice()` en `shared/` con S/; reemplazar todos los `$x.toFixed(2)`.
+- [x] Categorías del header, del menú móvil y del home desde `GET /api/categories` (hoy
       están fijas en el código).
-- [ ] Conectar o retirar el buscador del header (hoy no hace nada).
-- [ ] Corregir: `categoryName.toLowerCase()` sin protección ante nulos
+- [x] Conectar o retirar el buscador del header (hoy no hace nada).
+- [x] Corregir: `categoryName.toLowerCase()` sin protección ante nulos
       (`products-page.jsx`); `useOrders.updateStatus` sin `try/catch`; error de
       `useUsers.updateRole` que reemplaza toda la página; imagen repetida de la tarjeta
       *Unisex*; formularios de contacto y suscripción sin manejador.
 
 ### 0.3 Frontend: carrito
 
-- [ ] Persistir el carrito en `localStorage` (con `try/catch`).
-- [ ] Quitar el tope `MAX_CART_ITEMS = 5`. La regla de cantidad real llega en la fase 3.
-- [ ] Quitar la barra fija de «envío gratis desde $50».
+- [x] Persistir el carrito en `localStorage` (con `try/catch`).
+- [x] Quitar el tope `MAX_CART_ITEMS = 5`. La regla de cantidad real llega en la fase 3.
+- [x] Quitar la barra fija de «envío gratis desde $50».
 
 ### 0.4 Backend: capas
 
-- [ ] Reorganizar paquetes: `auth`, `catalog`, `user`, cada uno con
+- [x] Reorganizar paquetes: `auth`, `catalog`, `user`, cada uno con
       `controller / service / repository / dto`.
-- [ ] `CatalogController` → `CatalogService` → `ProductRepository` (`JdbcTemplate`).
-- [ ] `AdminProductController` → `ProductAdminService` (validaciones y `@Transactional`)
+- [x] `CatalogController` → `CatalogService` → `ProductRepository` (`JdbcTemplate`).
+- [x] `AdminProductController` → `ProductAdminService` (validaciones y `@Transactional`)
       → `ProductRepository`.
-- [ ] `CjImportController` → `CjImportService` → `ProductRepository` + `CjClient`
+- [x] `CjImportController` → `CjImportService` → `ProductRepository` + `CjClient`
       (reutilizar la inserción de producto; sin SQL duplicado).
-- [ ] `AdminOverviewController` → `StatsService` → `StatsRepository`.
-- [ ] `GlobalExceptionHandler` (`@RestControllerAdvice`): 400 / 404 / 409 / 422 / 500
+- [x] `AdminOverviewController` → `StatsService` → `StatsRepository`.
+- [x] `GlobalExceptionHandler` (`@RestControllerAdvice`): 400 / 404 / 409 / 422 / 500
       con JSON uniforme.
-- [ ] Mensajes de error en español en todo el backend.
-- [ ] `SecurityConfig`: dejar solo las reglas de rutas que existen o existirán en la fase 2.
-- [ ] Rotar la clave de CJ (el Word indica que fue expuesta).
+- [x] Mensajes de error en español en todo el backend.
+- [x] `SecurityConfig`: dejar solo las reglas de rutas que existen o existirán en la fase 2.
+- [ ] Rotar la clave de CJ (el Word indica que fue expuesta). **Acción manual del dueño de la cuenta CJ**: generar una clave nueva y actualizar `CJ_API_KEY` en Railway.
+
+**Estado (2026-10-07):** completada salvo la rotación de la clave de CJ. Commits `0d4dace`, `27d43da` y `08f332a` en la rama `fase-0-orden`.
 
 **Hecho cuando:** el frontend arranca sin archivos muertos y en español; ningún controller
 usa `JdbcTemplate`; los endpoints actuales responden igual que antes.

@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
-"""Genera clase_entregables/avance_2_ver_1.pptx (avance 2: arquitectura de la solución).
+"""Genera clase_entregables/avance_2_ver_2.pptx (avance 2: arquitectura de la solución).
 
 La portada es la de la presentación del entregable 1 (presentacion.portada); las demás
-láminas presentan los cuatro patrones de arquitectura vistos en clase aplicados a Coral Shop."""
+láminas resumen el Word del avance 2 (avance2_informe.py): los cuatro patrones de arquitectura
+vistos en clase aplicados a Coral Shop, con el estado hasta la fase 4. Cada lámina lleva notas
+del orador (avance2_notas.NOTAS) para que el equipo sepa qué decir en la exposición."""
 
 import os
 
@@ -10,6 +12,7 @@ from pptx.enum.shapes import MSO_SHAPE
 from pptx.enum.text import PP_ALIGN, MSO_ANCHOR
 
 import esquema
+from avance2_notas import NOTAS
 from presentacion import portada
 from pptx_util import (
     nueva_presentacion, lamina, caja, texto, cabecera, chip, tarjeta, vinetas, figura, pie, numero,
@@ -19,7 +22,7 @@ from pptx_util import (
 
 SALIDA = os.path.join(
     os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-    "clase_entregables", "avance_2_ver_1.pptx")
+    "clase_entregables", "avance_2_ver_2.pptx")
 
 C = PP_ALIGN.CENTER
 M = MSO_ANCHOR.MIDDLE
@@ -33,11 +36,11 @@ def agenda(prs):
     s = lamina(prs)
     cabecera(s, "Agenda", "Lo que vamos a recorrer")
     bloques = [
-        ("1", "Dónde estamos", "Fases terminadas y el caso de los 12 polos", PRIMARY),
-        ("2", "Arquitectura en capas", "El restaurante y el recorrido de un pedido", ACCENT),
+        ("1", "Dónde estamos", "Fases 0 a 4 terminadas y el caso de los 12 polos", PRIMARY),
+        ("2", "Arquitectura en capas", "El taller de Coral Shop y el recorrido de un pedido", ACCENT),
         ("3", "Cliente-servidor", "Varios clientes, un servidor, una base", BLUE),
         ("4", "MVC", "React como vista, Spring como controlador", GREEN),
-        ("5", "Dirigida por eventos", "OrderStatusChanged, la propuesta de la fase 4", GOLD),
+        ("5", "Dirigida por eventos", "OrderStatusChanged y la campana de avisos", GOLD),
         ("6", "Implementación", "Paquetes, reglas, pruebas y próximos pasos", PRIMARY),
     ]
     for i, (n, t, d, color) in enumerate(bloques):
@@ -53,11 +56,11 @@ def agenda(prs):
 
 def estado(prs):
     s = lamina(prs)
-    cabecera(s, "1 · Dónde estamos", "Tres fases terminadas e integradas")
+    cabecera(s, "1 · Dónde estamos", "Cinco fases terminadas e integradas")
     fases = [
         ("0", "Ordenar la casa", "Terminada", GREEN), ("1", "Modelo de datos", "Terminada", GREEN),
-        ("2", "API de compra", "Terminada", GREEN), ("3", "Frontend", "Siguiente", ACCENT),
-        ("4", "Eventos", "Diseñada", GOLD), ("5", "Calidad y demo", "Pendiente", MUTED),
+        ("2", "API de compra", "Terminada", GREEN), ("3", "Frontend", "Terminada", GREEN),
+        ("4", "Eventos", "Terminada", GREEN), ("5", "Calidad y demo", "Siguiente", ACCENT),
         ("6", "Pasarela real", "Pendiente", MUTED),
     ]
     ancho = 11.93 / len(fases)
@@ -69,7 +72,7 @@ def estado(prs):
         texto(s, x + 0.2, 2.72, ancho - 0.4, 0.3, e, size=9.5, color=color, italic=True)
 
     n_tablas, _, _ = esquema.totales()
-    cifras = [(str(n_tablas), "tablas en PostgreSQL"), ("13", "módulos del backend"), ("40", "pruebas unitarias"),
+    cifras = [(str(n_tablas), "tablas en PostgreSQL"), ("15", "módulos del backend"), ("44", "pruebas unitarias"),
               ("64", "controles de punta a punta")]
     for i, (n, d) in enumerate(cifras):
         x = 0.7 + i * 3.0
@@ -79,8 +82,9 @@ def estado(prs):
     caja(s, 0.7, 4.95, 11.93, 1.75, color=PRIMARY)
     texto(s, 1.0, 5.15, 11.3, 0.25, "EL CASO QUE GUÍA TODO EL AVANCE", size=9.5, color=ROSE, bold=True, spc=150)
     texto(s, 1.0, 5.48, 11.3, 1.1,
-          "Un cliente personaliza 12 polos con su logo bordado en el pecho (4 S, 4 M, 4 L), crea el pedido, paga, "
-          "y el administrador lo avanza de PAGADO a ENTREGADO. Total verificado: S/ 591.60 + S/ 10.00 de envío.",
+          "Un cliente personaliza 12 polos con su logo bordado en el pecho (4 S, 4 M, 4 L), crea el pedido y paga; "
+          "el administrador lo avanza hasta ENTREGADO y la campana le avisa cada cambio. Ya recorrido en el "
+          "navegador.",
           size=13, color=CREAM, interlineado=1.3)
 
 
@@ -95,7 +99,7 @@ def patrones(prs):
         ("3 · MVC", "Separa datos, pantalla y coordinación",
          "Modelo: records y servicios. Vista: React. Controlador: @RestController.", GREEN),
         ("4 · DIRIGIDO POR EVENTOS", "Reacciona a hechos del negocio",
-         "OrderStatusChanged publicado en el bus de Spring. Diseñado para la fase 4.", GOLD),
+         "OrderStatusChanged en el bus de Spring: auditoría y avisos. Implementado en la fase 4.", GOLD),
     ]
     for i, (et, t, d, color) in enumerate(cards):
         fila, col = divmod(i, 2)
@@ -108,23 +112,23 @@ def patrones(prs):
     pie(s, "No compiten: describen el sistema desde niveles distintos y se aplican a la vez.")
 
 
-def capas_restaurante(prs):
+def capas_taller(prs):
     s = lamina(prs)
-    cabecera(s, "2 · Arquitectura en capas", "El mozo no entra a la despensa")
-    figura(s, "A2_01_capas_restaurante.png", y=1.5, ancho_max=11.6, alto_max=5.35)
+    cabecera(s, "2 · Arquitectura en capas", "El vendedor no entra al almacén")
+    figura(s, "A2_01_capas_taller.png", y=1.5, ancho_max=11.6, alto_max=5.35)
     pie(s, "En el código: ningún controller recibe JdbcTemplate ni escribe SQL; todo el SQL vive en los @Repository.")
 
 
 def capas_pedido(prs):
     s = lamina(prs)
-    cabecera(s, "2 · Arquitectura en capas", "Crear un pedido: tres capas, tres responsabilidades")
+    cabecera(s, "2 · Arquitectura en capas", "Los 12 polos bordados: tres capas, tres responsabilidades")
     figura(s, "A2_02_capas_pedido.png", x=0.7, y=1.5, ancho_max=7.2, alto_max=5.4)
     vinetas(s, 8.1, 1.75, 4.6, [
         ("Presentación. ", "El DTO valida el formato con @Valid; si falla, 400 sin tocar la base."),
-        ("Negocio. ", "Una transacción: producto activo, zona válida para la técnica, diseño propio, escala de "
-                      "mayoreo y precios recalculados."),
-        ("Datos. ", "Descuento condicional de stock; si no alcanza, rollback completo y 409."),
-        ("Modelo compartido. ", "PricedLine, NewOrder y OrderStatus los usan las tres capas."),
+        ("Negocio. ", "Una transacción: el pecho admite bordado, el logo es del cliente, 12 polos = escala de "
+                      "docena (−15 %) y precios recalculados."),
+        ("Datos. ", "Descuento condicional de stock por talla; si no alcanza, rollback completo y 409."),
+        ("Evento. ", "Al confirmar, OrderService publica OrderStatusChanged (nuevo → PENDIENTE_PAGO)."),
     ], size=12, interlineado=1.3, sep=0.12)
 
 
@@ -134,7 +138,7 @@ def errores(prs):
     cards = [
         ("400", "Presentación", "Formato inválido",
          "Cotización sin líneas · archivo que no es imagen · diseño de más de 5 MB", BLUE),
-        ("404", "Negocio", "No existe para ti", "Un cliente pide el detalle de un pedido ajeno", MUTED),
+        ("404", "Negocio", "No existe para ti", "Un cliente pide un pedido o un aviso ajeno", MUTED),
         ("409", "Negocio · Datos", "Conflicto", "«Stock insuficiente para POLO-…-S (S, Blanco): pediste 21»",
          ACCENT),
         ("422", "Negocio", "Regla violada", "«La zona ESPALDA no admite bordado…» · pasar de PAGADO a ENTREGADO",
@@ -156,22 +160,24 @@ def cliente_servidor(prs):
     s = lamina(prs)
     cabecera(s, "3 · Cliente-servidor", "El servidor es la única autoridad")
     figura(s, "A2_03_cliente_servidor.png", y=1.5, ancho_max=11.4, alto_max=5.35)
-    pie(s, "El servidor recalcula precios y stock: nunca acepta importes enviados por el navegador.")
+    pie(s, "Como el taller central: el servidor recalcula precios y stock y nunca acepta importes del "
+           "navegador.")
 
 
 def mvc(prs):
     s = lamina(prs)
     cabecera(s, "4 · Modelo-Vista-Controlador", "Los tres roles de clase, con la vista en el navegador")
     figura(s, "A2_04_mvc.png", y=1.5, ancho_max=11.4, alto_max=5.35)
-    pie(s, "JavaBeans → Modelo · Servlets → Controlador · JSP → Vista: el controlador ahora responde JSON y React "
-           "lo dibuja.")
+    pie(s, "Ficha técnica = modelo · vista previa = vista · asesor de ventas = controlador. El controlador "
+           "responde JSON y React lo dibuja.")
 
 
 def eventos(prs):
     s = lamina(prs)
-    cabecera(s, "5 · Dirigida por eventos", "Quien publica no conoce a quien escucha")
+    cabecera(s, "5 · Dirigida por eventos", "La campana del taller: quien publica no sabe quién escucha")
     figura(s, "A2_05_eventos.png", y=1.5, ancho_max=11.4, alto_max=5.35)
-    pie(s, "Aún no implementado: se agrega en la fase 4 con el bus de Spring, sin broker externo.", color=GOLD)
+    pie(s, "Implementado en la fase 4 con el bus de Spring, sin broker externo; migración V6 (notifications y "
+           "audit_log).", color=GREEN)
 
 
 def conviven(prs):
@@ -181,7 +187,8 @@ def conviven(prs):
         ("Cliente-servidor", "Despliegue", "Reglas y datos protegidos en un solo lugar", BLUE),
         ("MVC", "Interacción", "La misma API sirve a la tienda, al panel y a las pruebas", GREEN),
         ("Capas", "Organización del servidor", "Cambios acotados y errores 400, 422 y 409 bien separados", PRIMARY),
-        ("Eventos", "Reacciones del negocio", "Notificar y auditar sin tocar el flujo de pedidos", GOLD),
+        ("Eventos", "Reacciones del negocio", "Cada cambio se audita y se avisa sin tocar el flujo de pedidos",
+         GOLD),
     ]
     texto(s, 0.95, 1.65, 3.2, 0.3, "PATRÓN", size=9.5, color=MUTED, bold=True, spc=120)
     texto(s, 4.2, 1.65, 3.2, 0.3, "NIVEL", size=9.5, color=MUTED, bold=True, spc=120)
@@ -206,16 +213,18 @@ def implementacion(prs):
           "├─ customization/ controller · dto · model · repository · service\n"
           "├─ design/        controller · dto · model · repository · service\n"
           "├─ pricing/       controller · dto · model · service\n"
-          "├─ order/         controller · dto · model · repository · service\n"
+          "├─ order/         controller · dto · event · model · repo · service\n"
           "├─ payment/       controller · dto · model · repository · service\n"
+          "├─ notification/  controller · dto · listener · repo · service\n"
+          "├─ audit/         listener · repository\n"
           "├─ address/ · shipping/ · user/ · stats/ · health/\n"
           "└─ common/        dto · exception\n\n"
-          "db/migration/     V1 … V5 (Flyway)",
-          size=10, color=CREAM, font="Consolas", interlineado=1.35)
-    tarjeta(s, 7.25, 1.6, 5.38, 1.6, "Cliente", "Catálogo filtrado, personalizador, diseños, cotización, "
-            "direcciones, pedido, pago y «Mis pedidos».", color=BLUE, size_c=11)
-    tarjeta(s, 7.25, 3.37, 5.38, 1.6, "Administrador", "Bandeja de pedidos con máquina de estados, productos, "
-            "categorías, usuarios y métricas.", color=PRIMARY, size_c=11)
+          "db/migration/     V1 … V6 (Flyway)",
+          size=9.5, color=CREAM, font="Consolas", interlineado=1.3)
+    tarjeta(s, 7.25, 1.6, 5.38, 1.6, "Tienda (cliente)", "Catálogo, personalizador con vista previa, carrito, "
+            "checkout con pago simulado, «Mis pedidos» y campana de avisos.", color=BLUE, size_c=11)
+    tarjeta(s, 7.25, 3.37, 5.38, 1.6, "Panel (administrador)", "Bandeja de pedidos con máquina de estados y "
+            "descarga del diseño, productos, categorías, usuarios y métricas.", color=PRIMARY, size_c=11)
     tarjeta(s, 7.25, 5.14, 5.38, 1.6, "Seguridad", "Sesión, CSRF, roles (un admin también compra) y SQL siempre "
             "con parámetros.", color=GREEN, size_c=11)
 
@@ -229,11 +238,14 @@ def reglas_pruebas(prs):
         ("Zonas por tipo: ", "el bordado admite menos zonas y tamaños que el estampado."),
         ("Sin sobreventa: ", "UPDATE … WHERE stock >= ? dentro de la transacción."),
         ("Estados: ", "PAGADO solo con pago aprobado; cancelar repone el stock."),
+        ("Rastro: ", "cada cambio de estado se audita y genera un aviso al cliente."),
         ("Pago seguro: ", "pedido bloqueado durante el cobro; la tarjeta no se guarda."),
-    ], size=12.5, interlineado=1.3, sep=0.14)
-    pruebas = [("40 / 40", "pruebas unitarias", "QuantityPolicy, importes, estados, imagen y pasarela", GREEN),
-               ("64 / 64", "controles de punta a punta", "flujo completo y cada regla rota contra PostgreSQL", BLUE),
-               ("0", "errores 500", "en el registro del servidor durante la verificación", PRIMARY)]
+    ], size=12, interlineado=1.25, sep=0.1)
+    pruebas = [("44 / 44", "pruebas unitarias", "mayoreo, importes, estados, imagen, pasarela y entrega del "
+                "evento", GREEN),
+               ("64 / 64", "controles de la API", "flujo completo y cada regla rota contra PostgreSQL", BLUE),
+               ("✓", "historia en el navegador", "12 polos de punta a punta, con los avisos de la campana",
+                PRIMARY)]
     for i, (n, t, d, color) in enumerate(pruebas):
         y = 1.7 + i * 1.7
         caja(s, 7.6, y, 5.03, 1.5, color=CARD, borde=LINE)
@@ -244,14 +256,15 @@ def reglas_pruebas(prs):
 
 def proximos(prs):
     s = lamina(prs)
-    cabecera(s, "Próximos pasos", "Del API a la tienda completa")
+    cabecera(s, "Próximos pasos", "De la tienda completa a la entrega final")
     pasos = [
-        ("Fase 3", "Frontend de compra", "Personalizador con vista previa, carrito por diseño, checkout, pago y "
-         "«Mis pedidos».", BLUE),
-        ("Fase 4", "Evento de dominio", "OrderStatusChanged con notificación al cliente y auditoría.", GOLD),
-        ("Fase 5", "Calidad y demo", "Datos ficticios, colección Postman, informe y presentación finales.", GREEN),
-        ("Despliegue", "Vercel + backend", "Frontend en Vercel con la variable BACKEND_URL; backend en el servicio "
-         "que se elija.", PRIMARY),
+        ("Fase 5", "Pruebas", "Integración de POST /api/orders (409 y rollback) y seguridad: nadie ve el pedido "
+         "ni el diseño de otro.", BLUE),
+        ("Fase 5", "Demo y despliegue", "Datos ficticios, colección Postman, frontend en Vercel (BACKEND_URL) y "
+         "backend publicado.", GREEN),
+        ("Fase 5", "Documentación", "Informe y PPT finales con capturas reales y reparto de la exposición.", GOLD),
+        ("Fase 6", "Pasarela real", "Pago en sandbox con webhook, detrás de la misma interfaz PaymentGateway.",
+         PRIMARY),
     ]
     for i, (et, t, d, color) in enumerate(pasos):
         x = 0.7 + i * 3.02
@@ -269,10 +282,10 @@ def cierre(prs):
     texto(s, 1.2, 1.42, 10.5, 0.9, "La arquitectura se ve en el código", size=38, color=CREAM, bold=True,
           font=TITULO)
     puntos = [
-        ("Capas comprobables", "Ningún controller toca la base; cada capa responde con su código."),
+        ("Capas comprobables", "El vendedor no entra al almacén: ningún controller toca la base."),
         ("Servidor como autoridad", "Precios y stock se recalculan siempre en el servidor."),
         ("MVC adaptado", "La vista pasó de JSP a React; el controlador responde JSON."),
-        ("Eventos con propósito", "Se agregan en la fase 4 para notificar y auditar."),
+        ("Eventos en marcha", "Cada cambio de estado se audita y se avisa al cliente."),
     ]
     for i, (t, d) in enumerate(puntos):
         fila, col = divmod(i, 2)
@@ -284,12 +297,20 @@ def cierre(prs):
     texto(s, 1.2, 6.35, 10.5, 0.4, "Gracias.  ¿Preguntas?", size=20, color=ROSE, bold=True, font=TITULO)
 
 
+def notas(slide, expositor, contenido):
+    """Notas del orador: quién expone la lámina y qué decir."""
+    marco = slide.notes_slide.notes_text_frame
+    marco.text = f"EXPOSITOR SUGERIDO: {expositor}\n\n{contenido.strip()}"
+
+
 def main():
     prs = nueva_presentacion()
-    laminas = [portada_avance, agenda, estado, patrones, capas_restaurante, capas_pedido, errores,
+    laminas = [portada_avance, agenda, estado, patrones, capas_taller, capas_pedido, errores,
                cliente_servidor, mvc, eventos, conviven, implementacion, reglas_pruebas, proximos, cierre]
-    for f in laminas:
+    assert len(laminas) == len(NOTAS), "cada lámina necesita sus notas del orador"
+    for f, (expositor, contenido) in zip(laminas, NOTAS):
         f(prs)
+        notas(prs.slides[len(prs.slides._sldIdLst) - 1], expositor, contenido)
     total = len(prs.slides._sldIdLst)
     for i, slide in enumerate(prs.slides, start=1):
         if i in (1, total):

@@ -1,0 +1,147 @@
+CORAL SHOP - VALORES DE EJEMPLO PARA LAS PRUEBAS
+================================================
+Datos ficticios, como pide la consigna: no usar datos personales reales.
+Fuentes: pruebas JUnit (backend/src/test), migración V5 (precios y reglas), pasarela simulada
+y perfil dev. Actualizado al 2026-10-13 (fases 0 a 4 terminadas).
+
+
+1. CUENTAS
+----------
+Administrador (lo crea el perfil "dev" al arrancar el backend si no existe):
+  Correo ......... diego@diego.com
+  Contraseña ..... diego989
+  Rol ............ ROLE_ADMIN (también puede comprar como cliente)
+
+Cliente de demostración (NO viene creado: registrarlo en /register):
+  Nombre ......... Ana
+  Apellido ....... Demo Torres
+  Correo ......... cliente.demo@coralshop.test
+  Contraseña ..... Demo12345        (mínimo 8 caracteres)
+
+Otros administradores: registrarlos como cliente y luego en la base:
+  UPDATE users SET role_id = 1 WHERE email = '...';
+
+
+2. DIRECCIÓN DE ENTREGA (checkout)
+----------------------------------
+  Recibe ......... Ana Demo Torres
+  Teléfono ....... 987 654 321      (solo números y espacios, 6 a 20; puede empezar con +)
+  Departamento ... Lima
+  Provincia ...... Lima
+  Distrito ....... Miraflores
+  Dirección ...... Av. Ejemplo 123, Dpto. 401
+  Referencia ..... Frente al parque (opcional)
+
+Teléfono inválido para probar el error 400: 98-76-AB
+
+
+3. TARJETAS DE LA PASARELA SIMULADA
+-----------------------------------
+  Titular: Cliente Demo   ·   CVV: 123   ·   Vencimiento: 12/2030 (cualquier fecha futura)
+
+  4111 1111 1111 1111  -> APROBADO  ("Pago aprobado")
+  5555 5555 5555 4444  -> APROBADO  (Mastercard de prueba, pasa Luhn)
+  4000 0000 0000 0002  -> RECHAZADO ("Pago rechazado: fondos insuficientes"; todo número que termine en 0002)
+  4111 1111 1111 1112  -> RECHAZADO ("El número de tarjeta no es válido"; no pasa Luhn)
+  1234 5678 1234 5678  -> RECHAZADO (no pasa Luhn)
+  4111 1111 1111 1111 con vencimiento 09/2026 -> RECHAZADO ("La tarjeta está vencida")
+
+  Sugerencia para la demo: pagar primero con 4000 0000 0000 0002 (rechazo) y reintentar con
+  4111 1111 1111 1111 (aprobado). El pedido sigue en PENDIENTE_PAGO hasta que un pago se aprueba.
+
+
+4. CASO DE REFERENCIA: 12 POLOS BORDADOS
+----------------------------------------
+  Producto ....... Polo blanco, precio base S/ 35.00 (crearlo desde el panel admin si no existe)
+  Técnica ........ BORDADO           costo S/ 15.00 por unidad
+  Zona ........... PECHO_IZQ         recargo S/ 8.00 (bordado: máx. 9 x 9 cm)
+  Diseño ......... un logo PNG o JPG de hasta 5 MB
+  Reparto ........ 4 talla S + 4 talla M + 4 talla L = 12 unidades -> escala "Docena" (15 %)
+
+  Cálculo (el servidor lo recalcula siempre):
+    Unitario ....... 35.00 + 15.00 + 8.00          = S/  58.00
+    Bruto .......... 58.00 x 12                     = S/ 696.00
+    Descuento ...... 15 % de 696.00                 = S/ 104.40
+    Total línea .... 696.00 - 104.40                = S/ 591.60
+    Envío .......... LIMA_METROPOLITANA             = S/  10.00
+    TOTAL PEDIDO ...                                  S/ 601.60
+
+  Recorrido de estados (el admin avanza desde la bandeja /admin/orders):
+    PENDIENTE_PAGO -> PAGADO (solo con pago aprobado) -> EN_PRODUCCION -> LISTO_PARA_ENVIO
+    -> ENVIADO -> ENTREGADO
+  En cada cambio la campana del cliente muestra un aviso, p. ej.
+    "Pedido CS-000123: En producción"
+
+
+5. REGLAS Y CATÁLOGO SEMBRADOS (migración V5)
+---------------------------------------------
+Escalas de mayoreo:
+  1-2 unidades .... Unidad ........ 0 %
+  3-5 ............. Paquete de 3 .. 5 %
+  6-11 ............ Paquete de 6 .. 10 %
+  12 o más ........ Docena ........ 15 %
+
+Técnicas:
+  ESTAMPADO ... S/ 8.00  (todas las zonas, formatos grandes)
+  BORDADO ..... S/ 15.00 (solo zonas pequeñas)
+
+Zonas del POLO:
+  Estampado: PECHO_IZQ (+5.00, 10x10 cm) · PECHO_CENTRO (+12.00, 28x35) · ESPALDA (+15.00, 30x40)
+             MANGA_IZQ / MANGA_DER (+4.00, 8x8)
+  Bordado:   PECHO_IZQ (+8.00, 9x9) · MANGA_IZQ / MANGA_DER (+6.00, 7x7)
+  (ESPALDA y PECHO_CENTRO NO admiten bordado -> sirve para probar el error 422)
+
+Métodos de envío:
+  LIMA_METROPOLITANA ... S/ 10.00 · 2 días · requiere dirección
+  PROVINCIAS ........... S/ 20.00 · 5 días · requiere dirección
+  RECOJO_TIENDA ........ S/  0.00 · 1 día  · sin dirección
+
+
+6. CASOS DE ERROR PARA PROBAR (y la respuesta esperada)
+-------------------------------------------------------
+  400 · Cotizar con el carrito vacío (POST /api/quotes sin líneas)
+  400 · Subir un archivo que no es imagen (p. ej. un .svg o .gif) o una imagen de más de 5 MB
+  400 · Cantidad 0 o negativa; teléfono con letras; CVV de 2 dígitos
+  404 · Un cliente pide el pedido o la notificación de otro cliente
+  409 · Pedir más unidades que el stock de una talla:
+        "Stock insuficiente para POLO-...-S (S, Blanco): pediste 21"
+  422 · Bordado en ESPALDA: "La zona ESPALDA no admite bordado..."
+  422 · El admin intenta pasar un pedido de PAGADO a ENTREGADO (salto de estados)
+  422 · El admin intenta marcar un pedido como PAGADO (solo lo hace un pago aprobado)
+
+
+7. VALORES QUE USAN LAS PRUEBAS UNITARIAS (44 pruebas, JUnit 5)
+---------------------------------------------------------------
+QuantityPolicyTest (escala que corresponde a cada cantidad):
+  1->1 · 2->1 · 3->3 · 4->3 · 5->3 · 6->6 · 9->6 · 11->6 · 12->12 · 15->12 · 100->12
+  0 y -1 -> error de regla de negocio
+
+LineAmountsTest (importes de una línea):
+  base 35.00 + extras 23.00, 12 u., 15 %  -> unitario 58.00, bruto 696.00, descuento 104.40, total 591.60
+  base 10.15, 3 u., 5 %                   -> bruto 30.45, descuento 1.52, total 28.93
+  base 19.99 + extras 4.01, 7 u., 10 %    -> total = bruto - descuento, siempre con 2 decimales
+
+OrderStatusPolicyTest (máquina de estados):
+  Permitidas: PENDIENTE_PAGO->PAGADO · PENDIENTE_PAGO->CANCELADO · PAGADO->EN_PRODUCCION
+              PAGADO->CANCELADO · EN_PRODUCCION->LISTO_PARA_ENVIO · LISTO_PARA_ENVIO->ENVIADO
+              ENVIADO->ENTREGADO
+  Rechazadas: PENDIENTE_PAGO->ENVIADO · PAGADO->ENTREGADO · EN_PRODUCCION->CANCELADO
+              ENVIADO->PAGADO · ENTREGADO->CANCELADO · CANCELADO->PAGADO · PAGADO->PAGADO
+  Solo CANCELADO repone el stock.
+
+SimulatedPaymentGatewayTest (fecha fija: 2026-10-07, America/Lima; pedido CS-TEST, S/ 100.00):
+  4111111111111111 12/2030 -> aprobado (referencia "SIM-...")
+  4000000000000002         -> "Pago rechazado: fondos insuficientes"
+  4111111111111112 12/2030 -> rechazado (Luhn)
+  4111111111111111 09/2026 -> rechazado (vencida) · 10/2026 -> aprobado (mes en curso)
+
+ImageTypeDetectorTest (validación del diseño subido):
+  PNG y JPEG -> aceptados
+  "<svg onload=alert(1)>", "GIF89a", bytes incompletos, vacío o nulo -> rechazados
+
+OrderStatusChangedDeliveryTest (evento de dominio):
+  Pedido CS-TEST0001 (id 5, cliente 9), PAGADO -> EN_PRODUCCION
+  Confirmado -> se audita y se notifica "Pedido CS-TEST0001: En producción" (enlace /account/orders/CS-TEST0001)
+  Rollback -> no se audita ni se notifica
+  Auditoría fallida -> se cancela también la notificación
+  Evento fuera de una transacción -> se ignora

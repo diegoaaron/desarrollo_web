@@ -277,6 +277,7 @@ def vineta(doc, texto, negrita_hasta=None):
 
 def bloque_codigo(doc, texto, size=8.5):
     p = doc.add_paragraph()
+    p.alignment = WD_ALIGN_PARAGRAPH.LEFT   # el texto justificado estira los espacios del código
     p.paragraph_format.line_spacing = 1.0
     p.paragraph_format.space_after = Pt(10)
     p.paragraph_format.left_indent = Cm(0.5)

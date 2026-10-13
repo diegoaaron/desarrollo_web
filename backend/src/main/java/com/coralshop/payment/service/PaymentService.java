@@ -3,6 +3,7 @@ package com.coralshop.payment.service;
 import com.coralshop.common.exception.BusinessRuleException;
 import com.coralshop.common.exception.ConflictException;
 import com.coralshop.common.exception.NotFoundException;
+import com.coralshop.order.event.OrderStatusChanged;
 import com.coralshop.order.model.OrderHeader;
 import com.coralshop.order.model.OrderStatus;
 import com.coralshop.order.repository.OrderRepository;
@@ -12,6 +13,7 @@ import com.coralshop.payment.dto.PaymentResponse;
 import com.coralshop.payment.model.PaymentCharge;
 import com.coralshop.payment.model.PaymentResult;
 import com.coralshop.payment.repository.PaymentRepository;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,13 +27,16 @@ public class PaymentService {
     private final PaymentRepository paymentRepository;
     private final OrderRepository orderRepository;
     private final OrderStatusPolicy statusPolicy;
+    private final ApplicationEventPublisher events;
 
     public PaymentService(PaymentGateway paymentGateway, PaymentRepository paymentRepository,
-                          OrderRepository orderRepository, OrderStatusPolicy statusPolicy) {
+                          OrderRepository orderRepository, OrderStatusPolicy statusPolicy,
+                          ApplicationEventPublisher events) {
         this.paymentGateway = paymentGateway;
         this.paymentRepository = paymentRepository;
         this.orderRepository = orderRepository;
         this.statusPolicy = statusPolicy;
+        this.events = events;
     }
 
     /**
@@ -61,8 +66,10 @@ public class PaymentService {
             if (!orderRepository.updateStatus(order.id(), order.status(), OrderStatus.PAGADO)) {
                 throw new ConflictException("El pedido cambió durante el pago; recárgalo");
             }
-            orderRepository.insertHistory(order.id(), order.status(), OrderStatus.PAGADO, userId,
-                    "Pago aprobado (" + result.providerReference() + ")");
+            String comment = "Pago aprobado (" + result.providerReference() + ")";
+            orderRepository.insertHistory(order.id(), order.status(), OrderStatus.PAGADO, userId, comment);
+            events.publishEvent(OrderStatusChanged.of(order.id(), order.orderCode(), order.userId(), order.status(),
+                    OrderStatus.PAGADO, userId, comment));
             orderStatus = OrderStatus.PAGADO;
         }
         return new PaymentResponse(order.orderCode(), result.approved() ? "APROBADO" : "RECHAZADO",

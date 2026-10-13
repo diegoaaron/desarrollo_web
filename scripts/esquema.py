@@ -6,7 +6,7 @@ Fuente de verdad única del esquema para los entregables: la usan el generador d
 figuras (diagramas entidad-relación) y el generador del informe (diccionario de campos).
 
 Refleja el esquema REAL que crean las migraciones Flyway del backend
-(backend/src/main/resources/db/migration, V1 a V5). Si se agrega una migración que
+(backend/src/main/resources/db/migration, V1 a V6). Si se agrega una migración que
 cambia tablas o campos, se actualiza este archivo en el mismo commit.
 
 Cada campo es una tupla: (nombre, tipo, llave, descripción)
@@ -310,6 +310,37 @@ TABLAS = [
              ("confirmed_at", "TIMESTAMPTZ", "", "Confirmación; obligatoria si está APROBADO."),
          ],
          restricciones=["un solo pago APROBADO por pedido (índice único parcial)", "amount > 0"]),
+    dict(nombre="notifications", modulo="compra",
+         desc="Avisos al cliente sobre sus pedidos. Los escribe NotificationListener al confirmarse el evento OrderStatusChanged.",
+         campos=[
+             ("id", "BIGINT", "PK", "Identificador del aviso."),
+             ("event_id", "UUID", "UQ", "Evento que lo originó; evita avisos duplicados."),
+             ("user_id", "BIGINT", "FK -> users.id", "Cliente destinatario."),
+             ("order_id", "BIGINT", "FK -> orders.id", "Pedido al que se refiere."),
+             ("title", "VARCHAR(120)", "", "Título visible en la campana."),
+             ("message", "VARCHAR(500)", "", "Texto del aviso."),
+             ("link", "VARCHAR(255)", "", "Ruta del frontend a la que lleva."),
+             ("is_read", "BOOLEAN", "", "Si el cliente ya lo leyó."),
+             ("created_at", "TIMESTAMPTZ", "", "Fecha del aviso."),
+             ("read_at", "TIMESTAMPTZ", "", "Fecha de lectura; obligatoria si is_read."),
+         ],
+         restricciones=["is_read implica read_at"]),
+
+    dict(nombre="audit_log", modulo="seguridad",
+         desc="Bitácora de auditoría genérica. La escribe AuditListener dentro de la misma transacción del cambio.",
+         campos=[
+             ("id", "BIGINT", "PK", "Identificador del registro."),
+             ("event_id", "UUID", "UQ", "Evento auditado; evita registros duplicados."),
+             ("event_type", "VARCHAR(60)", "", "Tipo de evento (OrderStatusChanged)."),
+             ("entity_type", "VARCHAR(40)", "", "Entidad afectada (ORDER)."),
+             ("entity_id", "BIGINT", "", "Id de la entidad afectada."),
+             ("actor_id", "BIGINT", "FK -> users.id", "Quién hizo el cambio."),
+             ("old_value", "VARCHAR(255)", "", "Valor anterior; NULL al crear."),
+             ("new_value", "VARCHAR(255)", "", "Valor nuevo."),
+             ("detail", "VARCHAR(500)", "", "Código del pedido y comentario."),
+             ("occurred_at", "TIMESTAMPTZ", "", "Momento del evento."),
+             ("recorded_at", "TIMESTAMPTZ", "", "Momento del registro."),
+         ]),
 
     # -------------------------------------------------------------------- soporte
     dict(nombre="favorites", modulo="soporte",

@@ -504,18 +504,43 @@ izquierdo (4 S, 4 M, 4 L) → carrito → checkout con dirección → pago recha
 
 **Objetivo:** aplicar el cuarto estilo de arquitectura visto en clase con un caso real.
 
-- [ ] Evento `OrderStatusChanged(eventId, orderId, fromStatus, toStatus, occurredAt)`,
+- [x] Evento `OrderStatusChanged(eventId, orderId, fromStatus, toStatus, occurredAt)`,
       publicado por `OrderService` con `ApplicationEventPublisher`.
-- [ ] Consumidor `NotificationListener` (`@TransactionalEventListener(phase = AFTER_COMMIT)`):
+- [x] Consumidor `NotificationListener` (`@TransactionalEventListener(phase = AFTER_COMMIT)`):
       registra una notificación para el cliente («Tu pedido CS-000123 pasó a EN_PRODUCCION»).
-- [ ] Consumidor `AuditListener`: escribe en la tabla de auditoría.
-- [ ] Nueva migración Flyway: tablas `notifications` y `audit_log`.
-- [ ] Endpoints `GET /api/notifications/me` y `PUT /api/notifications/{id}/read`; campana
+- [x] Consumidor `AuditListener`: escribe en la tabla de auditoría.
+- [x] Nueva migración Flyway: tablas `notifications` y `audit_log`.
+- [x] Endpoints `GET /api/notifications/me` y `PUT /api/notifications/{id}/read`; campana
       de notificaciones en el header.
-- [ ] Diagrama del flujo de eventos para el informe (publicador → bus → suscriptores).
+- [x] Diagrama del flujo de eventos para el informe (publicador → bus → suscriptores).
 
 **Hecho cuando:** al cambiar el estado desde el admin aparece la notificación al cliente,
 y si la transacción falla no se publica ningún evento.
+
+### 4.1 Decisiones fijadas al implementar
+
+- **Tres publicadores**, no solo `OrderService`: crear el pedido (`null → PENDIENTE_PAGO`),
+  el pago aprobado (`PaymentService`, `→ PAGADO`) y el cambio del admin (`OrderAdminService`).
+  El evento lleva además `orderCode`, `customerId`, `changedBy` y `comment` para que los
+  suscriptores no consulten la base. Paquete `com.coralshop.order.event`.
+- **Fases distintas por suscriptor**: `AuditListener` corre en `BEFORE_COMMIT` (misma
+  transacción: si la auditoría falla, el cambio se deshace; nunca hay cambio sin rastro).
+  `NotificationListener` corre en `AFTER_COMMIT` con transacción propia (`REQUIRES_NEW`) y,
+  si falla, solo lo registra en el log: el cambio ya está confirmado.
+- **Idempotencia**: `event_id` (UUID) es único en `notifications` y `audit_log`, con
+  `INSERT … ON CONFLICT DO NOTHING`.
+- **Migración `V6__eventos_notificaciones_auditoria.sql`**. `audit_log` es genérica
+  (`entity_type`, `entity_id`, `old_value`, `new_value`) para auditar otras entidades después.
+- **API**: `GET /api/notifications/me` → `{ items (últimas 20), unreadCount }`;
+  `PUT /api/notifications/{id}/read` y `PUT /api/notifications/me/read` (marcar todas) → 204.
+  Una notificación ajena responde 404.
+- **Campana** (`features/notifications`): solo con sesión; consulta cada 30 s y al volver a la
+  pestaña; al abrir un aviso lo marca como leído y navega al pedido.
+- **Prueba** `OrderStatusChangedDeliveryTest`: con los suscriptores reales y un gestor de
+  transacciones sin base, comprueba que un rollback no audita ni notifica y que una auditoría
+  fallida cancela la notificación.
+- **Figura 12** (`figuras.py` → `12_flujo_eventos.png`); `esquema.py` y las figuras 8–10
+  incluyen las dos tablas nuevas. Se insertan en el informe en la fase 5.3.
 
 ---
 

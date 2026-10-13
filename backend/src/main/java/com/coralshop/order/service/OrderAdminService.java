@@ -9,11 +9,13 @@ import com.coralshop.common.exception.NotFoundException;
 import com.coralshop.order.dto.AdminOrderSummaryView;
 import com.coralshop.order.dto.OrderDetailView;
 import com.coralshop.order.dto.StatusChangeRequest;
+import com.coralshop.order.event.OrderStatusChanged;
 import com.coralshop.order.model.OrderHeader;
 import com.coralshop.order.model.OrderStatus;
 import com.coralshop.order.model.StockMovement;
 import com.coralshop.order.repository.OrderRepository;
 import java.util.List;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,13 +27,16 @@ public class OrderAdminService {
     private final ProductRepository productRepository;
     private final OrderStatusPolicy statusPolicy;
     private final OrderDetailAssembler detailAssembler;
+    private final ApplicationEventPublisher events;
 
     public OrderAdminService(OrderRepository orderRepository, ProductRepository productRepository,
-                             OrderStatusPolicy statusPolicy, OrderDetailAssembler detailAssembler) {
+                             OrderStatusPolicy statusPolicy, OrderDetailAssembler detailAssembler,
+                             ApplicationEventPublisher events) {
         this.orderRepository = orderRepository;
         this.productRepository = productRepository;
         this.statusPolicy = statusPolicy;
         this.detailAssembler = detailAssembler;
+        this.events = events;
     }
 
     @Transactional(readOnly = true)
@@ -46,7 +51,11 @@ public class OrderAdminService {
         return detailAssembler.assemble(orderId, true);
     }
 
-    /** Cambia el estado según la máquina de estados; cancelar devuelve el stock. */
+    /**
+     * Cambia el estado según la máquina de estados; cancelar devuelve el stock. Publica
+     * {@link OrderStatusChanged}: la auditoría se escribe en esta misma transacción y el aviso al
+     * cliente, solo si la transacción se confirma.
+     */
     @Transactional
     public OrderDetailView changeStatus(long adminId, long orderId, StatusChangeRequest request) {
         OrderStatus next = parseStatus(request.status());
@@ -63,6 +72,8 @@ public class OrderAdminService {
                 productRepository.incrementStock(movement.variantId(), movement.quantity());
             }
         }
+        events.publishEvent(OrderStatusChanged.of(orderId, order.orderCode(), order.userId(), order.status(), next,
+                adminId, comment));
         return detailAssembler.assemble(orderId, true);
     }
 

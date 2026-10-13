@@ -11,6 +11,7 @@ import com.coralshop.order.dto.CreateOrderRequest;
 import com.coralshop.order.dto.CreatedOrderResponse;
 import com.coralshop.order.dto.OrderDetailView;
 import com.coralshop.order.dto.OrderSummaryView;
+import com.coralshop.order.event.OrderStatusChanged;
 import com.coralshop.order.model.NewOrder;
 import com.coralshop.order.model.OrderStatus;
 import com.coralshop.order.repository.OrderRepository;
@@ -28,6 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -47,12 +49,13 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final UserRepository userRepository;
     private final OrderDetailAssembler detailAssembler;
+    private final ApplicationEventPublisher events;
     private final SecureRandom random = new SecureRandom();
 
     public OrderService(PricingService pricingService, ShippingService shippingService, AddressService addressService,
                         DesignRepository designRepository, ProductRepository productRepository,
                         OrderRepository orderRepository, UserRepository userRepository,
-                        OrderDetailAssembler detailAssembler) {
+                        OrderDetailAssembler detailAssembler, ApplicationEventPublisher events) {
         this.pricingService = pricingService;
         this.shippingService = shippingService;
         this.addressService = addressService;
@@ -61,6 +64,7 @@ public class OrderService {
         this.orderRepository = orderRepository;
         this.userRepository = userRepository;
         this.detailAssembler = detailAssembler;
+        this.events = events;
     }
 
     /**
@@ -96,6 +100,8 @@ public class OrderService {
             orderRepository.insertLine(orderId, line);
         }
         orderRepository.insertHistory(orderId, null, OrderStatus.PENDIENTE_PAGO, userId, "Pedido creado");
+        events.publishEvent(OrderStatusChanged.of(orderId, order.orderCode(), userId, null, OrderStatus.PENDIENTE_PAGO,
+                userId, "Pedido creado"));
         return new CreatedOrderResponse(order.orderCode(), total, OrderStatus.PENDIENTE_PAGO.name());
     }
 

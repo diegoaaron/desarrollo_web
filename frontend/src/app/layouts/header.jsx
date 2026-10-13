@@ -9,6 +9,7 @@ import {
   useCategories,
 } from "../../features/categories/hooks/use-categories";
 import { MobileMenu } from "./mobile-menu";
+import { NotificationBell } from "../../features/notifications/components/notification-bell";
 import { fullName, initial } from "../../features/auth/model/account-name";
 
 export function Header() {
@@ -126,6 +127,7 @@ export function Header() {
                   ) : <User aria-hidden="true" />}
                 </Link>
               )}
+              {!checking && account ? <NotificationBell /> : null}
               <button
                 ref={cartButtonRef}
                 type="button"

@@ -686,7 +686,7 @@ def fig_er_1():
             ["categories", "brands", "product_types"],
             ["products", "product_images"],
             ["sizes", "colors", "product_variants"],
-            ["favorites", "banners"],
+            ["favorites", "banners", "audit_log"],
         ],
         9.0, 4.8, 185, 88,
         nota="El stock no vive en products sino en product_variants: cada combinación de producto, talla y color tiene su propio SKU y su propio stock.")
@@ -700,10 +700,10 @@ def fig_er_2():
             ["customization_techniques", "print_zones", "quantity_tiers"],
             ["product_type_zones", "design_uploads"],
             ["order_lines", "order_line_zones"],
-            ["orders", "shipping_methods"],
+            ["orders", "shipping_methods", "notifications"],
             ["order_items", "order_status_history", "payments"],
         ],
-        9.0, 5.0, 178, 92,
+        9.0, 6.0, 178, 110.4,
         nota="order_lines y order_items copian nombre, SKU, talla, color y precios al comprar: el pedido queda inmutable aunque el catálogo cambie después.")
 
 
@@ -810,6 +810,58 @@ def fig_foda():
     guardar(fig, ruta("11_foda.png"))
 
 
+# ======================================================= 12 · FLUJO DE EVENTOS
+def _bloque(ax, x, y, w, h, color, titulo, sub, size_t=8.6, size_s=7):
+    caja(ax, x, y, w, h, fill=WHITE, edge=color, lw=1.4, r=0.6)
+    texto(ax, x + w / 2, y + h * 0.66, titulo, size=size_t, color=color, ha="center", bold=True)
+    texto(ax, x + w / 2, y + h * 0.30, sub, size=size_s, color=TEXT, ha="center", lh=1.3)
+
+
+def fig_eventos():
+    fig, ax = lienzo(10, 6.2, 100, 62)
+    titulo_figura(ax, 3, 56.5, "Figura 12 · Arquitectura dirigida por eventos",
+                  "Flujo del evento OrderStatusChanged", size_k=8, size_t=14)
+
+    # Contenido del evento
+    caja(ax, 63, 51, 34, 9, fill=CARD, edge=GOLD, lw=1.2, r=0.6)
+    texto(ax, 80, 57.6, "OrderStatusChanged", size=8.6, color=GOLD, ha="center", bold=True)
+    texto(ax, 80, 53.6, "eventId · orderId · orderCode · customerId\nfrom · to · changedBy · comment · occurredAt",
+          size=6.6, color=TEXT, ha="center", lh=1.3)
+
+    # Publicadores (capa de servicio, dentro de su @Transactional)
+    texto(ax, 3, 47.5, "PUBLICADORES · capa service, dentro de su transacción", size=7.4, color=PRIMARY, bold=True)
+    publicadores = [(3, "OrderService", "crea el pedido\n→ PENDIENTE_PAGO"),
+                    (35, "PaymentService", "pago aprobado\n→ PAGADO"),
+                    (67, "OrderAdminService", "avanza o cancela\n→ siguiente estado")]
+    for x, titulo, sub in publicadores:
+        _bloque(ax, x, 36, 30, 9.5, PRIMARY, titulo, sub)
+        ax.plot([x + 15, x + 15], [36, 30.4], color=PRIMARY, lw=1.6, zorder=3)
+        texto(ax, x + 16, 33.2, "publishEvent", size=6.6, color=PRIMARY, italic=True)
+
+    ax.plot([3, 97], [30, 30], color=ACCENT, lw=3.2, zorder=3)
+    texto(ax, 31, 27.6, "BUS DE EVENTOS · ApplicationEventPublisher de Spring", size=7.6, color=ACCENT, bold=True)
+
+    # Suscriptores
+    suscriptores = [
+        (8, BLUE, "AuditListener", "BEFORE_COMMIT · misma transacción\nsi falla, el cambio se deshace",
+         "audit_log", "bitácora: quién, cuándo, de qué a qué"),
+        (54, GREEN, "NotificationListener", "AFTER_COMMIT · transacción nueva\nsolo si el cambio se guardó",
+         "notifications", "campana del header · GET /api/notifications/me"),
+    ]
+    for x, color, titulo, sub, tabla, uso in suscriptores:
+        ax.plot([x + 19, x + 19], [30, 24.6], color=color, lw=1.6, zorder=3)
+        _bloque(ax, x, 15, 38, 9.5, color, titulo, sub)
+        flecha(ax, (x + 19, 15), (x + 19, 11.2), color=color, size=8)
+        caja(ax, x + 6, 5.2, 26, 6, fill=CARD, edge=color, lw=1.1, r=0.5)
+        texto(ax, x + 19, 9.1, tabla, size=7.8, color=color, ha="center", bold=True)
+        texto(ax, x + 19, 6.7, uso, size=6.2, color=MUTED, ha="center")
+
+    texto(ax, 3, 2.2, "@TransactionalEventListener: si la transacción se deshace, ningún suscriptor recibe el evento. "
+          "event_id es único en ambas tablas, así que un evento repetido no duplica nada.",
+          size=6.8, color=MUTED, italic=True)
+    guardar(fig, ruta("12_flujo_eventos.png"))
+
+
 if __name__ == "__main__":
     print("Generando figuras en", BASE)
     fig_ishikawa()
@@ -823,4 +875,5 @@ if __name__ == "__main__":
     fig_er_2()
     fig_er_global()
     fig_foda()
+    fig_eventos()
     print("Listo.")

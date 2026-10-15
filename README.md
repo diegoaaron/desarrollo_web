@@ -137,6 +137,7 @@ izquierda del **▶ verde**, aparecen:
 | **Backend + Frontend** | lanza las dos a la vez — **la que se usa normalmente** |
 | **Backend** | API Spring Boot en `http://localhost:8082`, con `DB_URL`, `DB_USER`, `DB_PASSWORD` y el perfil `dev` ya definidos |
 | **Frontend** | `npm run dev` en `http://localhost:5173`, apuntando al backend local (`API_PROXY_TARGET=http://localhost:8082`) |
+| **Backend (demo)** | igual que **Backend**, con los perfiles `dev,demo`: carga los datos de demostración (ver [sección 3.1](#31-datos-de-demostración-perfil-demo)) |
 
 Elige **Backend + Frontend** y dale al **▶**. Se abren dos pestañas en la ventana *Run*
 (o *Services*):
@@ -220,6 +221,49 @@ docker exec -it coralshop-db psql -U coralshop -d coralshop -c "UPDATE users SET
 Luego cierra sesión y vuelve a entrar.
 
 > Usa siempre datos ficticios. No registres datos personales reales.
+
+### 3.1 Datos de demostración (perfil `demo`)
+
+Para ensayar la exposición con una tienda «llena», ejecuta la configuración **Backend
+(demo)** (perfiles `dev,demo`) en lugar de **Backend**. Al arrancar carga **una sola vez**:
+
+- **8 productos** de los cuatro tipos (polos, poleras, gorras y tote bag) con tallas,
+  colores, stock e ilustraciones propias (`frontend/public/demo/`, generadas con
+  `scripts/demo_imagenes.py`). Uno de ellos, «Polo Coral Edición Lima», no es personalizable.
+- **5 clientes ficticios**, cada uno con su dirección y su logo subido como diseño.
+- **8 pedidos** que cubren todos los estados. El de Renzo es la historia de referencia:
+  12 polos negros con el logo bordado en el pecho (4 S, 4 M, 4 L), pagado y llevado hasta
+  ENTREGADO, con su historial y sus notificaciones. Camila tiene un pago rechazado y un
+  pedido cancelado (el stock volvió al inventario).
+
+Todo se crea a través de los servicios de la API (no con SQL suelto), así que respeta las
+reglas del negocio. Si el primer cliente demo ya existe, no se vuelve a cargar nada.
+
+| Cuenta | Correo | Contraseña |
+|---|---|---|
+| Clientes demo | `renzo.paredes@demo.coralshop.pe`, `valeria.quispe@…`, `lucia.fernandez@…`, `mateo.rojas@…`, `camila.torres@…` (todos `@demo.coralshop.pe`) | `Cliente2026` |
+| Administrador demo | `admin@demo.coralshop.pe` | la de `DEMO_ADMIN_PASSWORD`; sin ella, se genera una al azar y se muestra **una vez** en el log del backend |
+
+En local también sirve el administrador de desarrollo (`diego@diego.com`). Variables
+opcionales del perfil: `DEMO_ADMIN_EMAIL`, `DEMO_ADMIN_PASSWORD` y `DEMO_CUSTOMER_PASSWORD`.
+
+> Los datos demo se agregan a la base que esté usando el backend. Para empezar de cero,
+> borra el contenedor y créalo de nuevo (paso 4): `docker rm -f coralshop-db`.
+
+### 3.2 Documentación de la API y colección Postman
+
+- **Swagger UI:** <http://localhost:8082/api/docs> (o <http://localhost:5173/api/docs>,
+  a través del proxy). El documento OpenAPI está en `/api/docs/openapi.json`. La página
+  explica cómo autenticarse (token CSRF + login).
+- **Postman:** importa `backend/postman/Coral_Shop.postman_collection.json`. Recorre la
+  historia de referencia (cliente: catálogo → subir logo → cotizar → pedido → pago;
+  administrador: de PAGADO a ENTREGADO) y los errores esperados (401, 400, 404). Requiere
+  el backend con los datos demo. Desde la terminal:
+
+  ```powershell
+  cd backend\postman
+  npx newman run Coral_Shop.postman_collection.json --working-dir .
+  ```
 
 ---
 
@@ -310,7 +354,7 @@ un diseño de casi 5 MB pasa por el reenvío de Vercel.
 | Comando | Qué hace |
 |---|---|
 | `./mvnw spring-boot:run` | ejecuta la API |
-| `./mvnw test` | ejecuta las pruebas |
+| `./mvnw test` | ejecuta las pruebas: unitarias y de integración (estas levantan un PostgreSQL en Docker con Testcontainers; sin Docker se omiten) |
 | `./mvnw package` | genera el JAR desplegable en `target/` |
 | `java -jar target/coral-shop-backend-0.0.1-SNAPSHOT.jar` | ejecuta el JAR (con las mismas variables de entorno) |
 

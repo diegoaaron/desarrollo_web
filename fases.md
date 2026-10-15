@@ -548,18 +548,44 @@ y si la transacción falla no se publica ningún evento.
 
 ### 5.1 Pruebas
 
-- [ ] JUnit: `PricingService`, `QuantityPolicy`, `OrderStatusPolicy` (lógica pura, TDD).
-- [ ] Prueba de integración de `POST /api/orders`: stock insuficiente → 409 y *rollback*.
-- [ ] Prueba de seguridad: un cliente no puede ver el pedido ni el diseño de otro.
+- [x] JUnit: `PricingService`, `QuantityPolicy`, `OrderStatusPolicy` (lógica pura, TDD).
+- [x] Prueba de integración de `POST /api/orders`: stock insuficiente → 409 y *rollback*.
+- [x] Prueba de seguridad: un cliente no puede ver el pedido ni el diseño de otro.
 
 ### 5.2 Demo
 
-- [ ] Datos de demostración (migración o script aparte): productos de los cuatro tipos con
+- [x] Datos de demostración (migración o script aparte): productos de los cuatro tipos con
       fotos, variantes y stock; clientes y pedidos en distintos estados. **Datos
       ficticios**.
-- [ ] Colección Postman (o Swagger con `springdoc-openapi`) de toda la API.
+- [x] Colección Postman (o Swagger con `springdoc-openapi`) de toda la API.
 - [ ] Desplegar y verificar: frontend en Vercel (variable `BACKEND_URL`, ver README) y
       backend en el servicio que se elija, con login, subida de diseño y pedido en producción.
+
+### 5.4 Decisiones fijadas al implementar (5.1 y 5.2)
+
+- **Pruebas de integración con Testcontainers** (PostgreSQL 16 real, migraciones V1–V6):
+  `OrderCreationIntegrationTest` (201 y descuento de stock; 409 que deshace también el stock
+  de la línea anterior; 400 con errores por campo) y `OwnershipSecurityIntegrationTest`
+  (pedido, diseño y pago ajenos → 404; diseño ajeno en un pedido → 422; rutas de admin → 403;
+  sin sesión → 401; sin CSRF → 403). Un solo contenedor por ejecución; sin Docker se omiten.
+  `PricingServiceTest` cubre la historia de referencia (S/ 591.60) y cada regla de rechazo.
+  Total: **73 pruebas** en verde.
+- **Datos demo por perfil `demo`**, no por migración: un `ApplicationRunner`
+  (`com.coralshop.demo`) que usa los servicios de la API en una sola transacción, así que los
+  datos pasan por las reglas, descuentan stock, registran pagos simulados y dejan auditoría y
+  notificaciones. Es idempotente (marca: el correo del primer cliente demo). Una migración
+  Flyway habría ido también a producción y habría duplicado la lógica de precios en SQL.
+- **8 productos, 5 clientes, 8 pedidos**: uno o más por estado; el de Renzo es la historia de
+  referencia hasta ENTREGADO. Imágenes propias en `frontend/public/demo/`
+  (`scripts/demo_imagenes.py`); por eso la URL de imagen de producto admite también rutas del
+  sitio (`/demo/…`), no solo `http(s)://`.
+- **Administrador demo** `admin@demo.coralshop.pe`: contraseña por `DEMO_ADMIN_PASSWORD`; sin
+  ella se genera una al azar y se muestra una vez en el log (nunca una clave fija en un
+  despliegue público). Clientes demo: `Cliente2026`.
+- **Swagger UI en `/api/docs`** (springdoc 2.8) para que pase por el proxy de Vite y de Vercel;
+  incluye el login del filtro de seguridad. **Postman**: `backend/postman/` con la historia de
+  referencia completa (cliente y administrador) y los errores esperados; verificada con
+  Newman (39 peticiones, 38 aserciones).
 
 ### 5.3 Documentación del entregable 2
 

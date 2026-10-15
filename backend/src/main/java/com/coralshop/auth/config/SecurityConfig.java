@@ -37,6 +37,8 @@ public class SecurityConfig {
                         "/api/products", "/api/products/*", "/api/products/*/customization-options",
                         "/api/categories", "/api/brands", "/api/product-types", "/api/shipping-methods").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/auth/register", "/api/auth/login", "/api/quotes").permitAll()
+                // Documentación de la API (Swagger UI y el documento OpenAPI).
+                .requestMatchers(HttpMethod.GET, "/api/docs", "/api/docs/**", "/api/swagger-ui/**").permitAll()
                 .requestMatchers("/api/auth/me").authenticated()
                 // Cliente (ROLE_USER; un administrador también lo cumple, D11).
                 .requestMatchers(HttpMethod.GET, "/api/orders/me", "/api/orders/me/*").hasRole("USER")

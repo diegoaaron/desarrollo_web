@@ -100,10 +100,10 @@ export function ProductForm() {
             <AdminPanel className="space-y-4 p-5 sm:p-6">
               <h2 className="flex items-center gap-2 font-black text-slate-950"><Image className="h-5 w-5 text-[#e94727]" aria-hidden="true" /> Imagen del producto</h2>
               <Field id="product-image" label="URL de la imagen">
-                <input id="product-image" type="url" required pattern="https?://.+" value={form.imageUrl} onChange={(event) => setForm({ ...form, imageUrl: event.target.value })} className={`${fieldStyles} mt-2`} placeholder="https://ejemplo.com/polo.jpg" />
+                <input id="product-image" type="text" required pattern="(https?://|/(?!/)).+" title="URL HTTP(S) o ruta del sitio que empiece con /" value={form.imageUrl} onChange={(event) => setForm({ ...form, imageUrl: event.target.value })} className={`${fieldStyles} mt-2`} placeholder="https://ejemplo.com/polo.jpg o /demo/polo-clasico.png" />
               </Field>
-              <p className="text-xs leading-5 text-slate-500">Pega la URL pública (HTTPS) de una imagen. La subida de archivos aún no está disponible.</p>
-              {form.imageUrl.startsWith("https://") || form.imageUrl.startsWith("http://") ? (
+              <p className="text-xs leading-5 text-slate-500">Pega la URL pública (HTTPS) de una imagen o la ruta de una imagen del sitio (por ejemplo, /demo/polo-clasico.png). La subida de archivos aún no está disponible.</p>
+              {/^(https?:\/\/|\/(?!\/))/.test(form.imageUrl) ? (
                 <img src={form.imageUrl} alt="Vista previa del producto" className="h-40 w-full rounded-xl bg-stone-50 object-contain" />
               ) : null}
             </AdminPanel>

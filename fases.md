@@ -568,7 +568,7 @@ y si la transacción falla no se publica ningún evento.
       de usuario del personalizador y del mayoreo.
 - [ ] Regenerar el informe y la PPT (`scripts/generar.ps1`).
 - [ ] Capturas reales de las pantallas para el informe.
-- [ ] Reparto de la exposición entre los cinco integrantes y ensayo con la demo.
+- [ ] Reparto de la exposición entre los cuatro integrantes y ensayo con la demo.
 
 ---
 

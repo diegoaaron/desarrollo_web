@@ -736,7 +736,7 @@ def seccion_4(doc):
         "importados; si esos valores quedarán escritos en el código, cada ajuste de precio exigiría un nuevo "
         "despliegue.",
         "Levantar el entorno con Docker Compose desde el sprint 1 y no al final. Es la forma de asegurar que "
-        "los cinco integrantes trabajen sobre la misma versión de Tomcat y de PostgreSQL, y de que la "
+        "los cuatro integrantes trabajen sobre la misma versión de Tomcat y de PostgreSQL, y de que la "
         "demostración de la semana 18 no dependa de la máquina de una persona.",
         "Preparar los datos simulados con volumen realista, del orden de 60 productos y 400 variantes. Un "
         "catálogo de cinco productos no permite demostrar la paginación, los filtros ni el rendimiento, que "

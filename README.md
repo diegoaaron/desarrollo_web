@@ -362,7 +362,6 @@ scripts, no el Word ni la PPT.
 
 ## Equipo — Grupo 1
 
-- Choquehuanca Marrufo, Liam Lennon
 - Damián Valdivia, Diego Aarón
 - Loayza Gerónimo, Juan Franco
 - Villanueva Montalvo, Apolo Chris

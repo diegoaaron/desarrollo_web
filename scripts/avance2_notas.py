@@ -2,9 +2,8 @@
 """Notas del orador de la presentación del avance 2 (avance2_presentacion.py).
 
 Una entrada por lámina, en el mismo orden: (expositor sugerido, qué decir). El reparto es una
-propuesta de 3 láminas por integrante; se cambia aquí y se vuelve a generar la PPT."""
+propuesta de 3 o 4 láminas por integrante; se cambia aquí y se vuelve a generar la PPT."""
 
-LIAM = "Liam Choquehuanca"
 DIEGO = "Diego Damián"
 JUAN = "Juan Franco Loayza"
 APOLO = "Apolo Villanueva"
@@ -12,7 +11,7 @@ JIAN = "Jian Pier Campos"
 
 NOTAS = [
     # 1 · Portada
-    (LIAM, """
+    (DIEGO, """
 QUÉ DECIR: Saludar y presentar al grupo (Grupo 1) y el proyecto: Coral Shop, una tienda virtual de ropa juvenil
 (polos, poleras, gorras y tote bags) donde el propio cliente personaliza el estampado o el bordado.
 Este avance muestra la ARQUITECTURA de la solución: cómo aplicamos los cuatro patrones vistos en clase
@@ -20,14 +19,14 @@ Este avance muestra la ARQUITECTURA de la solución: cómo aplicamos los cuatro 
 IDEA CLAVE: no es un diseño en papel; todo lo que vamos a mostrar ya está implementado hasta la fase 4.
 """),
     # 2 · Agenda
-    (LIAM, """
+    (DIEGO, """
 QUÉ DECIR: Recorrer rápido los seis bloques. Primero dónde estamos; luego los cuatro patrones, uno por uno,
 cada uno explicado con una analogía de nuestro propio taller de estampado (no del restaurante de la clase);
 al final la implementación, las pruebas y lo que falta.
 TIP: no leer las tarjetas; decir solo el título de cada bloque y pasar. Esta lámina dura ~30 segundos.
 """),
     # 3 · Dónde estamos
-    (LIAM, """
+    (DIEGO, """
 QUÉ DECIR: El proyecto se organiza en 7 fases. Las fases 0 a 4 están TERMINADAS e integradas en GitHub:
 0 ordenar el código, 1 modelo de datos, 2 API de compra, 3 frontend de compra y 4 eventos. La siguiente es la 5
 (calidad y demo) y la 6 es la pasarela de pago real.
@@ -48,7 +47,7 @@ sistema desde un nivel distinto.
 TRANSICIÓN: «Empezamos por capas, con un ejemplo de nuestro propio taller».
 """),
     # 5 · Capas: el taller
-    (DIEGO, """
+    (JUAN, """
 QUÉ DECIR: En clase se usó el restaurante; nosotros usamos nuestro taller de estampado y bordado.
 - El VENDEDOR atiende al cliente y revisa que el pedido esté completo (tallas, colores, diseño) → es el
   Controller (capa de presentación).
@@ -61,7 +60,7 @@ escribe SQL; todo el SQL está en los @Repository. Si mañana cambiamos de base 
 repositorios.
 """),
     # 6 · Capas: el pedido de 12 polos
-    (DIEGO, """
+    (JUAN, """
 QUÉ DECIR: Mismo patrón, ahora con el pedido real (POST /api/orders). Seguir los números rojos del diagrama:
 1. PRESENTACIÓN: CustomerOrderController y el DTO CreateOrderRequest validan el FORMATO con @Valid. Si falta un
    campo o la cantidad no es válida → error 400, sin tocar la base.
@@ -84,7 +83,7 @@ Todo pasa por un solo @RestControllerAdvice que responde siempre con la misma fo
 y el frontend muestra ese mensaje junto al campo que falló. Los mensajes son reales, sacados de las pruebas.
 """),
     # 8 · Cliente-servidor
-    (JUAN, """
+    (APOLO, """
 QUÉ DECIR: ANALOGÍA: los pedidos llegan por varios canales, pero todos van a un único taller central que tiene
 la lista de precios y el stock oficiales. Ningún canal fija sus propios precios.
 En el software hay tres clientes (la tienda, el panel del administrador y Postman) y UN servidor Spring Boot,
@@ -96,7 +95,7 @@ DETALLES A MENCIONAR:
 - En desarrollo Vite reenvía /api al backend; en producción lo hará Vercel con la variable BACKEND_URL.
 """),
     # 9 · MVC
-    (JUAN, """
+    (APOLO, """
 QUÉ DECIR: ANALOGÍA: el MODELO es la ficha técnica del pedido (tallas, técnica, zonas, precio y sus reglas); la
 VISTA es la vista previa del polo con el logo que el cliente ve en pantalla; el CONTROLADOR es el asesor de
 ventas, que recibe lo que el cliente elige, actualiza la ficha y le muestra el resultado.
@@ -129,7 +128,7 @@ QUÉ DECIR: Resumir cómo conviven los cuatro patrones en el mismo caso de los 1
 IDEA CLAVE: cada patrón responde a una pregunta distinta, por eso se usan los cuatro a la vez.
 """),
     # 12 · Implementación: paquetes
-    (APOLO, """
+    (JIAN, """
 QUÉ DECIR: A la izquierda, la estructura real del backend: un paquete por funcionalidad (pedidos, pagos,
 notificaciones, auditoría…) y, dentro de cada uno, los paquetes por capa: controller, service, repository, dto y
 model. Ningún paquete mezcla capas, que es lo que pide la rúbrica. Son 15 módulos y 127 clases, y las tablas se

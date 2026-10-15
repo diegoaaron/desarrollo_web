@@ -10,7 +10,6 @@ CARRERA = "Ingeniería de Software"
 CICLO = "2026"
 GRUPO = "Grupo 1"
 INTEGRANTES = [
-    "Choquehuanca Marrufo, Liam Lennon",
     "Damián Valdivia, Diego Aarón",
     "Loayza Gerónimo, Juan Franco",
     "Villanueva Montalvo, Apolo Chris",
@@ -426,7 +425,7 @@ TECNOLOGIAS = [
      "del frontend.",
      "Metodología adoptada por el equipo"),
     ("Control de versiones", "Git y GitHub",
-     "Trabajo en paralelo de los cinco integrantes con ramas por funcionalidad.",
+     "Trabajo en paralelo de los cuatro integrantes con ramas por funcionalidad.",
      "Práctica del curso"),
 ]
 
@@ -581,7 +580,7 @@ CRONOGRAMA = [
      "Módulos M09, M11, M15, M17, M18, M19 y M20. Datos simulados, pruebas de extremo a extremo y despliegue.",
      "Planificado"),
     ("Sprint 5", "Semana 18", "Exposición",
-     "Ensayo de la demostración y reparto de la exposición entre los cinco integrantes.", "Planificado"),
+     "Ensayo de la demostración y reparto de la exposición entre los cuatro integrantes.", "Planificado"),
 ]
 
 GLOSARIO = [

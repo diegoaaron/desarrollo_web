@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
-"""Genera entregables/Presentacion_Proyecto_Final_Coral_Shop.pptx"""
+"""Genera clase_entregables/Presentacion_Proyecto_Final_Coral_Shop.pptx (exposición final).
+
+Cada lámina lleva notas del orador con el expositor y qué decir (presentacion_notas.NOTAS).
+portada() también la usa avance2_presentacion.py."""
 
 import os
 
@@ -8,6 +11,8 @@ from pptx.enum.text import PP_ALIGN, MSO_ANCHOR
 from pptx.util import Inches, Pt
 
 import contenido as CONT
+import esquema
+from presentacion_notas import NOTAS
 from pptx_util import (
     nueva_presentacion, lamina, caja, texto, cabecera, chip, tarjeta, vinetas,
     figura, pie, numero,
@@ -52,6 +57,10 @@ def portada(prs, lema="Proyecto Final  ·  Diagnóstico, diseño de la solución
           size=12.5, color=CREAM, interlineado=1.25)
 
 
+def portada_final(prs):
+    portada(prs, lema="Proyecto Final  ·  Diagnóstico, solución implementada y demostración")
+
+
 # ------------------------------------------------------------------- 2 agenda
 def agenda(prs):
     s = lamina(prs)
@@ -59,10 +68,10 @@ def agenda(prs):
     bloques = [
         ("1", "Diagnóstico del negocio", "Empresa, Canvas, PESTEL, FODA e Ishikawa", PRIMARY),
         ("2", "Problemática y objetivos", "La causa raíz y las metas medibles", ACCENT),
-        ("3", "Características de la tienda", "Los 20 módulos y 49 requerimientos", BLUE),
-        ("4", "Arquitectura", "Cliente-servidor en tres capas sobre Tomcat", PRIMARY),
-        ("5", "Modelo de datos", "28 tablas, relaciones y campos", GREEN),
-        ("6", "Implementación", "Paquetes, clases, algoritmos y cronograma", GOLD),
+        ("3", "La solución", "12 módulos, personalizador y mayoreo", BLUE),
+        ("4", "Arquitectura", "Cliente-servidor, MVC, capas y eventos", PRIMARY),
+        ("5", "Modelo de datos", f"{esquema.totales()[0]} tablas versionadas con Flyway", GREEN),
+        ("6", "Implementación y demo", "Paquetes, algoritmos, pruebas y demo en vivo", GOLD),
     ]
     for i, (n, t, d, color) in enumerate(bloques):
         fila, col = divmod(i, 3)
@@ -98,8 +107,8 @@ def empresa(prs):
     texto(s, 1.0, 4.38, 6.7, 0.28, "QUÉ VENDE", size=9.5, color=ACCENT, bold=True, spc=150)
     vinetas(s, 1.0, 4.70, 6.7, [
         ("Catálogo propio: ", "polos, poleras con capucha, gorras y tote bags."),
-        ("Estampado personalizado: ", "el cliente elige zona, técnica y tamaño, "
-         "y sube su propia imagen o texto."),
+        ("Estampado y bordado personalizados: ", "el cliente elige la técnica y las "
+         "zonas, y sube su propio diseño."),
         ("El 45 % de las ventas ", "ya proviene de la línea personalizada, que es "
          "también la que más trabajo manual exige."),
         ("Pedidos por volumen: ", "polos de promoción, de facultad, de equipos "
@@ -142,17 +151,17 @@ def pestel(prs):
     cabecera(s, "1 · Entorno", "Análisis PESTEL articulado al proyecto")
     items = [
         ("Político", "Fiscalización de INDECOPI sobre información al consumidor",
-         "Obliga a publicar políticas y habilitar reclamos", PRIMARY),
+         "Precio final desglosado y políticas publicadas en la tienda", PRIMARY),
         ("Económico", "Tipo de cambio volátil encarece los insumos importados",
          "Los costos de estampado son configurables en base de datos", BLUE),
-        ("Social", "El joven valora la autoexpresión y confía en las reseñas",
-         "Origina el personalizador (M03) y las reseñas verificadas (M09)", ACCENT),
-        ("Tecnológico", "Estampado DTF accesible para tiradas cortas y Java EE maduro",
-         "Hace viable producir desde una unidad; sustenta Tomcat y Docker", GREEN),
+        ("Social", "El joven valora la autoexpresión y encarga prendas en grupo",
+         "Origina el personalizador (M03) y el mayoreo repartible (M04)", ACCENT),
+        ("Tecnológico", "Estampado DTF y bordado para tiradas cortas; Spring Boot maduro",
+         "Producir desde una unidad; Spring Boot y PostgreSQL en Docker", GREEN),
         ("Ecológico", "Presión por reducir el desperdicio textil",
          "Producir bajo demanda evita el sobrestock", GOLD),
         ("Legal", "Ley 29733 de Protección de Datos Personales",
-         "Exige BCrypt, consentimiento y bitácora de auditoría", PRIMARY),
+         "BCrypt, CSRF, diseños privados y nunca guardar la tarjeta", PRIMARY),
     ]
     for i, (factor, hallazgo, implicancia, color) in enumerate(items):
         fila, col = divmod(i, 2)
@@ -267,18 +276,18 @@ def objetivos(prs):
     texto(s, 1.0, 1.72, 2.2, 0.24, "OBJETIVO GENERAL", size=9.5, color=ROSE,
           bold=True, spc=150)
     texto(s, 1.0, 1.98, 11.3, 0.6,
-          "Diseñar e implementar una plataforma web que permita al cliente comprar y personalizar "
-          "prendas en línea, y a la empresa gestionar catálogo, inventario por variante y el ciclo "
-          "completo del pedido.",
+          "Diseñar e implementar una plataforma web que permita al cliente personalizar prendas y "
+          "comprarlas por unidad o por mayor, y a la empresa gestionar catálogo, inventario por variante "
+          "y el ciclo completo del pedido.",
           size=12, color=CREAM, interlineado=1.28)
 
     oes = [
         ("OE-1", "Tienda virtual operativa", "80 % de pedidos por la web al 3.er mes", PRIMARY),
-        ("OE-2", "Personalizador automático", "De 6 horas a menos de 1 minuto", ACCENT),
-        ("OE-3", "Inventario por variante", "Cancelaciones por stock: de 12 % a < 2 %", BLUE),
-        ("OE-4", "Tablero e informes", "8 indicadores actualizados al día", GREEN),
-        ("OE-5", "Seguridad y trazabilidad", "100 % de acciones en bitácora", GOLD),
-        ("OE-6", "Arquitectura del curso con TDD", "70 % de cobertura en la capa de servicio", PRIMARY),
+        ("OE-2", "Personalizador automático", "Cotizar: de 6 horas a menos de 1 minuto", ACCENT),
+        ("OE-3", "Inventario y mayoreo", "Cancelaciones por stock: de 12 % a < 2 %", BLUE),
+        ("OE-4", "Trazabilidad del pedido", "100 % de cambios auditados y avisados", GREEN),
+        ("OE-5", "Seguridad", "0 accesos a recursos ajenos en las pruebas", GOLD),
+        ("OE-6", "Arquitectura del curso", "73 de 73 pruebas automatizadas en verde", PRIMARY),
     ]
     for i, (cod, nombre, meta, color) in enumerate(oes):
         fila, col = divmod(i, 3)
@@ -295,542 +304,335 @@ def objetivos(prs):
 # --------------------------------------------------------------- 10 solucion
 def solucion(prs):
     s = lamina(prs)
-    cabecera(s, "3 · La propuesta", "Qué vamos a construir")
+    cabecera(s, "3 · La solución", "Qué construimos")
+    tarjetas = [
+        ("Stock por variante", "Cada combinación de producto, talla y color tiene su SKU y su stock. Se "
+         "descuenta en la misma transacción del pedido: no hay sobreventa.", BLUE),
+        ("Personalizador", "Técnica y zonas válidas según la prenda, subida del diseño, vista previa sobre "
+         "la silueta y precio calculado por el servidor al instante.", ACCENT),
+        ("Mayoreo repartible", "Un mismo diseño se reparte entre tallas y colores y alcanza su escala: "
+         "3 → 5 %, 6 → 10 %, 12 → 15 % de descuento.", GREEN),
+    ]
+    for i, (t, c, color) in enumerate(tarjetas):
+        tarjeta(s, 0.7 + i * 4.05, 1.62, 3.78, 2.05, t, c, color=color, size_c=10.5)
 
-    tarjeta(s, 0.7, 1.62, 5.95, 2.15,
-            "coral_shop",
-            "Aplicación de página única en React 19 + Vite. Catálogo, ficha de producto, "
-            "personalizador de estampado, carrito, checkout y panel administrativo.",
-            color=BLUE, etiqueta="FRONTEND", size_t=17, size_c=11)
-    tarjeta(s, 6.68, 1.62, 5.95, 2.15,
-            "coral_shop_backend",
-            "Aplicación Java sobre Apache Tomcat. API REST en tres capas: Servlets como "
-            "controlador, servicios con las reglas y DAO sobre JDBC. PostgreSQL de 28 tablas.",
-            color=PRIMARY, etiqueta="BACKEND", size_t=17, size_c=11)
-
-    caja(s, 0.7, 3.95, 11.93, 2.72, color=PRIMARY)
-    texto(s, 1.0, 4.18, 11.3, 0.28, "LAS DOS DECISIONES QUE LA HACEN DISTINTA",
-          size=10, color=ROSE, bold=True, spc=150)
-
-    caja(s, 1.0, 4.58, 5.5, 1.9, color=DARK)
-    texto(s, 1.28, 4.8, 4.95, 0.34, "El stock vive en la variante", size=15,
-          color=CREAM, bold=True, font=TITULO)
-    texto(s, 1.28, 5.22, 4.95, 1.1,
-          "Un polo negro talla M y uno negro talla L son existencias independientes, cada una "
-          "con su SKU y su stock. Es lo que corta de raíz el 12 % de cancelaciones por sobreventa.",
-          size=10.5, color=MUTED_LIGHT, interlineado=1.32)
-
-    caja(s, 6.83, 4.58, 5.5, 1.9, color=DARK)
-    texto(s, 7.11, 4.8, 4.95, 0.34, "El personalizador en línea", size=15,
-          color=CREAM, bold=True, font=TITULO)
-    texto(s, 7.11, 5.22, 4.95, 1.1,
-          "El cliente compone su arte, lo ve sobre la prenda y conoce el precio final sin esperar "
-          "a nadie. Ese diseño viaja al taller convertido en una orden de producción trazable.",
-          size=10.5, color=MUTED_LIGHT, interlineado=1.32)
+    caja(s, 0.7, 3.92, 7.6, 2.75, color=CARD, borde=LINE)
+    texto(s, 1.0, 4.1, 7.0, 0.26, "IMPLEMENTADO Y FUNCIONANDO EN LOCAL", size=9.5, color=GREEN, bold=True, spc=120)
+    vinetas(s, 1.0, 4.42, 7.0, [
+        "Tienda: catálogo, ficha, personalizador, carrito, checkout y pago simulado",
+        "Cliente: cuenta, direcciones, «Mis pedidos» con línea de tiempo y campana de avisos",
+        "Panel: tablero, productos y variantes, categorías, bandeja de pedidos, usuarios",
+        "Calidad: 73 pruebas, Swagger, Postman y datos demo ficticios",
+    ], size=10.5, interlineado=1.25, bullet_color=GREEN)
+    caja(s, 8.55, 3.92, 4.08, 2.75, color=PRIMARY)
+    texto(s, 8.85, 4.1, 3.5, 0.26, "TRABAJO FUTURO", size=9.5, color=ROSE, bold=True, spc=120)
+    vinetas(s, 8.85, 4.42, 3.5, [
+        "Pasarela de pago real (sandbox)",
+        "Despliegue público",
+        "Correo al cliente",
+        "Cupones, favoritos y reseñas",
+    ], size=10.5, color=CREAM, interlineado=1.25, bullet_color=ROSE)
 
 
-# ----------------------------------------------------------------- 11 alcance
-def alcance(prs):
-    s = lamina(prs)
-    cabecera(s, "3 · Alcance", "Qué entra y qué no en esta solución")
-
-    caja(s, 0.7, 1.62, 6.1, 5.05, color=CARD, borde=LINE)
-    chip(s, 0.7, 1.62, 6.1, 0.4, "INCLUIDO", color=GREEN, size=11)
-    vinetas(s, 0.98, 2.22, 5.6, [
-        "Tienda pública con catálogo, búsqueda, filtros y stock real por variante",
-        "Personalizador con vista previa, carga de arte y recargo automático",
-        "Carrito de invitado y de usuario, favoritos y cupones",
-        "Checkout con direcciones, modalidades de entrega y confirmación",
-        "Cuenta: registro, JWT, perfil, historial y Mis diseños",
-        "Backoffice: tablero, CRUD de catálogo, inventario con kardex y pedidos",
-        "Aprobación del arte y máquina de estados del pedido",
-        "Usuarios y roles, cupones, envíos, reportes y auditoría",
-    ], size=10.5, interlineado=1.28, bullet_color=GREEN, sep=0.05)
-
-    caja(s, 7.0, 1.62, 5.63, 5.05, color=CARD, borde=LINE)
-    chip(s, 7.0, 1.62, 5.63, 0.4, "FUERA DE ESTA VERSIÓN", color=ACCENT, size=11)
-    vinetas(s, 7.28, 2.22, 5.1, [
-        "Pasarela de pagos real (el pago se simula y se registra)",
-        "Facturación electrónica ante SUNAT",
-        "Envío automático de correos (los avisos van a la bandeja del sistema)",
-        "Rastreo satelital del paquete (sí se registra el número de guía)",
-        "Inicio de sesión con redes sociales",
-        "Módulo contable y de planillas",
-        "Editor gráfico avanzado con capas y filtros",
-        "Aplicación móvil nativa (la web es responsiva)",
-    ], size=10.5, interlineado=1.28, bullet_color=ACCENT, sep=0.05)
-
-
-# ---------------------------------------------------------------- 12 modulos
+# ----------------------------------------------------------------- 11 modulos
 def modulos(prs):
     s = lamina(prs)
-    cabecera(s, "3 · Características de la tienda", "Los 20 módulos de la plataforma")
-    figura(s, "07_modulos.png", y=1.55, ancho_max=12.0, alto_max=5.3)
-    pie(s, "Cada módulo se descompone en requerimientos funcionales verificables: 49 en total, "
-           "más 15 requerimientos no funcionales y 14 reglas de negocio.")
+    cabecera(s, "3 · Características de la tienda", "12 módulos, 36 requerimientos funcionales")
+    figura(s, "07_modulos.png", y=1.6, ancho_max=12.0, alto_max=4.9)
+    pie(s, "Todos implementados y verificados. Detalle de requerimientos, historias de usuario y reglas en la "
+           "sección 2.1 del informe.")
 
 
-# --------------------------------------------------- 13 funcionalidades cliente
-def funcionalidades_cliente(prs):
+# ---------------------------------------------------------- 12 personalizador
+def personalizador(prs):
     s = lamina(prs)
-    cabecera(s, "3 · Funcionalidades", "Lo que puede hacer el cliente")
-    bloques = [
-        ("M01-M02", "Explorar y elegir", BLUE, [
-            "Catálogo con búsqueda, filtros por categoría, talla, color y precio",
-            "Orden por relevancia, precio, novedad o valoración",
-            "Ficha con galería, guía de tallas y stock real de cada variante",
-            "Las combinaciones agotadas se muestran deshabilitadas",
-            "Hasta cuatro productos relacionados de la misma categoría",
-        ]),
-        ("M03", "Personalizar", ACCENT, [
-            "Elegir zona (pecho, espalda, manga), técnica (DTF, serigrafía, vinil, bordado) y tamaño (A5, A4, A3)",
-            "Subir una imagen o escribir un texto con tipografía y color",
-            "Vista previa del estampado sobre la prenda elegida",
-            "Recargo calculado al instante y guardado en Mis diseños",
-            "Solo PNG o JPG de hasta 5 MB: el resto se rechaza indicando el motivo",
-        ]),
-        ("M04-M07", "Comprar", GREEN, [
-            "Carrito de invitado que se fusiona con la cuenta al iniciar sesión",
-            "Favoritos, cupones de descuento y cálculo del envío",
-            "Checkout con libreta de direcciones y pago simulado",
-            "Código de pedido CS-2026-000123 al confirmar",
-            "Si una talla se agotó mientras compraba, el pedido no se crea y el carrito queda intacto",
-        ]),
-        ("M08-M10", "Seguir y opinar", GOLD, [
-            "Estado del pedido con su línea de tiempo completa",
-            "Notificación en la bandeja ante cada cambio de estado",
-            "Reseña solo si compró el producto y ya lo recibió",
-            "Perfil, direcciones, historial y diseños guardados",
-            "Recuperación de contraseña con token de un solo uso",
-        ]),
-    ]
-    for i, (cod, titulo, color, items) in enumerate(bloques):
-        fila, col = divmod(i, 2)
-        x = 0.7 + col * 6.15
-        y = 1.62 + fila * 2.6
-        caja(s, x, y, 5.85, 2.4, color=CARD, borde=LINE)
-        caja(s, x, y, 0.07, 2.4, color=color, radio=0.02, forma=MSO_SHAPE.RECTANGLE)
-        chip(s, x + 0.26, y + 0.22, 1.05, 0.26, cod, color=color, size=8.5)
-        texto(s, x + 1.45, y + 0.19, 4.2, 0.32, titulo, size=15, color=color,
-              bold=True, font=TITULO)
-        vinetas(s, x + 0.26, y + 0.62, 5.35, items, size=10, interlineado=1.25,
-                bullet_color=color, sep=0.035)
+    cabecera(s, "3 · El corazón del negocio", "Personalizador y mayoreo")
+    figura(s, "capturas/C04_personalizador.png", x=0.7, y=1.5, ancho_max=5.0, alto_max=5.35)
+    caja(s, 6.1, 1.6, 6.53, 2.15, color=CARD, borde=LINE)
+    texto(s, 6.4, 1.78, 6.0, 0.26, "HISTORIA DE REFERENCIA", size=9.5, color=ACCENT, bold=True, spc=120)
+    texto(s, 6.4, 2.1, 6.0, 1.5,
+          "«Como delegado de mi promoción quiero 12 polos con el mismo logo bordado en el pecho, repartidos "
+          "en 4 S, 4 M y 4 L, y pagar precio de docena.»", size=13, color=TEXT, font=TITULO, interlineado=1.3)
+    filas = [("Prenda base", "S/ 35.00"), ("+ Bordado", "S/ 15.00"), ("+ Pecho izquierdo", "S/ 8.00"),
+             ("= Precio unitario", "S/ 58.00"), ("× 12 unidades", "S/ 696.00"), ("− 15 % docena", "− S/ 104.40")]
+    for i, (k, v) in enumerate(filas):
+        y = 3.98 + i * 0.36
+        texto(s, 6.4, y, 3.6, 0.3, k, size=11.5, color=TEXT)
+        texto(s, 9.6, y, 2.7, 0.3, v, size=11.5, color=TEXT, bold=True, align=PP_ALIGN.RIGHT)
+    caja(s, 6.1, 6.2, 6.53, 0.55, color=PRIMARY)
+    texto(s, 6.4, 6.2, 6.0, 0.55, "Total del diseño:  S/ 591.60  · calculado por el servidor", size=14,
+          color=CREAM, bold=True, anchor=M)
 
 
-# ----------------------------------------------------- 14 funcionalidades admin
-def funcionalidades_admin(prs):
-    s = lamina(prs)
-    cabecera(s, "3 · Funcionalidades", "Lo que puede hacer la tienda")
-    bloques = [
-        ("M11", "Tablero", PRIMARY, [
-            "Ventas del día y del mes",
-            "Pedidos por estado",
-            "Top de productos vendidos",
-            "Alertas de stock crítico",
-        ]),
-        ("M12-M13", "Catálogo y maestros", BLUE, [
-            "CRUD de categorías jerárquicas",
-            "Productos con varias imágenes",
-            "Variantes con SKU generado",
-            "Tallas, colores, técnicas y zonas",
-        ]),
-        ("M14", "Inventario", GREEN, [
-            "Ajustes de stock con motivo",
-            "Kardex de todo movimiento",
-            "Alertas de stock mínimo",
-            "Reserva y liberación por pedido",
-        ]),
-        ("M15", "Pedidos", ACCENT, [
-            "Bandeja filtrable por estado",
-            "Cambio de estado validado",
-            "Aprobación del arte del cliente",
-            "Historial con responsable",
-        ]),
-        ("M16-M18", "Gobierno", GOLD, [
-            "Usuarios, roles y permisos",
-            "Campañas de cupones",
-            "Modalidades y costos de envío",
-            "Baja lógica, nunca borrado",
-        ]),
-        ("M19-M20", "Reportes y auditoría", PRIMARY, [
-            "Ventas por periodo y categoría",
-            "Productos más vendidos",
-            "Exportación a CSV",
-            "Bitácora de toda acción admin",
-        ]),
-    ]
-    for i, (cod, titulo, color, items) in enumerate(bloques):
-        fila, col = divmod(i, 3)
-        x = 0.7 + col * 4.05
-        y = 1.62 + fila * 2.6
-        caja(s, x, y, 3.75, 2.4, color=CARD, borde=LINE)
-        caja(s, x, y, 0.07, 2.4, color=color, radio=0.02, forma=MSO_SHAPE.RECTANGLE)
-        chip(s, x + 0.24, y + 0.22, 1.05, 0.26, cod, color=color, size=8.5)
-        texto(s, x + 0.24, y + 0.6, 3.3, 0.32, titulo, size=14, color=color,
-              bold=True, font=TITULO)
-        vinetas(s, x + 0.24, y + 1.02, 3.3, items, size=9.8, interlineado=1.25,
-                bullet_color=color, sep=0.03)
-
-
-# --------------------------------------------------------------- 15 casos uso
+# ----------------------------------------------------------------- 13 casos de uso
 def casos_uso(prs):
     s = lamina(prs)
-    cabecera(s, "3 · Actores y casos de uso", "Quién hace qué en el sistema")
-    figura(s, "05_casos_uso.png", y=1.55, ancho_max=11.4, alto_max=5.3)
-    pie(s, "El invitado solo alcanza los cuatro primeros casos de uso: al intentar el checkout "
-           "debe registrarse y su carrito de sesión se fusiona con el de su cuenta.")
+    cabecera(s, "3 · Quién hace qué", "Casos de uso")
+    figura(s, "05_casos_uso.png", y=1.5, ancho_max=11.4, alto_max=5.35)
 
 
-# ------------------------------------------------------------- 16 tecnologias
+# --------------------------------------------------------------- 14 tecnologias
 def tecnologias(prs):
     s = lamina(prs)
-    cabecera(s, "4 · Stack", "Tecnologías y su sustento en las clases del curso")
-
-    caja(s, 0.7, 1.62, 3.85, 5.05, color=CARD, borde=LINE)
-    chip(s, 0.7, 1.62, 3.85, 0.4, "FRONTEND", color=BLUE, size=10.5)
-    vinetas(s, 0.98, 2.2, 3.35, [
-        "React 19 + Vite", "Tailwind CSS", "React Router", "Context API",
-        "Fetch sobre /api/v1", "Desplegado en Netlify",
-    ], size=11.5, interlineado=1.3, bullet_color=BLUE, sep=0.09)
-    texto(s, 0.98, 4.75, 3.35, 1.7,
-          "Decisión del equipo: una SPA evita recargar la página en cada filtro del "
-          "catálogo y es lo que hace posible un personalizador de estampado fluido.",
-          size=10, color=MUTED, interlineado=1.3)
-
-    caja(s, 4.72, 1.62, 4.6, 5.05, color=PRIMARY)
-    chip(s, 4.72, 1.62, 4.6, 0.4, "BACKEND  ·  JAVA EE DEL CURSO", color=DARK, size=10.5)
-    filas = [
-        ("Java 17 + JVM", "S01 · Arquitectura Java"),
-        ("Jakarta Servlets (controlador)", "S01 · Servlet = Controlador"),
-        ("JavaBeans (modelo)", "S01 · Bean = Modelo"),
-        ("Apache Tomcat 10 (web container)", "S03 · Web Server vs Container"),
-        ("JDBC: PreparedStatement y ResultSet", "S03 · JDBC"),
-        ("HttpSession y JSESSIONID", "Clase 4 · Session scope"),
-        ("Docker y Docker Compose", "S02 · Contenedores web"),
+    cabecera(s, "4 · Tecnologías", "Stack y sustento en lo visto en clase")
+    stack = [
+        ("VISTA", "React 19 · Vite 8 · Tailwind 4 · React Router 7", BLUE),
+        ("SERVIDOR", "Spring Boot 3.5 · Java 21 · Tomcat embebido", PRIMARY),
+        ("DATOS", "PostgreSQL 16 en Docker · Flyway V1–V6 · JdbcTemplate", GREEN),
+        ("SEGURIDAD", "Spring Security · sesión JSESSIONID · CSRF · BCrypt", ACCENT),
+        ("CALIDAD", "JUnit 5 · Testcontainers · Swagger · Postman", GOLD),
     ]
-    y = 2.18
-    for tecnologia, fuente in filas:
-        texto(s, 5.0, y, 4.05, 0.28, tecnologia, size=11, color=CREAM, bold=True,
-              interlineado=1.15)
-        texto(s, 5.0, y + 0.28, 4.05, 0.22, fuente, size=8.8, color=ROSE)
-        y += 0.63
+    for i, (k, v, color) in enumerate(stack):
+        y = 1.62 + i * 0.98
+        caja(s, 0.7, y, 5.7, 0.82, color=CARD, borde=LINE)
+        chip(s, 0.9, y + 0.24, 1.35, 0.34, k, color=color, size=9)
+        texto(s, 2.45, y, 3.85, 0.82, v, size=11, color=TEXT, anchor=M, interlineado=1.15)
 
-    caja(s, 9.49, 1.62, 3.14, 5.05, color=CARD, borde=LINE)
-    chip(s, 9.49, 1.62, 3.14, 0.4, "DATOS Y CALIDAD", color=GREEN, size=10.5)
-    vinetas(s, 9.77, 2.2, 2.64, [
-        "PostgreSQL 16", "HikariCP (pool)", "Gson (JSON)", "JWT + BCrypt",
-        "Maven (WAR)", "JUnit 5 + Mockito", "Postman y Swagger", "Git y GitHub",
-    ], size=11, interlineado=1.3, bullet_color=GREEN, sep=0.09)
+    caja(s, 6.7, 1.62, 5.93, 5.05, color=PRIMARY)
+    texto(s, 7.0, 1.84, 5.4, 0.26, "¿POR QUÉ SPRING BOOT?", size=10, color=ROSE, bold=True, spc=150)
+    texto(s, 7.0, 2.16, 5.4, 0.7, "No reemplaza lo visto en clase: lo empaqueta.", size=15, color=CREAM,
+          bold=True, font=TITULO)
+    pares = [("Servlet = Controlador (S01)", "DispatcherServlet + @RestController"),
+             ("Contenedor web (S02)", "Tomcat embebido"),
+             ("JDBC + PreparedStatement (S03)", "JdbcTemplate con parámetros ?"),
+             ("commit / rollback (S03)", "@Transactional"),
+             ("Session scope (Clase 4)", "Cookie JSESSIONID"),
+             ("JSP = Vista (Clase 4)", "React en el navegador")]
+    for i, (a, b) in enumerate(pares):
+        y = 2.95 + i * 0.6
+        texto(s, 7.0, y, 2.85, 0.5, a, size=10.5, color=ROSE, interlineado=1.1)
+        texto(s, 9.9, y, 2.55, 0.5, "→  " + b, size=10.5, color=CREAM, bold=True, interlineado=1.1)
 
 
-# ------------------------------------------------------------- 17 arquitectura
+# -------------------------------------------------------------- 15 arquitectura
 def arquitectura(prs):
     s = lamina(prs)
-    cabecera(s, "4 · Arquitectura de la solución",
-             "Cliente-servidor en tres capas sobre un contenedor web Java")
-    figura(s, "03_arquitectura.png", y=1.52, ancho_max=12.1, alto_max=5.35)
-    pie(s, "El Servlet recibe y coordina, el Servicio concentra las reglas y la transacción, "
-           "y el DAO es el único punto que conoce SQL.")
+    cabecera(s, "4 · Arquitectura", "Cliente-servidor en capas")
+    figura(s, "03_arquitectura.png", y=1.5, ancho_max=11.6, alto_max=5.35)
 
 
-# ------------------------------------------------------------------- 18 mvc
-def mvc(prs):
+# -------------------------------------------------- 16 cliente-servidor y MVC
+def cs_mvc(prs):
     s = lamina(prs)
-    cabecera(s, "4 · Justificación", "Cómo aplicamos el MVC visto en clase")
-
-    texto(s, 0.7, 1.6, 11.93, 0.5,
-          "La sesión 1 cierra estableciendo la correspondencia: JavaBean es el Modelo, "
-          "el Servlet es el Controlador y el JSP es la Vista. La conservamos con una sola adaptación.",
-          size=12.5, color=TEXT, interlineado=1.3)
-
-    cols = [
-        ("MODELO", "JavaBean por tabla", "Idéntico a la teoría", GREEN,
-         "paquete model + DTO para la API.\nAtributos privados con getters y setters, "
-         "sin lógica de negocio."),
-        ("CONTROLADOR", "Servlet por recurso", "Idéntico a la teoría", PRIMARY,
-         "paquete web.controller + filtros.\nLee la petición, delega en el servicio y "
-         "serializa la respuesta."),
-        ("VISTA", "JSP con EL y JSTL", "Adaptado: React en el navegador", ACCENT,
-         "El servlet responde JSON en lugar de hacer forward a un JSP, porque el cliente "
-         "es una aplicación de página única."),
-    ]
-    for i, (capa, clase, estado, color, detalle) in enumerate(cols):
-        x = 0.7 + i * 4.05
-        caja(s, x, 2.35, 3.75, 2.6, color=CARD, borde=LINE)
-        chip(s, x, 2.35, 3.75, 0.4, capa, color=color, size=10.5)
-        texto(s, x + 0.26, 2.95, 3.23, 0.34, clase, size=14, color=color, bold=True,
-              font=TITULO)
-        texto(s, x + 0.26, 3.38, 3.23, 0.34, estado, size=10.5, color=MUTED,
-              italic=True, interlineado=1.2)
-        texto(s, x + 0.26, 3.9, 3.23, 0.9, detalle, size=10.5, color=TEXT,
-              interlineado=1.3)
-
-    caja(s, 0.7, 5.15, 11.93, 1.5, color=PRIMARY)
-    texto(s, 1.0, 5.35, 11.3, 0.24, "POR QUÉ LA ADAPTACIÓN NO ROMPE EL PATRÓN",
-          size=9.5, color=ROSE, bold=True, spc=150)
-    texto(s, 1.0, 5.65, 11.3, 0.85,
-          "El Servlet sigue siendo el Controlador y sigue sin contener reglas de negocio ni SQL: lo único "
-          "que cambia es el formato de la respuesta, de HTML a JSON. Añadimos además una capa de servicio "
-          "entre el controlador y el acceso a datos, para no concentrar la lógica en el servlet.",
-          size=11.5, color=CREAM, interlineado=1.3)
+    cabecera(s, "4 · Patrones vistos en clase", "Cliente-servidor y MVC")
+    figura(s, "A2_03_cliente_servidor.png", x=0.6, y=1.55, ancho_max=6.0, alto_max=3.9)
+    figura(s, "A2_04_mvc.png", x=6.75, y=1.55, ancho_max=6.0, alto_max=3.9)
+    tarjeta(s, 0.7, 5.6, 5.85, 1.12, "Un servidor, varios clientes",
+            "Tienda, panel, Swagger y Postman hablan con la misma API; solo el servidor toca PostgreSQL.",
+            color=BLUE, size_t=12, size_c=10)
+    tarjeta(s, 6.78, 5.6, 5.85, 1.12, "La Vista pasó al navegador",
+            "React reemplaza a la JSP; el controlador responde JSON en lugar de hacer forward.",
+            color=GREEN, size_t=12, size_c=10)
 
 
-# ------------------------------------------------------------------ 19 flujo
-def flujo(prs):
+# ------------------------------------------------------------ 17 capas y flujo
+def capas_flujo(prs):
     s = lamina(prs)
-    cabecera(s, "4 · Cómo colaboran las capas", "Confirmación de un pedido personalizado")
-    figura(s, "04_flujo_peticion.png", y=1.55, ancho_max=12.0, alto_max=5.3)
-    pie(s, "Si una variante no tiene stock, el servicio hace rollback y responde 409: nunca "
-           "queda un pedido a medio grabar.")
+    cabecera(s, "4 · Arquitectura en capas", "Recorrido del pedido de 12 polos")
+    figura(s, "04_flujo_peticion.png", y=1.5, ancho_max=10.4, alto_max=4.55)
+    chips = [("400", "formato · controller", PRIMARY), ("422", "regla · service", BLUE),
+             ("409", "stock · transacción", GREEN), ("404", "recurso ajeno", ACCENT)]
+    for i, (n, d, color) in enumerate(chips):
+        x = 0.9 + i * 3.0
+        chip(s, x, 6.25, 0.8, 0.42, n, color=color, size=13)
+        texto(s, x + 0.95, 6.25, 2.0, 0.42, d, size=10.5, color=TEXT, anchor=M)
 
 
-# ---------------------------------------------------------------- 20 datos
-def datos_global(prs):
-    s = lamina(prs)
-    cabecera(s, "5 · Modelo de datos", "28 tablas agrupadas en cinco módulos")
-    figura(s, "10_er_global.png", y=1.55, ancho_max=12.0, alto_max=5.3)
-
-
-def datos_er1(prs):
-    s = lamina(prs)
-    cabecera(s, "5 · Modelo entidad-relación (1 de 2)", "Usuarios, catálogo e inventario")
-    figura(s, "08_er_usuarios_catalogo.png", y=1.5, ancho_max=12.4, alto_max=5.55)
-
-
-def datos_er2(prs):
-    s = lamina(prs)
-    cabecera(s, "5 · Modelo entidad-relación (2 de 2)",
-             "Personalización, carrito, pedidos y soporte")
-    figura(s, "09_er_personalizacion_compra.png", y=1.5, ancho_max=12.4, alto_max=5.55)
-
-
-def datos_decisiones(prs):
-    s = lamina(prs)
-    cabecera(s, "5 · Modelo de datos", "Las decisiones que sostienen el modelo")
-    decisiones = [
-        ("El stock vive en la variante",
-         "product guarda el modelo de prenda; product_variant guarda cada combinación real de "
-         "talla y color con su SKU, su stock y su precio propio. UNIQUE (product_id, size_id, color_id).",
-         BLUE),
-        ("El pedido es inmutable",
-         "order_item copia nombre, SKU, talla, color y precio al momento de comprar. Si mañana "
-         "sube el precio, los pedidos ya emitidos no cambian. Desnormalización consciente.",
-         GREEN),
-        ("La personalización es una entidad propia",
-         "customization guarda la configuración concreta del estampado y puede reutilizar un "
-         "design de Mis diseños. La misma estructura sirve al carrito y al pedido.",
-         ACCENT),
-        ("Todo movimiento deja rastro",
-         "Ninguna operación cambia el stock sin escribir en inventory_movement el stock anterior, "
-         "el nuevo, el motivo y el responsable. Lo mismo hacen order_status_history y audit_log.",
-         GOLD),
-    ]
-    for i, (titulo, cuerpo, color) in enumerate(decisiones):
-        fila, col = divmod(i, 2)
-        x = 0.7 + col * 6.15
-        y = 1.7 + fila * 2.5
-        tarjeta(s, x, y, 5.85, 2.25, titulo, cuerpo, color=color, size_t=15,
-                size_c=10.5)
-    pie(s, "222 campos  ·  39 claves foráneas  ·  tercera forma normal, con la excepción "
-           "deliberada de order_item")
-
-
-# ---------------------------------------------------------------- 21 estados
+# ------------------------------------------------------------------ 18 estados
 def estados(prs):
     s = lamina(prs)
-    cabecera(s, "5 · Reglas del negocio en el código", "Máquina de estados del pedido")
-    figura(s, "06_estados_pedido.png", y=1.7, ancho_max=12.0, alto_max=4.7)
-    pie(s, "Enum OrderStatus + EnumMap de transiciones permitidas: cualquier salto no declarado "
-           "lanza TransicionInvalidaException (HTTP 409).")
+    cabecera(s, "4 · Ciclo de vida", "Máquina de estados del pedido")
+    figura(s, "06_estados_pedido.png", y=1.55, ancho_max=12.0, alto_max=5.2)
 
 
-# ------------------------------------------------------------ 22 paquetes
-def paquetes(prs):
+# ------------------------------------------------------------------ 19 eventos
+def eventos(prs):
     s = lamina(prs)
-    cabecera(s, "6 · Implementación", "Estructura de paquetes y clases")
+    cabecera(s, "4 · Arquitectura dirigida por eventos", "OrderStatusChanged")
+    figura(s, "12_flujo_eventos.png", x=0.6, y=1.5, ancho_max=7.6, alto_max=5.3)
+    vinetas(s, 8.5, 1.75, 4.2, [
+        ("Tres publicadores: ", "crear el pedido, aprobar el pago y el cambio del administrador."),
+        ("AuditListener: ", "antes del commit, en la misma transacción. Sin auditoría no hay cambio."),
+        ("NotificationListener: ", "después del commit. Crea el aviso de la campana."),
+        ("Idempotente: ", "event_id único; un evento repetido no duplica nada."),
+        ("Extensible: ", "un correo al cliente sería otro suscriptor, sin tocar los servicios."),
+    ], size=11, interlineado=1.3, sep=0.1)
 
-    caja(s, 0.7, 1.62, 5.7, 5.05, color=DARK)
-    texto(s, 1.0, 1.86, 5.1, 0.24, "pe.edu.utp.coralshop", size=10, color=ROSE,
-          bold=True, spc=100)
-    arbol = (
-        "config/      DataSourceProvider, AppContextListener\n"
-        "web/\n"
-        "  controller/  Servlets, uno por recurso\n"
-        "  filter/      CORS, JWT, roles, logging\n"
-        "  listener/    arranque y cierre del pool\n"
-        "service/     reglas de negocio y transacción\n"
-        "  impl/        implementaciones\n"
-        "dao/         interfaces de acceso a datos\n"
-        "  jdbc/        PreparedStatement y ResultSet\n"
-        "model/       un JavaBean por tabla\n"
-        "  dto/         entrada y salida de la API\n"
-        "  enums/       OrderStatus, MovementType...\n"
-        "exception/   excepciones de negocio\n"
-        "util/        Json, Password, Jwt, SkuGenerator"
-    )
-    texto(s, 1.0, 2.2, 5.1, 4.2, arbol, size=10, color=CREAM, font="Consolas",
-          interlineado=1.42)
 
-    caja(s, 6.6, 1.62, 6.03, 2.4, color=CARD, borde=LINE)
-    texto(s, 6.88, 1.86, 5.47, 0.3, "La regla de dependencia", size=15,
-          color=PRIMARY, bold=True, font=TITULO)
-    texto(s, 6.88, 2.28, 5.47, 0.4,
-          "web.controller → service → dao → model.  Nunca al revés.",
-          size=12, color=BLUE, bold=True)
-    texto(s, 6.88, 2.75, 5.47, 1.1,
-          "Un DAO no conoce al servicio que lo invoca y un servicio no sabe si lo llama un "
-          "servlet o una prueba. Gracias a eso la capa de servicio se prueba con Mockito sin "
-          "levantar Tomcat ni la base de datos.",
-          size=10.5, color=TEXT, interlineado=1.3)
+# ------------------------------------------------------------------- 20 datos
+def datos(prs):
+    s = lamina(prs)
+    n_t, n_c, n_fk = esquema.totales()
+    cabecera(s, "5 · Modelo de datos", f"{n_t} tablas, {n_c} campos, {n_fk} claves foráneas")
+    figura(s, "10_er_global.png", x=0.6, y=1.5, ancho_max=7.9, alto_max=4.3)
+    vinetas(s, 8.75, 1.7, 3.9, [
+        ("Stock en la variante: ", "UNIQUE (producto, talla, color) y CHECK stock ≥ 0."),
+        ("Reglas como datos: ", "product_type_zones define zona × técnica × recargo."),
+        ("Una línea = un diseño: ", "order_lines → order_line_zones → order_items (reparto)."),
+        ("Pedido inmutable: ", "precios, SKU y dirección copiados al comprar."),
+        ("Integridad en la base: ", "un solo pago aprobado por pedido; total = subtotal − descuento + envío."),
+    ], size=10.5, interlineado=1.28, sep=0.08)
+    pie(s, "Flyway V1–V6 crea el esquema al arrancar. Los diagramas ER completos están en el Anexo A del informe.")
 
-    caja(s, 6.6, 4.22, 6.03, 2.45, color=CARD, borde=LINE)
-    texto(s, 6.88, 4.44, 5.47, 0.3, "POO aplicada", size=15, color=PRIMARY,
+
+# --------------------------------------------------------- 21 implementacion
+def implementacion(prs):
+    s = lamina(prs)
+    cabecera(s, "6 · Implementación", "Paquetes por funcionalidad y por capa")
+    caja(s, 0.7, 1.62, 5.6, 5.05, color=DARK)
+    texto(s, 0.95, 1.8, 5.2, 4.8,
+          "com.coralshop/\n"
+          "├─ catalog/      controller · service · repository · dto\n"
+          "├─ customization/\n"
+          "├─ design/\n"
+          "├─ pricing/      PricingService · QuantityPolicy\n"
+          "├─ order/        … · event/OrderStatusChanged\n"
+          "├─ payment/      PaymentGateway (interfaz)\n"
+          "├─ notification/ listener · …\n"
+          "├─ audit/        listener · repository\n"
+          "├─ address/ shipping/ user/ stats/\n"
+          "├─ auth/         SecurityConfig\n"
+          "└─ common/       GlobalExceptionHandler\n\n"
+          "17 paquetes · 131 clases · 0 controllers con SQL",
+          size=10, color=CREAM, font="Consolas", interlineado=1.25)
+    texto(s, 6.6, 1.62, 6.0, 0.3, "ALGORITMOS Y ESTRUCTURAS", size=10, color=ACCENT, bold=True, spc=150)
+    algos = [
+        ("EnumMap + EnumSet", "transiciones de estado en O(1)", PRIMARY),
+        ("UPDATE … WHERE stock >= ?", "reserva atómica, sin sobreventa", GREEN),
+        ("SELECT … FOR UPDATE", "un pedido no se paga dos veces", BLUE),
+        ("Luhn", "valida la tarjeta de prueba", ACCENT),
+        ("Bytes mágicos + SHA-256", "tipo real y huella del diseño", GOLD),
+        ("SecureRandom", "código CS-XXXXXXXX impredecible", PRIMARY),
+    ]
+    for i, (a, b, color) in enumerate(algos):
+        y = 2.05 + i * 0.77
+        caja(s, 6.6, y, 6.03, 0.66, color=CARD, borde=LINE)
+        caja(s, 6.6, y, 0.07, 0.66, color=color, radio=0.02, forma=MSO_SHAPE.RECTANGLE)
+        texto(s, 6.85, y, 2.9, 0.66, a, size=11, color=color, bold=True, anchor=M)
+        texto(s, 9.8, y, 2.75, 0.66, b, size=10.5, color=TEXT, anchor=M, interlineado=1.1)
+
+
+# ------------------------------------------------------------------ 22 pruebas
+def pruebas(prs):
+    s = lamina(prs)
+    cabecera(s, "6 · Calidad", "Cómo sabemos que funciona")
+    cifras = [("73", "pruebas automatizadas\nen verde", PRIMARY), ("39", "peticiones Postman\nde la historia", BLUE),
+              ("0", "accesos a recursos\najenos", GREEN), ("1", "historia completa\nen el navegador", GOLD)]
+    for i, (n, d, color) in enumerate(cifras):
+        x = 0.7 + i * 3.06
+        caja(s, x, 1.62, 2.83, 1.8, color=CARD, borde=LINE)
+        texto(s, x, 1.75, 2.83, 0.8, n, size=40, color=color, bold=True, font=TITULO, align=C)
+        texto(s, x + 0.2, 2.65, 2.43, 0.65, d, size=10.5, color=MUTED, align=C, interlineado=1.2)
+    tarjeta(s, 0.7, 3.7, 3.85, 2.97, "Unitarias", "PricingService con la historia de referencia (S/ 591.60) y "
+            "cada regla de rechazo; QuantityPolicy; OrderStatusPolicy; detección de imagen; pasarela simulada; "
+            "entrega del evento.", color=PRIMARY, size_c=10)
+    tarjeta(s, 4.74, 3.7, 3.85, 2.97, "Integración", "Testcontainers con PostgreSQL 16 real y las migraciones "
+            "V1–V6: pedido 201 con descuento de stock; 409 que deshace todo; 400 con errores por campo.",
+            color=BLUE, size_c=10)
+    tarjeta(s, 8.78, 3.7, 3.85, 2.97, "Seguridad", "Pedido, diseño o pago ajeno → 404; diseño ajeno en un "
+            "pedido → 422; admin → 403; sin sesión → 401; sin token CSRF → 403.", color=GREEN, size_c=10)
+
+
+# --------------------------------------------------------------------- 23 demo
+def demo(prs):
+    s = lamina(prs, DARK)
+    texto(s, 0.7, 0.42, 11.9, 0.3, "DEMOSTRACIÓN EN VIVO", size=11, color=ACCENT, bold=True, spc=200)
+    texto(s, 0.7, 0.74, 11.9, 0.7, "La historia de los 12 polos, de punta a punta", size=30, color=CREAM,
           bold=True, font=TITULO)
-    vinetas(s, 6.88, 4.86, 5.47, [
-        ("Encapsulamiento: ", "atributos privados con getters y setters (estándar JavaBean)."),
-        ("Abstracción: ", "cada DAO y servicio se declara primero como interfaz."),
-        ("Herencia: ", "AbstractJdbcDao concentra conexión, cierre y manejo de SQLException."),
-        ("Polimorfismo: ", "PricingService resuelve el recargo según la técnica."),
-        ("Composición: ", "OrderService compone cuatro DAO en una sola transacción."),
-    ], size=10, interlineado=1.22, sep=0.03)
-
-
-# ------------------------------------------------------------ 23 algoritmos
-def algoritmos(prs):
-    s = lamina(prs)
-    cabecera(s, "6 · Implementación", "Algoritmos y estructuras de datos")
-    filas = [
-        ("Carrito en sesión", "HashMap", "O(1)",
-         "Clave = variante + hash de la personalización", BLUE),
-        ("Ordenar el catálogo", "Comparator + TimSort", "O(n log n)",
-         "Comparadores encadenados por precio, valoración y fecha", BLUE),
-        ("Árbol de categorías", "Árbol n-ario, recorrido DFS", "O(n)",
-         "category se autorreferencia con parent_id", GREEN),
-        ("Estados del pedido", "EnumMap + EnumSet", "O(1)",
-         "Sustituye una cadena de condicionales anidados", ACCENT),
-        ("Cola de estampados", "Queue (FIFO)", "O(1)",
-         "El taller atiende en el orden en que se aprobó el arte", ACCENT),
-        ("Precios y descuentos", "BigDecimal, HALF_UP", "—",
-         "Evita el error de redondeo del punto flotante en dinero", GOLD),
-        ("Búsqueda por SKU o slug", "Índice B-tree", "O(log n)",
-         "Frente al recorrido secuencial de la tabla", GREEN),
-        ("Reserva de stock", "SELECT ... FOR UPDATE", "O(log n)",
-         "Impide que dos compras vendan la misma última unidad", PRIMARY),
+    pasos = [
+        ("1", "Catálogo y ficha", "Polo clásico: stock por talla y color"),
+        ("2", "Personalizar", "Bordado en pecho izquierdo + logo; la espalda no admite bordado"),
+        ("3", "Mayoreo", "4 S, 4 M, 4 L → docena: S/ 591.60"),
+        ("4", "Comprar", "Envío a Lima S/ 601.60; pago rechazado y luego aprobado"),
+        ("5", "Panel", "Pedido PAGADO → EN_PRODUCCION; descargar el diseño"),
+        ("6", "Cliente", "Campana con el aviso y línea de tiempo en «Mis pedidos»"),
+        ("7", "API", "Swagger: 409 por stock y 422 por zona inválida"),
     ]
-    y0 = 1.62
-    chip(s, 0.7, y0, 11.93, 0.36, "", color=PRIMARY)
-    encabezados = [("PROPÓSITO", 0.95, 2.9), ("ESTRUCTURA", 3.95, 2.8),
-                   ("COMPLEJIDAD", 6.85, 1.5), ("POR QUÉ", 8.45, 4.0)]
-    for t, x, w in encabezados:
-        texto(s, x, y0, w, 0.36, t, size=9.5, color=WHITE, bold=True, spc=80,
-              anchor=M)
-    for i, (prop, est, cmpx, motivo, color) in enumerate(filas):
-        y = y0 + 0.46 + i * 0.62
-        if i % 2 == 0:
-            caja(s, 0.7, y - 0.06, 11.93, 0.56, color=CARD, radio=0.02)
-        texto(s, 0.95, y, 2.9, 0.45, prop, size=11, color=color, bold=True, anchor=M)
-        texto(s, 3.95, y, 2.8, 0.45, est, size=10.5, color=TEXT, anchor=M)
-        texto(s, 6.85, y, 1.5, 0.45, cmpx, size=10.5, color=MUTED, bold=True, anchor=M)
-        texto(s, 8.45, y, 4.0, 0.45, motivo, size=10, color=MUTED, anchor=M,
-              interlineado=1.15)
+    for i, (n, t, d) in enumerate(pasos):
+        y = 1.7 + i * 0.7
+        chip(s, 0.8, y + 0.08, 0.44, 0.44, n, color=ACCENT, size=12)
+        texto(s, 1.45, y, 2.4, 0.6, t, size=14, color=ROSE, bold=True, anchor=M)
+        texto(s, 3.85, y, 4.6, 0.6, d, size=11.5, color=CREAM, anchor=M, interlineado=1.15)
+    figura(s, "capturas/C18_detalle_admin.png", x=8.75, y=1.65, ancho_max=3.9, alto_max=4.6)
+    texto(s, 0.8, 6.75, 11.5, 0.35, "Todo corre en local · datos ficticios del perfil demo · tarjetas de prueba "
+          "4111 1111 1111 1111 y 4000 0000 0000 0002", size=10, color=MUTED_LIGHT, italic=True)
 
 
-# ------------------------------------------------------------ 24 metodologia
-def metodologia(prs):
+# ------------------------------------------------------------- 24 conclusiones
+def conclusiones(prs):
     s = lamina(prs)
-    cabecera(s, "6 · Cómo trabajamos", "Metodología TDD y plan de trabajo")
-
-    for i, (n, titulo, desc, color) in enumerate([
-        ("1", "Red", "Se escribe la prueba con JUnit para una funcionalidad que aún no existe, "
-         "y por tanto falla.", ACCENT),
-        ("2", "Green", "Se escribe el código mínimo en Java para que esa prueba concreta pase.", GREEN),
-        ("3", "Refactor", "Se limpia y optimiza el código con la confianza de que las pruebas "
-         "siguen respaldándolo.", BLUE),
-    ]):
-        x = 0.7 + i * 4.05
-        caja(s, x, 1.62, 3.75, 1.85, color=CARD, borde=LINE)
-        chip(s, x + 0.26, 1.86, 0.42, 0.42, n, color=color, size=13)
-        texto(s, x + 0.9, 1.9, 2.6, 0.34, titulo, size=17, color=color, bold=True,
-              font=TITULO)
-        texto(s, x + 0.26, 2.46, 3.23, 0.85, desc, size=10.5, color=TEXT,
-              interlineado=1.3)
-
-    caja(s, 0.7, 3.72, 11.93, 2.95, color=CARD, borde=LINE)
-    chip(s, 0.7, 3.72, 11.93, 0.4, "CRONOGRAMA", color=PRIMARY, size=10.5)
-    sprints = [
-        ("Sprint 0", "Sem. 9-10", "Diagnóstico y diseño", "Este informe", "Completado", GREEN),
-        ("Sprint 1", "Sem. 11-12", "Cimientos", "Maven, Docker, schema.sql, usuarios y JWT", "Planificado", MUTED),
-        ("Sprint 2", "Sem. 13-14", "Catálogo e inventario", "M01, M02, M12, M13, M14", "Planificado", MUTED),
-        ("Sprint 3", "Sem. 15-16", "Personalización y compra", "M03 a M08", "Planificado", MUTED),
-        ("Sprint 4", "Sem. 17", "Backoffice y cierre", "M09, M11, M15, M17 a M20", "Planificado", MUTED),
-        ("Sprint 5", "Sem. 18", "Exposición", "Ensayo y demostración", "Planificado", MUTED),
+    cabecera(s, "7 · Conclusiones", "Lo que demuestra el proyecto")
+    items = [
+        ("Ataca la causa raíz. ", "El problema era la falta de canal propio (D1); la plataforma lo resuelve."),
+        ("Sin sobreventa por diseño. ", "Stock por variante y reserva atómica en la transacción."),
+        ("La propuesta de valor es software. ", "Personalizar, ver y cotizar una docena con tallas mezcladas, en segundos."),
+        ("El servidor manda. ", "Recalcula precios y stock; la base protege sus reglas con CHECK e índices únicos."),
+        ("Cuatro patrones, comprobables. ", "Cliente-servidor, MVC, capas y eventos están en el código, no solo en el papel."),
+        ("Calidad con evidencia. ", "73 pruebas, Postman y la historia de referencia en el navegador."),
     ]
-    y = 4.32
-    for nombre, periodo, objetivo, entregable, estado, color in sprints:
-        texto(s, 1.0, y, 1.2, 0.3, nombre, size=11, color=PRIMARY, bold=True, anchor=M)
-        texto(s, 2.25, y, 1.3, 0.3, periodo, size=10.5, color=MUTED, anchor=M)
-        texto(s, 3.6, y, 2.9, 0.3, objetivo, size=10.5, color=TEXT, anchor=M)
-        texto(s, 6.6, y, 4.6, 0.3, entregable, size=10.5, color=MUTED, anchor=M)
-        chip(s, 11.3, y + 0.02, 1.15, 0.26, estado, color=color, size=8)
-        y += 0.38
+    for i, (a, b) in enumerate(items):
+        fila, col = divmod(i, 2)
+        x = 0.7 + col * 6.05
+        y = 1.65 + fila * 1.68
+        caja(s, x, y, 5.85, 1.45, color=CARD, borde=LINE)
+        chip(s, x + 0.25, y + 0.25, 0.42, 0.42, str(i + 1), color=PRIMARY, size=12)
+        texto(s, x + 0.85, y + 0.22, 4.8, 1.1, a + b, size=11.5, color=TEXT, interlineado=1.3)
 
 
-# --------------------------------------------------------------- 25 cierre
+# ----------------------------------------------------------- 25 trabajo futuro
+def futuro(prs):
+    s = lamina(prs)
+    cabecera(s, "7 · Recomendaciones", "Trabajo futuro")
+    items = [
+        ("Pasarela real", "Otra implementación de PaymentGateway (Mercado Pago, Culqi o Izipay) con webhook "
+         "firmado e idempotente.", PRIMARY),
+        ("Expiración", "@Scheduled cancela los pedidos pendientes de pago y repone el stock.", ACCENT),
+        ("Despliegue", "Frontend en Vercel (vercel.mjs listo) y backend en un servicio con el JAR.", BLUE),
+        ("Correo", "EmailListener como tercer suscriptor del evento, sin tocar los servicios.", GREEN),
+        ("Backlog", "Cupones, favoritos, reseñas y banners (dos tablas ya existen).", GOLD),
+        ("Indicadores", "Ventas por periodo y tiempo por etapa desde el historial y la auditoría.", PRIMARY),
+    ]
+    for i, (t, c, color) in enumerate(items):
+        fila, col = divmod(i, 3)
+        tarjeta(s, 0.7 + col * 4.05, 1.65 + fila * 2.55, 3.78, 2.3, t, c, color=color, size_c=10.5)
+
+
+# ------------------------------------------------------------------ 26 cierre
 def cierre(prs):
     s = lamina(prs, DARK)
-    caja(s, -1.4, 4.6, 4.6, 4.6, color=PRIMARY, forma=MSO_SHAPE.OVAL)
-    caja(s, 11.0, -1.4, 3.8, 3.8, color=ACCENT, forma=MSO_SHAPE.OVAL)
+    caja(s, 10.2, -1.6, 4.8, 4.8, color=PRIMARY, forma=MSO_SHAPE.OVAL)
+    caja(s, 11.6, 4.9, 3.4, 3.4, color=ACCENT, forma=MSO_SHAPE.OVAL)
+    texto(s, 0.8, 1.2, 9.5, 0.3, "CORAL SHOP  ·  GRUPO 1", size=11, color=ACCENT, bold=True, spc=200)
+    texto(s, 0.8, 1.7, 9.5, 1.2, "Diseña tu estilo,\nestampa tu idea.", size=44, color=CREAM, bold=True,
+          font=TITULO, interlineado=1.1)
+    texto(s, 0.8, 3.6, 9.5, 0.5, "Gracias.  ¿Preguntas?", size=24, color=ROSE, bold=True, font=TITULO)
+    texto(s, 0.8, 4.6, 10.0, 1.0, "  ·  ".join(CONT.INTEGRANTES), size=13, color=CREAM, interlineado=1.3)
+    texto(s, 0.8, 5.6, 10.0, 0.4, "Repositorio: github.com/diegoaaron/desarrollo_web", size=12,
+          color=MUTED_LIGHT)
 
-    texto(s, 1.2, 1.0, 9.5, 0.3, "PARA CERRAR", size=11, color=ROSE, bold=True, spc=200)
-    texto(s, 1.2, 1.42, 10.5, 0.9, "Lo que dejamos definido", size=40, color=CREAM,
-          bold=True, font=TITULO)
 
-    puntos = [
-        ("Un problema con causa raíz identificada",
-         "Ishikawa, Canvas, PESTEL y FODA cruzado apuntan al mismo vacío: no hay canal propio."),
-        ("Una tienda con las funcionalidades cerradas",
-         "20 módulos, 49 requerimientos funcionales, 15 no funcionales y 14 reglas de negocio."),
-        ("Una arquitectura justificada en la teoría del curso",
-         "Servlets, JavaBeans, JDBC y Tomcat, en tres capas y con la Vista externalizada a React."),
-        ("Un modelo de datos completo",
-         "28 tablas, 222 campos y 39 claves foráneas, con su diccionario campo por campo."),
-    ]
-    for i, (t, d) in enumerate(puntos):
-        fila, col = divmod(i, 2)
-        x = 1.2 + col * 5.75
-        y = 2.75 + fila * 1.55
-        caja(s, x, y, 5.4, 1.3, color=PRIMARY)
-        texto(s, x + 0.3, y + 0.2, 4.8, 0.34, t, size=13, color=CREAM, bold=True,
-              font=TITULO, interlineado=1.15)
-        texto(s, x + 0.3, y + 0.66, 4.8, 0.5, d, size=10, color=MUTED_LIGHT,
-              interlineado=1.25)
+def notas(slide, expositor, contenido):
+    marco = slide.notes_slide.notes_text_frame
+    marco.text = f"EXPOSITOR: {expositor}\n\n{contenido.strip()}"
 
-    texto(s, 1.2, 6.35, 10.5, 0.4,
-          "Gracias.  ¿Preguntas?",
-          size=20, color=ROSE, bold=True, font=TITULO)
-    texto(s, 8.9, 6.98, 3.7, 0.3, "coral-st.netlify.app", size=10, color=MUTED_LIGHT,
-          align=PP_ALIGN.RIGHT)
+
+LAMINAS = [portada_final, agenda, empresa, canvas, pestel, foda, ishikawa, problematica, objetivos,
+           solucion, modulos, personalizador, casos_uso, tecnologias, arquitectura, cs_mvc, capas_flujo,
+           estados, eventos, datos, implementacion, pruebas, demo, conclusiones, futuro, cierre]
 
 
 def main():
     prs = nueva_presentacion()
-    laminas = [
-        portada, agenda, empresa, canvas, pestel, foda, ishikawa, problematica,
-        objetivos, solucion, alcance, modulos, funcionalidades_cliente,
-        funcionalidades_admin, casos_uso, tecnologias, arquitectura, mvc, flujo,
-        datos_global, datos_er1, datos_er2, datos_decisiones, estados, paquetes,
-        algoritmos, metodologia, cierre,
-    ]
-    for f in laminas:
+    assert len(LAMINAS) == len(NOTAS), "cada lámina necesita sus notas del orador"
+    for f, (expositor, contenido) in zip(LAMINAS, NOTAS):
         f(prs)
-    # numeracion (se omite en portada y cierre)
+        notas(prs.slides[len(prs.slides._sldIdLst) - 1], expositor, contenido)
     total = len(prs.slides._sldIdLst)
     for i, slide in enumerate(prs.slides, start=1):
-        if i in (1, total):
-            continue
-        numero(slide, i, total)
+        if i not in (1, total) and LAMINAS[i - 1] is not demo:
+            numero(slide, i, total)
     prs.save(SALIDA)
-    print(f"Presentacion generada ({total} laminas):", SALIDA)
+    print(f"Presentación generada ({total} láminas):", SALIDA)
 
 
 if __name__ == "__main__":

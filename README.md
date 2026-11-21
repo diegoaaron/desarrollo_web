@@ -18,6 +18,10 @@ Esta guía explica cómo levantar el proyecto en una computadora **sin nada inst
 usando **IntelliJ IDEA** para manejar backend y frontend desde un solo lugar. Si
 prefieres la terminal, mira la [sección 4](#4-alternativa-levantar-todo-desde-la-terminal).
 
+> **Alcance: solo local.** El proyecto se ejecuta y se demuestra en local; no hay
+> despliegue público ni pasarela de pago real (el pago es simulado). Ambos quedan como
+> trabajo futuro en `fases.md`.
+
 ---
 
 ## 1. Paso 0 — Instalar las herramientas
@@ -319,35 +323,12 @@ npm run dev
 |---|---|
 | `npm run dev` | servidor de desarrollo con recarga automática |
 | `npm run lint` | revisa el código con ESLint |
-| `npm run build` | compila para producción en `dist/` (lo que se sube a Vercel u otro hosting) |
+| `npm run build` | compila para producción en `dist/` |
 | `npm run preview` | sirve `dist/` en local para probar el build |
 | `npm run build:compilado` | genera `compilado/index.html`, un único archivo que se abre con doble clic |
 
-El despliegue en Vercel se configura con `frontend/vercel.mjs` (ver sección
-«Desplegar el frontend en Vercel»).
-
-### Desplegar el frontend en Vercel
-
-Todavía no hay despliegue. Cuando se decida, el frontend queda listo para Vercel y solo
-hace falta configurar valores en el proyecto de Vercel, sin tocar el código:
-
-| Ajuste en Vercel | Valor |
-|---|---|
-| Root Directory | `frontend` |
-| Framework Preset | Vite (lo detecta solo) |
-| Build Command / Output Directory | `npm run build` / `dist` (por defecto) |
-| Variable de entorno `BACKEND_URL` | URL pública **https** del backend, sin `/api` al final (por ejemplo `https://api.coralshop.pe`) |
-
-`frontend/vercel.mjs` lee `BACKEND_URL` al desplegar y crea dos reglas: `/api/*` se
-reenvía al backend y cualquier otra ruta sirve `index.html` (React Router). Si la
-variable falta o no es https, el despliegue falla con un mensaje claro en lugar de
-publicar una tienda sin API.
-
-El navegador solo habla con el dominio de Vercel, así que la sesión (cookie
-`JSESSIONID`) y el token CSRF funcionan igual que en local: el backend no necesita CORS.
-El backend se despliega aparte (cualquier servicio que ejecute el JAR con `DB_URL`,
-`DB_USER` y `DB_PASSWORD`, sin el perfil `dev`). Al desplegar, comprueba que la subida de
-un diseño de casi 5 MB pasa por el reenvío de Vercel.
+`frontend/vercel.mjs` se conserva solo como punto de partida por si en el futuro se
+despliega en Vercel (lee la variable `BACKEND_URL`); hoy no se usa.
 
 ### Backend (`backend/`)
 
@@ -355,7 +336,7 @@ un diseño de casi 5 MB pasa por el reenvío de Vercel.
 |---|---|
 | `./mvnw spring-boot:run` | ejecuta la API |
 | `./mvnw test` | ejecuta las pruebas: unitarias y de integración (estas levantan un PostgreSQL en Docker con Testcontainers; sin Docker se omiten) |
-| `./mvnw package` | genera el JAR desplegable en `target/` |
+| `./mvnw package` | genera el JAR ejecutable en `target/` |
 | `java -jar target/coral-shop-backend-0.0.1-SNAPSHOT.jar` | ejecuta el JAR (con las mismas variables de entorno) |
 
 En Windows usa `.\mvnw.cmd` en lugar de `./mvnw`. En IntelliJ, estos mismos objetivos
@@ -373,6 +354,13 @@ python -m venv .venv
 .venv\Scripts\python -m pip install -r requirements.txt
 .\scripts\generar.ps1            # figuras + informe + presentación + PDFs
 .\scripts\generar.ps1 -SinPdf    # sin exportar a PDF (no necesita Office)
+```
+
+Las capturas reales del informe se toman aparte, con la aplicación levantada con el perfil
+`demo` (sección 3.1). Usa el Microsoft Edge instalado, así que no descarga navegadores:
+
+```powershell
+.venv\Scripts\python scripts\capturas.py --admin-password <DEMO_ADMIN_PASSWORD>
 ```
 
 Los archivos de `clase_entregables/` se regeneran: para cambiarlos se editan los

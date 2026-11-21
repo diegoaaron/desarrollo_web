@@ -7,6 +7,8 @@ aquí primero.
 - Origen: `clase_entregables/Analisis_Codigo_vs_Arquitectura_y_Negocio.md`.
 - El informe del entregable 1 queda **solo como histórico**; no se toma en cuenta.
 - Tecnología backend: **Spring Boot** (definitivo).
+- Alcance: **solo local** (D13). Sin despliegue ni pasarela de pago real; ambos pasan a
+  [Trabajo futuro](#trabajo-futuro-fuera-del-alcance).
 
 ---
 
@@ -22,7 +24,7 @@ aquí primero.
 8. [Fase 3 — Frontend del flujo de compra](#fase-3--frontend-del-flujo-de-compra)
 9. [Fase 4 — Evento de dominio](#fase-4--evento-de-dominio)
 10. [Fase 5 — Calidad, demo y documentación](#fase-5--calidad-demo-y-documentación)
-11. [Fase 6 — Pasarela de pago real](#fase-6--pasarela-de-pago-real)
+11. [Trabajo futuro (fuera del alcance)](#trabajo-futuro-fuera-del-alcance)
 12. [Backlog (fuera del núcleo)](#backlog-fuera-del-núcleo)
 
 ---
@@ -53,13 +55,14 @@ pecho (4 S, 4 M, 4 L), paga y ve su pedido pasar de PAGADO a ENTREGADO.*
 | D3 | Un paquete por mayor comparte **diseño, técnica y zonas** y se **reparte entre tallas y colores** | ✅ Definida |
 | D4 | Técnicas: **ESTAMPADO** y **BORDADO** (el bordado tiene zonas y tamaños más limitados y mayor costo base) | ✅ Definida |
 | D5 | Zonas predefinidas **por tipo de producto** (polo/polera: pecho izq., pecho centro, espalda, mangas; gorra: frente, lateral; tote: cara A, cara B) | ✅ Definida |
-| D6 | Pago **simulado** en las fases 2 y 3; **pasarela real en la fase 6** | ✅ Definida |
+| D6 | Pago **simulado** (definitivo para el proyecto). La pasarela real queda como trabajo futuro: la interfaz `PaymentGateway` permite agregarla sin tocar precios, stock ni pedidos | ✅ Definida |
 | D7 | Imágenes del cliente: PNG/JPG de hasta 5 MB, guardadas en PostgreSQL (`bytea`), porque el disco de los servicios de despliegue suele ser efímero | ✅ Definida |
 | D8 | **Sin proveedores externos**: todos los productos base a personalizar se cargan y configuran desde el panel admin de Coral Shop. La integración con CJ Dropshipping que traía el backend se **eliminó** | ✅ Definida |
 | D9 | Interfaz en **español**; moneda **S/ (PEN)**; direcciones con departamento, provincia y distrito | ✅ Definida |
 | D10 | El servidor **siempre recalcula** precio y stock; nunca confía en importes enviados por el navegador | ✅ Definida |
 | D11 | **Una sola cuenta para comprar y administrar.** Un administrador también es cliente (jerarquía `ROLE_ADMIN` ⊃ `ROLE_USER`). El login lleva a «Mi cuenta» por defecto; el botón **Admin** del header lleva al login y, tras autenticarse, al panel | ✅ Definida |
 | D12 | **La cuenta se identifica por su correo.** El registro pide nombre, apellido, correo y contraseña (sin nombre de usuario). Migración `V4__user_names_replace_username.sql` | ✅ Definida |
+| D13 | **Todo en local** (2026-11-21). La aplicación se ejecuta y se demuestra en local (PostgreSQL en Docker + backend + frontend). Se retiran del plan el despliegue (antigua 5.2) y la pasarela real (antigua fase 6); todas las funcionalidades siguen disponibles en local | ✅ Definida |
 
 ### D2 — Regla de cantidad: opción A, cantidad libre con escalas
 
@@ -125,7 +128,6 @@ bloqueaban cantidades que el cliente igual podía armar agregando unidades suelt
 | **3** | Frontend del flujo de compra | 2 | Personalizador, carrito, checkout, confirmación, «Mis pedidos» |
 | **4** | Evento de dominio `OrderStatusChanged` | 2 | Notificaciones al cliente y auditoría |
 | **5** | Calidad, demo y documentación del entregable 2 | 3, 4 | Pruebas, datos demo, Postman, informe y PPT |
-| **6** | Pasarela de pago real | 5 | Pago en *sandbox* con webhook |
 
 Las fases 2 y 3 pueden avanzar en paralelo una vez acordados los contratos de la API
 (sección «Contratos» de la fase 2).
@@ -232,7 +234,7 @@ y la `V4` (nombre y apellido en lugar de nombre de usuario).
 | `order_line_zones` | `order_line_id`, `zone_id`, `surcharge` | Zonas elegidas y su recargo congelado |
 | `order_items` (recrear) | `id`, `order_line_id`, `variant_id`, `sku`, `size_name`, `color_name`, `quantity` | **Reparto** de la línea entre tallas y colores. CHECK: la suma de las cantidades = `quantity_total` (se valida en el Service) |
 | `order_status_history` | `id`, `order_id`, `from_status`, `to_status`, `changed_by`, `comment`, `changed_at` | Trazabilidad para «Mis pedidos» |
-| `payments` | `id`, `order_id`, `provider`, `provider_reference` UQ, `amount`, `currency`, `status`, `created_at`, `confirmed_at` | `provider` = SIMULADO en la fase 2; la pasarela real se agrega en la fase 6 sin cambiar la tabla |
+| `payments` | `id`, `order_id`, `provider`, `provider_reference` UQ, `amount`, `currency`, `status`, `created_at`, `confirmed_at` | `provider` = SIMULADO; una pasarela real (trabajo futuro) se agregaría sin cambiar la tabla |
 
 ### 1.5 Estados del pedido
 
@@ -268,7 +270,7 @@ Ajustes respecto de las tablas de arriba, decididos al escribir la V5:
   personalizar); un CHECK obliga a que vayan juntos.
 - `orders.total_amount = subtotal - discount_amount + shipping_cost` se valida con CHECK.
 - `payments`: un solo pago `APROBADO` por pedido (índice único parcial); `provider` sin
-  lista cerrada para que la fase 6 no altere la tabla.
+  lista cerrada para que una pasarela futura no altere la tabla.
 - Los códigos de estado del pedido ya son los de la sección 1.5; el panel admin y
   `StatsRepository` (ingresos = pedidos `ENTREGADO`) se actualizaron a esos códigos.
 - Semilla de recargos y medidas (`product_type_zones`): 23 combinaciones tipo × zona ×
@@ -315,7 +317,7 @@ diagrama 1.5; cualquier otra → 422. `CANCELADO` repone el stock.
 
 **Pago simulado** (`PaymentGateway` como **interfaz**; `SimulatedPaymentGateway` como
 implementación): aprueba o rechaza según la tarjeta de prueba ingresada; si aprueba,
-registra `payments` y pasa el pedido a `PAGADO`. La fase 6 agrega otra implementación de
+registra `payments` y pasa el pedido a `PAGADO`. Una pasarela real (trabajo futuro) sería otra implementación de
 la misma interfaz.
 
 ### 2.2 Contratos (endpoints)
@@ -558,8 +560,7 @@ y si la transacción falla no se publica ningún evento.
       fotos, variantes y stock; clientes y pedidos en distintos estados. **Datos
       ficticios**.
 - [x] Colección Postman (o Swagger con `springdoc-openapi`) de toda la API.
-- [ ] Desplegar y verificar: frontend en Vercel (variable `BACKEND_URL`, ver README) y
-      backend en el servicio que se elija, con login, subida de diseño y pedido en producción.
+- ~~Despliegue~~: retirado del plan (D13). La demo se hace en local.
 
 ### 5.4 Decisiones fijadas al implementar (5.1 y 5.2)
 
@@ -582,44 +583,57 @@ y si la transacción falla no se publica ningún evento.
 - **Administrador demo** `admin@demo.coralshop.pe`: contraseña por `DEMO_ADMIN_PASSWORD`; sin
   ella se genera una al azar y se muestra una vez en el log (nunca una clave fija en un
   despliegue público). Clientes demo: `Cliente2026`.
-- **Swagger UI en `/api/docs`** (springdoc 2.8) para que pase por el proxy de Vite y de Vercel;
+- **Swagger UI en `/api/docs`** (springdoc 2.8) para que pase por el proxy de Vite;
   incluye el login del filtro de seguridad. **Postman**: `backend/postman/` con la historia de
   referencia completa (cliente y administrador) y los errores esperados; verificada con
   Newman (39 peticiones, 38 aserciones).
 
 ### 5.3 Documentación del entregable 2
 
-- [ ] Actualizar los generadores de `scripts/` con el contenido real: stack Spring Boot,
+- [x] Actualizar los generadores de `scripts/` con el contenido real: stack Spring Boot,
       capas, MVC, eventos, modelo de datos (desde `esquema.py`), funcionalidades, historias
       de usuario del personalizador y del mayoreo.
-- [ ] Regenerar el informe y la PPT (`scripts/generar.ps1`).
-- [ ] Capturas reales de las pantallas para el informe.
-- [ ] Reparto de la exposición entre los cuatro integrantes y ensayo con la demo.
+- [x] Regenerar el informe y la PPT (`scripts/generar.ps1`).
+- [x] Capturas reales de las pantallas para el informe.
+- [x] Reparto de la exposición entre los cuatro integrantes (notas del orador de la PPT).
+- [ ] Ensayo con la demo (lo hace el equipo; guion en la lámina 23 y en el Anexo E del informe).
+
+### 5.5 Decisiones fijadas al documentar (5.3)
+
+- **Informe final** (`informe.py` + `contenido.py`, 75 páginas): la sección 1 (diagnóstico) se
+  conserva; las secciones 2 a 5 describen lo implementado: 12 módulos (M01–M12), 36 RF, 15 RNF,
+  14 reglas, 10 historias (5 del personalizador y el mayoreo), CU-07 detallado, «por qué Spring
+  Boot» frente a lo visto en clase, los cuatro patrones, 22 endpoints, algoritmos reales y
+  pruebas. Trabajo futuro: pasarela, expiración de pedidos, despliegue, correo y backlog.
+- **Figuras rehechas** (03 arquitectura, 04 flujo, 05 casos de uso, 06 estados, 07 módulos); las
+  figuras ya no llevan el número dentro de la imagen (lo pone el pie del documento).
+- **Capturas reales** con `scripts/capturas.py` (Playwright sobre Edge, sin descargar
+  navegadores): recorre la historia de referencia con el perfil demo y deja 20 PNG en
+  `clase_entregables/figuras/capturas/`. Crea un pedido nuevo en cada ejecución. Sustituyen a
+  los mockups del Anexo B; `mockups.py` queda fuera de `generar.ps1`.
+- **PPT final** de 26 láminas con notas del orador (`presentacion_notas.py`): Diego 1–7,
+  Juan Franco 8–13, Apolo 14–19, Jian Pier 20–26 (demo con Diego al teclado).
 
 ---
 
-## Fase 6 — Pasarela de pago real
+## Trabajo futuro (fuera del alcance)
 
-**Objetivo:** reemplazar el pago simulado por un proveedor real en modo *sandbox*, sin
-tocar la lógica de precios, stock ni pedidos.
+Retirado del plan el 2026-11-21 (D13). El informe lo recoge en **Recomendaciones**.
 
-- [ ] Elegir proveedor peruano con *sandbox*: **Mercado Pago** (Checkout Pro), **Culqi**
-      o **Izipay**. Criterios: documentación, SDK Java, Yape y tarjetas, comisiones.
-- [ ] Nueva implementación de `PaymentGateway` (p. ej. `MercadoPagoPaymentGateway`),
-      elegida por configuración (`payment.provider=simulado|mercadopago`).
-- [ ] El servidor crea la preferencia o intención de pago con el **importe del pedido
-      calculado en el servidor**.
-- [ ] Endpoint `POST /api/payments/webhook`: verificar la firma del proveedor, consultar el
-      estado real del pago y solo entonces pasar el pedido a `PAGADO`.
-- [ ] **Idempotencia**: `provider_reference` único; un webhook repetido no confirma dos
-      veces ni descuenta stock dos veces.
-- [ ] Expiración: los pedidos en `PENDIENTE_PAGO` por más de N minutos se cancelan y
-      reponen stock (tarea programada con `@Scheduled`).
-- [ ] Claves del proveedor solo en variables de entorno del servidor.
-- [ ] Nunca almacenar datos de tarjeta en Coral Shop.
+**Pasarela de pago real** (antigua fase 6)
 
-**Hecho cuando:** un pago en *sandbox* confirma el pedido mediante webhook, y repetir el
-webhook no cambia nada.
+- Proveedor peruano con *sandbox*: Mercado Pago (Checkout Pro), Culqi o Izipay.
+- Nueva implementación de `PaymentGateway` elegida por configuración
+  (`payment.provider=simulado|mercadopago`); el importe lo sigue calculando el servidor.
+- Webhook `POST /api/payments/webhook` con verificación de firma e **idempotencia**
+  (`provider_reference` único).
+- Expiración de pedidos en `PENDIENTE_PAGO` con `@Scheduled` (cancela y repone stock).
+- Claves solo en variables de entorno; nunca guardar datos de tarjeta.
+
+**Despliegue** (antigua tarea de la 5.2)
+
+- Frontend en Vercel (`frontend/vercel.mjs` ya lee `BACKEND_URL`) y backend en un servicio
+  que ejecute el JAR con `DB_URL`, `DB_USER` y `DB_PASSWORD`, sin el perfil `dev`.
 
 ---
 

@@ -20,7 +20,8 @@ public record UpdateProductRequest(
         @NotNull @Positive Long categoryId,
         @Positive Long productTypeId,
         boolean isCustomizable,
-        @NotBlank @Pattern(regexp = "https?://.+", message = "La imagen debe ser una URL HTTP(S)") String imageUrl,
+        @NotBlank @Pattern(regexp = "(https?://|/(?!/)).+",
+                message = "La imagen debe ser una URL HTTP(S) o una ruta del sitio que empiece con /") String imageUrl,
         boolean isActive,
         @NotNull @Valid List<Variant> variants
 ) {

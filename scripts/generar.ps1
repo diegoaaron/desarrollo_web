@@ -3,6 +3,10 @@
 #
 #   .\scripts\generar.ps1              # figuras + informe + presentacion + PDFs
 #   .\scripts\generar.ps1 -SinPdf      # omite la exportacion a PDF (no requiere Office)
+#
+# Las capturas reales del informe (clase_entregables/figuras/capturas/) NO se regeneran aqui:
+# requieren la aplicacion levantada con el perfil demo. Se toman aparte con
+#   .venv\Scripts\python scripts\capturas.py --admin-password <DEMO_ADMIN_PASSWORD>
 
 param(
     [switch]$SinPdf
@@ -26,19 +30,15 @@ Crealo con:
 
 $env:PYTHONIOENCODING = "utf-8"
 
-Write-Host "[1/4] Figuras..." -ForegroundColor Cyan
+Write-Host "[1/3] Figuras..." -ForegroundColor Cyan
 & $py (Join-Path $scripts "figuras.py")
 if ($LASTEXITCODE -ne 0) { throw "figuras.py fallo" }
 
-Write-Host "[2/4] Mockups (Anexo B)..." -ForegroundColor Cyan
-& $py (Join-Path $scripts "mockups.py")
-if ($LASTEXITCODE -ne 0) { throw "mockups.py fallo" }
-
-Write-Host "[3/4] Informe..." -ForegroundColor Cyan
+Write-Host "[2/3] Informe..." -ForegroundColor Cyan
 & $py (Join-Path $scripts "informe.py")
 if ($LASTEXITCODE -ne 0) { throw "informe.py fallo" }
 
-Write-Host "[4/4] Presentacion..." -ForegroundColor Cyan
+Write-Host "[3/3] Presentacion..." -ForegroundColor Cyan
 & $py (Join-Path $scripts "presentacion.py")
 if ($LASTEXITCODE -ne 0) { throw "presentacion.py fallo" }
 

@@ -18,6 +18,10 @@ Esta guía explica cómo levantar el proyecto en una computadora **sin nada inst
 usando **IntelliJ IDEA** para manejar backend y frontend desde un solo lugar. Si
 prefieres la terminal, mira la [sección 4](#4-alternativa-levantar-todo-desde-la-terminal).
 
+> **Alcance: solo local.** El proyecto se ejecuta y se demuestra en local; no hay
+> despliegue público ni pasarela de pago real (el pago es simulado). Ambos quedan como
+> trabajo futuro en `fases.md`.
+
 ---
 
 ## 1. Paso 0 — Instalar las herramientas
@@ -137,6 +141,7 @@ izquierda del **▶ verde**, aparecen:
 | **Backend + Frontend** | lanza las dos a la vez — **la que se usa normalmente** |
 | **Backend** | API Spring Boot en `http://localhost:8082`, con `DB_URL`, `DB_USER`, `DB_PASSWORD` y el perfil `dev` ya definidos |
 | **Frontend** | `npm run dev` en `http://localhost:5173`, apuntando al backend local (`API_PROXY_TARGET=http://localhost:8082`) |
+| **Backend (demo)** | igual que **Backend**, con los perfiles `dev,demo`: carga los datos de demostración (ver [sección 3.1](#31-datos-de-demostración-perfil-demo)) |
 
 Elige **Backend + Frontend** y dale al **▶**. Se abren dos pestañas en la ventana *Run*
 (o *Services*):
@@ -221,6 +226,49 @@ Luego cierra sesión y vuelve a entrar.
 
 > Usa siempre datos ficticios. No registres datos personales reales.
 
+### 3.1 Datos de demostración (perfil `demo`)
+
+Para ensayar la exposición con una tienda «llena», ejecuta la configuración **Backend
+(demo)** (perfiles `dev,demo`) en lugar de **Backend**. Al arrancar carga **una sola vez**:
+
+- **8 productos** de los cuatro tipos (polos, poleras, gorras y tote bag) con tallas,
+  colores, stock e ilustraciones propias (`frontend/public/demo/`, generadas con
+  `scripts/demo_imagenes.py`). Uno de ellos, «Polo Coral Edición Lima», no es personalizable.
+- **5 clientes ficticios**, cada uno con su dirección y su logo subido como diseño.
+- **8 pedidos** que cubren todos los estados. El de Renzo es la historia de referencia:
+  12 polos negros con el logo bordado en el pecho (4 S, 4 M, 4 L), pagado y llevado hasta
+  ENTREGADO, con su historial y sus notificaciones. Camila tiene un pago rechazado y un
+  pedido cancelado (el stock volvió al inventario).
+
+Todo se crea a través de los servicios de la API (no con SQL suelto), así que respeta las
+reglas del negocio. Si el primer cliente demo ya existe, no se vuelve a cargar nada.
+
+| Cuenta | Correo | Contraseña |
+|---|---|---|
+| Clientes demo | `renzo.paredes@demo.coralshop.pe`, `valeria.quispe@…`, `lucia.fernandez@…`, `mateo.rojas@…`, `camila.torres@…` (todos `@demo.coralshop.pe`) | `Cliente2026` |
+| Administrador demo | `admin@demo.coralshop.pe` | la de `DEMO_ADMIN_PASSWORD`; sin ella, se genera una al azar y se muestra **una vez** en el log del backend |
+
+En local también sirve el administrador de desarrollo (`diego@diego.com`). Variables
+opcionales del perfil: `DEMO_ADMIN_EMAIL`, `DEMO_ADMIN_PASSWORD` y `DEMO_CUSTOMER_PASSWORD`.
+
+> Los datos demo se agregan a la base que esté usando el backend. Para empezar de cero,
+> borra el contenedor y créalo de nuevo (paso 4): `docker rm -f coralshop-db`.
+
+### 3.2 Documentación de la API y colección Postman
+
+- **Swagger UI:** <http://localhost:8082/api/docs> (o <http://localhost:5173/api/docs>,
+  a través del proxy). El documento OpenAPI está en `/api/docs/openapi.json`. La página
+  explica cómo autenticarse (token CSRF + login).
+- **Postman:** importa `backend/postman/Coral_Shop.postman_collection.json`. Recorre la
+  historia de referencia (cliente: catálogo → subir logo → cotizar → pedido → pago;
+  administrador: de PAGADO a ENTREGADO) y los errores esperados (401, 400, 404). Requiere
+  el backend con los datos demo. Desde la terminal:
+
+  ```powershell
+  cd backend\postman
+  npx newman run Coral_Shop.postman_collection.json --working-dir .
+  ```
+
 ---
 
 ## 4. Alternativa: levantar todo desde la terminal
@@ -275,43 +323,20 @@ npm run dev
 |---|---|
 | `npm run dev` | servidor de desarrollo con recarga automática |
 | `npm run lint` | revisa el código con ESLint |
-| `npm run build` | compila para producción en `dist/` (lo que se sube a Vercel u otro hosting) |
+| `npm run build` | compila para producción en `dist/` |
 | `npm run preview` | sirve `dist/` en local para probar el build |
 | `npm run build:compilado` | genera `compilado/index.html`, un único archivo que se abre con doble clic |
 
-El despliegue en Vercel se configura con `frontend/vercel.mjs` (ver sección
-«Desplegar el frontend en Vercel»).
-
-### Desplegar el frontend en Vercel
-
-Todavía no hay despliegue. Cuando se decida, el frontend queda listo para Vercel y solo
-hace falta configurar valores en el proyecto de Vercel, sin tocar el código:
-
-| Ajuste en Vercel | Valor |
-|---|---|
-| Root Directory | `frontend` |
-| Framework Preset | Vite (lo detecta solo) |
-| Build Command / Output Directory | `npm run build` / `dist` (por defecto) |
-| Variable de entorno `BACKEND_URL` | URL pública **https** del backend, sin `/api` al final (por ejemplo `https://api.coralshop.pe`) |
-
-`frontend/vercel.mjs` lee `BACKEND_URL` al desplegar y crea dos reglas: `/api/*` se
-reenvía al backend y cualquier otra ruta sirve `index.html` (React Router). Si la
-variable falta o no es https, el despliegue falla con un mensaje claro en lugar de
-publicar una tienda sin API.
-
-El navegador solo habla con el dominio de Vercel, así que la sesión (cookie
-`JSESSIONID`) y el token CSRF funcionan igual que en local: el backend no necesita CORS.
-El backend se despliega aparte (cualquier servicio que ejecute el JAR con `DB_URL`,
-`DB_USER` y `DB_PASSWORD`, sin el perfil `dev`). Al desplegar, comprueba que la subida de
-un diseño de casi 5 MB pasa por el reenvío de Vercel.
+`frontend/vercel.mjs` se conserva solo como punto de partida por si en el futuro se
+despliega en Vercel (lee la variable `BACKEND_URL`); hoy no se usa.
 
 ### Backend (`backend/`)
 
 | Comando | Qué hace |
 |---|---|
 | `./mvnw spring-boot:run` | ejecuta la API |
-| `./mvnw test` | ejecuta las pruebas |
-| `./mvnw package` | genera el JAR desplegable en `target/` |
+| `./mvnw test` | ejecuta las pruebas: unitarias y de integración (estas levantan un PostgreSQL en Docker con Testcontainers; sin Docker se omiten) |
+| `./mvnw package` | genera el JAR ejecutable en `target/` |
 | `java -jar target/coral-shop-backend-0.0.1-SNAPSHOT.jar` | ejecuta el JAR (con las mismas variables de entorno) |
 
 En Windows usa `.\mvnw.cmd` en lugar de `./mvnw`. En IntelliJ, estos mismos objetivos
@@ -329,6 +354,13 @@ python -m venv .venv
 .venv\Scripts\python -m pip install -r requirements.txt
 .\scripts\generar.ps1            # figuras + informe + presentación + PDFs
 .\scripts\generar.ps1 -SinPdf    # sin exportar a PDF (no necesita Office)
+```
+
+Las capturas reales del informe se toman aparte, con la aplicación levantada con el perfil
+`demo` (sección 3.1). Usa el Microsoft Edge instalado, así que no descarga navegadores:
+
+```powershell
+.venv\Scripts\python scripts\capturas.py --admin-password <DEMO_ADMIN_PASSWORD>
 ```
 
 Los archivos de `clase_entregables/` se regeneran: para cambiarlos se editan los
@@ -362,7 +394,6 @@ scripts, no el Word ni la PPT.
 
 ## Equipo — Grupo 1
 
-- Choquehuanca Marrufo, Liam Lennon
 - Damián Valdivia, Diego Aarón
 - Loayza Gerónimo, Juan Franco
 - Villanueva Montalvo, Apolo Chris

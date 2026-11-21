@@ -405,7 +405,7 @@ def proximos_pasos(doc):
         ("Fase 5 · Despliegue. Frontend en Vercel con la variable BACKEND_URL y backend en el servicio que se "
          "elija, verificando login, subida de diseño y pedido en producción.", "Fase 5 · Despliegue."),
         ("Fase 5 · Documentación. Informe y presentación finales con capturas reales de las pantallas y reparto "
-         "de la exposición entre los cinco integrantes.", "Fase 5 · Documentación."),
+         "de la exposición entre los cuatro integrantes.", "Fase 5 · Documentación."),
         ("Fase 6 · Pasarela real. Pago en sandbox con confirmación por webhook, detrás de la misma interfaz "
          "PaymentGateway que hoy usa el pago simulado.", "Fase 6 · Pasarela real."),
     ]:

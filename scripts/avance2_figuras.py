@@ -71,7 +71,7 @@ def analogia(ax, y, h, lineas):
 # ===================================================== 1 · el taller en capas
 def fig_taller():
     fig, ax = lienzo(10, 5.4, 100, 54)
-    titulo_figura(ax, 3, 49, "Figura A1 · Arquitectura en capas",
+    titulo_figura(ax, 3, 49, "Arquitectura en capas",
                   "El taller de Coral Shop en capas", size_k=8, size_t=14)
 
     # taller
@@ -123,7 +123,7 @@ def fig_taller():
 # ======================================================= 2 · pedido en capas
 def fig_pedido_capas():
     fig, ax = lienzo(10, 7.4, 100, 74)
-    titulo_figura(ax, 3, 69, "Figura A2 · Arquitectura en capas",
+    titulo_figura(ax, 3, 69, "Arquitectura en capas",
                   "Crear el pedido de 12 polos bordados: el recorrido por las tres capas", size_k=8, size_t=14)
 
     persona(ax, 9, 59, PRIMARY, "Cliente")
@@ -169,7 +169,7 @@ def fig_pedido_capas():
 def fig_cliente_servidor():
     n_tablas, _, _ = esquema.totales()
     fig, ax = lienzo(10, 6.4, 100, 64)
-    titulo_figura(ax, 3, 59.5, "Figura A3 · Arquitectura cliente-servidor",
+    titulo_figura(ax, 3, 59.5, "Arquitectura cliente-servidor",
                   "Varios clientes, un servidor de aplicación y una base de datos", size_k=8, size_t=14)
     analogia(ax, 48.5, 8, "Los pedidos llegan por varios canales (la tienda web, el panel del taller, las pruebas), "
              "pero todos van a\nun único taller central que guarda la lista de precios y el stock oficiales. Ningún "
@@ -209,7 +209,7 @@ def fig_cliente_servidor():
 # ================================================================== 4 · MVC
 def fig_mvc():
     fig, ax = lienzo(10, 6.6, 100, 66)
-    titulo_figura(ax, 3, 61, "Figura A4 · Modelo-Vista-Controlador",
+    titulo_figura(ax, 3, 61, "Modelo-Vista-Controlador",
                   "MVC con React como vista y Spring como controlador", size_k=8, size_t=14)
     analogia(ax, 48.5, 9, "Modelo = la ficha técnica del pedido (tallas, técnica, zonas, precio y sus reglas).\n"
              "Vista = la vista previa del polo con el logo que el cliente mira en pantalla.\n"
@@ -249,7 +249,7 @@ def fig_mvc():
 # ============================================================ 5 · eventos
 def fig_eventos():
     fig, ax = lienzo(10, 6.8, 100, 68)
-    titulo_figura(ax, 3, 63, "Figura A5 · Arquitectura dirigida por eventos",
+    titulo_figura(ax, 3, 63, "Arquitectura dirigida por eventos",
                   "El evento OrderStatusChanged, implementado en la fase 4", size_k=8, size_t=14)
     etiqueta(ax, 72, 61.5, 25, 3.6, "IMPLEMENTADO · MIGRACIÓN V6", fill=GREEN, size=7)
     analogia(ax, 49.5, 9, "Cuando un pedido cambia de etapa, el jefe de taller toca la campana. Control interno lo "

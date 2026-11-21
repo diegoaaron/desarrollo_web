@@ -1,0 +1,726 @@
+{
+  "info": {
+    "name": "Coral Shop API",
+    "description": "Historia de referencia de la demo: un cliente personaliza 12 polos con su logo bordado en el pecho (4 S, 4 M, 4 L), paga y el administrador lleva el pedido hasta ENTREGADO.\n\nRequisitos: backend con los perfiles dev,demo (datos demo cargados). Ejecuta las carpetas en orden con el Collection Runner. Cada escritura pide antes su token CSRF (script de la colección). Documentación completa de la API: {{baseUrl}}/api/docs",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Antes de cada escritura pide un token CSRF nuevo (la sesión lo exige en POST, PUT y DELETE).",
+          "if (pm.request.method !== 'GET') {",
+          "  pm.sendRequest({ url: pm.variables.get('baseUrl') + '/api/auth/csrf', method: 'GET' }, (err, res) => {",
+          "    if (err) { console.error(err); return; }",
+          "    pm.request.headers.upsert({ key: 'X-CSRF-TOKEN', value: res.json().token });",
+          "  });",
+          "}"
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8082"
+    },
+    {
+      "key": "customerEmail",
+      "value": "renzo.paredes@demo.coralshop.pe"
+    },
+    {
+      "key": "customerPassword",
+      "value": "Cliente2026"
+    },
+    {
+      "key": "adminEmail",
+      "value": "diego@diego.com"
+    },
+    {
+      "key": "adminPassword",
+      "value": "diego989"
+    },
+    {
+      "key": "designId",
+      "value": ""
+    },
+    {
+      "key": "productId",
+      "value": ""
+    },
+    {
+      "key": "variantS",
+      "value": ""
+    },
+    {
+      "key": "variantM",
+      "value": ""
+    },
+    {
+      "key": "variantL",
+      "value": ""
+    },
+    {
+      "key": "addressId",
+      "value": ""
+    },
+    {
+      "key": "orderCode",
+      "value": ""
+    },
+    {
+      "key": "orderId",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "1 · Cliente: personalizar, comprar y pagar",
+      "item": [
+        {
+          "name": "1. Token CSRF",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/auth/csrf"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('trae token', () => pm.expect(pm.response.json().token).to.be.a('string'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "2. Iniciar sesión (cliente demo)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/api/auth/login",
+            "description": "Formulario email/password. Deja la cookie JSESSIONID en el cookie jar de Postman.",
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "email",
+                  "value": "{{customerEmail}}",
+                  "type": "text"
+                },
+                {
+                  "key": "password",
+                  "value": "{{customerPassword}}",
+                  "type": "text"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('es el cliente', () => pm.expect(pm.response.json().email).to.eql(pm.collectionVariables.get('customerEmail')));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "3. Catálogo: polos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/products?type=POLO&q=cl%C3%A1sico"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 200', () => pm.response.to.have.status(200));",
+                  "const p = pm.response.json().items.find(i => i.name === 'Polo clásico de algodón');",
+                  "pm.test('encuentra el polo clásico', () => pm.expect(p).to.be.an('object'));",
+                  "pm.collectionVariables.set('productId', p.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "4. Ficha del producto (variantes)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/products/{{productId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 200', () => pm.response.to.have.status(200));",
+                  "const v = pm.response.json().variants.filter(x => x.color === 'Negro');",
+                  "['S', 'M', 'L'].forEach(t => pm.collectionVariables.set('variant' + t, v.find(x => x.size === t).id));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "5. Opciones de personalización",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/products/{{productId}}/customization-options"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('ofrece bordado', () => pm.expect(pm.response.json().techniques.map(t => t.code)).to.include('BORDADO'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "6. Subir el logo",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/api/designs",
+            "description": "Sube logo-demo.png (está junto a la colección). En la app de Postman, si no lo encuentra, elige ese archivo (o cualquier PNG/JPG de hasta 5 MB) en la pestaña Body.",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": "logo-demo.png"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 201', () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set('designId', pm.response.json().id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "7. Cotizar 12 polos bordados",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/quotes",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"lines\": [\n    {\n      \"productId\": {{productId}},\n      \"techniqueCode\": \"BORDADO\",\n      \"zoneCodes\": [\n        \"PECHO_IZQ\"\n      ],\n      \"designId\": {{designId}},\n      \"items\": [\n        {\n          \"variantId\": {{variantS}},\n          \"quantity\": 4\n        },\n        {\n          \"variantId\": {{variantM}},\n          \"quantity\": 4\n        },\n        {\n          \"variantId\": {{variantL}},\n          \"quantity\": 4\n        }\n      ]\n    }\n  ]\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 200', () => pm.response.to.have.status(200));",
+                  "const q = pm.response.json();",
+                  "pm.test('carrito válido', () => pm.expect(q.valid).to.be.true);",
+                  "pm.test('aplica la docena', () => pm.expect(q.lines[0].tier.minQuantity).to.eql(12));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "8. Mis direcciones",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/addresses"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('addressId', pm.response.json()[0].id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "9. Crear pedido",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/orders",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"lines\": [\n    {\n      \"productId\": {{productId}},\n      \"techniqueCode\": \"BORDADO\",\n      \"zoneCodes\": [\n        \"PECHO_IZQ\"\n      ],\n      \"designId\": {{designId}},\n      \"items\": [\n        {\n          \"variantId\": {{variantS}},\n          \"quantity\": 4\n        },\n        {\n          \"variantId\": {{variantM}},\n          \"quantity\": 4\n        },\n        {\n          \"variantId\": {{variantL}},\n          \"quantity\": 4\n        }\n      ]\n    }\n  ],\n  \"addressId\": {{addressId}},\n  \"shippingMethodCode\": \"LIMA_METROPOLITANA\",\n  \"customerNote\": \"Pedido desde Postman\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 201', () => pm.response.to.have.status(201));",
+                  "const o = pm.response.json();",
+                  "pm.test('queda pendiente de pago', () => pm.expect(o.status).to.eql('PENDIENTE_PAGO'));",
+                  "pm.collectionVariables.set('orderCode', o.orderCode);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "10. Pagar (tarjeta de prueba aprobada)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/orders/{{orderCode}}/payment",
+            "description": "Pasarela simulada: 4111 1111 1111 1111 se aprueba; 4000 0000 0000 0002 se rechaza por fondos.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cardNumber\": \"4111 1111 1111 1111\",\n  \"cardHolder\": \"CLIENTE DEMO\",\n  \"expiryMonth\": 12,\n  \"expiryYear\": 2030,\n  \"cvv\": \"123\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('pedido pagado', () => pm.expect(pm.response.json().orderStatus).to.eql('PAGADO'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "11. Mis pedidos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/orders/me"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "12. Detalle de mi pedido",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/orders/me/{{orderCode}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('orderId', pm.response.json().id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "13. Mis notificaciones",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/notifications/me"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "14. Cerrar sesión",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/api/auth/logout"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 204', () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "2 · Administrador: llevar el pedido a ENTREGADO",
+      "item": [
+        {
+          "name": "1. Iniciar sesión (administrador)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/api/auth/login",
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "email",
+                  "value": "{{adminEmail}}",
+                  "type": "text"
+                },
+                {
+                  "key": "password",
+                  "value": "{{adminPassword}}",
+                  "type": "text"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "2. Bandeja de pedidos pagados",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/orders?status=PAGADO"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "3. Detalle del pedido",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/orders/{{orderId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "4. Pasar a EN_PRODUCCION",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/orders/{{orderId}}/status",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"EN_PRODUCCION\",\n  \"comment\": \"Diseño aprobado\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('estado EN_PRODUCCION', () => pm.expect(pm.response.json().status).to.eql('EN_PRODUCCION'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "5. Pasar a LISTO_PARA_ENVIO",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/orders/{{orderId}}/status",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"LISTO_PARA_ENVIO\",\n  \"comment\": \"Bordado listo\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('estado LISTO_PARA_ENVIO', () => pm.expect(pm.response.json().status).to.eql('LISTO_PARA_ENVIO'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "6. Pasar a ENVIADO",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/orders/{{orderId}}/status",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"ENVIADO\",\n  \"comment\": \"Entregado al courier\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('estado ENVIADO', () => pm.expect(pm.response.json().status).to.eql('ENVIADO'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "7. Pasar a ENTREGADO",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/orders/{{orderId}}/status",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"ENTREGADO\",\n  \"comment\": \"Recibido por el cliente\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('estado ENTREGADO', () => pm.expect(pm.response.json().status).to.eql('ENTREGADO'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "8. Resumen del tablero",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/stats/overview"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "9. Cerrar sesión",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/api/auth/logout"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 204', () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "3 · Errores esperados",
+      "item": [
+        {
+          "name": "Sin sesión → 401",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/orders/me"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 401', () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Cuerpo inválido → 400",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/quotes",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"lines\": []\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Producto inexistente → 404",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/products/999999"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 404', () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
